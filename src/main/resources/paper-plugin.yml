@@ -1,0 +1,4 @@
+name: Last Life for Extra Life
+version: '0.0.1'
+main: com.dragon.lastlife.Initializer
+api-version: '1.21'
