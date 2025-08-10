@@ -3,8 +3,9 @@ plugins {
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
-group = 'com.dragon'
-version = '0.0.1'
+group = "com.dragon"
+version = "${project_version}-MC${minecraft_version}-${build_status}.${build_number}"
+
 
 repositories {
     mavenCentral()
@@ -22,7 +23,13 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:${minecraft_version}-${paperweight_build}")
+    implementation "org.json:json:$json_version"
+    implementation "com.quiptmc:core:${quipt_version}"
+    implementation "com.quiptmc:common:${quipt_version}"
+    implementation "com.quiptmc:paper:${quipt_version}"
+    compileOnly "org.eclipse.jetty:jetty-server:$jetty_server_version"
+    compileOnly "org.eclipse.jetty:jetty-servlet:$jetty_servlet_version"
 }
 
 tasks {
@@ -30,11 +37,11 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21")
+        minecraftVersion("${minecraft_version}")
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = Integer.parseInt("${java_version}")
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion
@@ -43,6 +50,13 @@ java {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
 }
+
+tasks.register("copyGradleProperties", Copy) {
+    from rootProject.file('gradle.properties')
+    into "src/main/resources/"
+}
+
+tasks.processResources.dependsOn("copyGradleProperties")
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
@@ -53,7 +67,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 processResources {
-    def props = [version: version]
+    def props = [minecraft_version: minecraft_version, author: author, name: rootProject.name, project_version: project_version]
     inputs.properties props
     filteringCharset 'UTF-8'
     filesMatching('paper-plugin.yml') {
