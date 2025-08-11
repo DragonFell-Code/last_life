@@ -1,28 +1,65 @@
 package com.dragon.lastlife;
 
-import com.quiptmc.minecraft.CoreUtils;
-import com.quiptmc.minecraft.utils.loaders.ServerLoader;
-import com.quiptmc.paper.api.PaperIntegration;
+import com.dragon.lastlife.party.Party;
+import com.dragon.lastlife.utils.Utils;
+import com.quiptmc.core.QuiptIntegration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.util.Map;
 
 public final class Initializer extends JavaPlugin {
 
+    private LastLife integration;
+
     @Override
     public void onEnable() {
-        PaperIntegration quipt = new LastLife("LastLife", new ServerLoader<>(ServerLoader.Type.PAPER, this));
-        CoreUtils.init(quipt);
+        integration = new LastLife();
+        integration.enable();
+        Utils.init(this);
+        getLogger().info("LastLife plugin has been enabled successfully.");
+    }
 
+    public LastLife integration() {
+        return integration;
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
     }
-    public static class LastLife extends PaperIntegration {
+
+    public class LastLife extends QuiptIntegration {
+
+        File dataFolder = new File("plugins/" + getName());
 
 
-        public LastLife(String name, ServerLoader<JavaPlugin> loader) {
-            super(name, loader);
+        @Override
+        public void enable() {
+            if (!dataFolder.exists()) {
+                log("Initializer", "Attempting to create data folder (" + dataFolder.getPath() + "): " + dataFolder.mkdirs());
+            }
+            // Initialize other components here, e.g., HeartbeatUtils, LocationUtils, etc.
+        }
+
+        @Override
+        public void log(String tag, String message) {
+            getLogger().info("[%s] %s".formatted(tag, message));
+        }
+
+        @Override
+        public File dataFolder() {
+            return dataFolder;
+        }
+
+        @Override
+        public String name() {
+            return getName();
+        }
+
+        @Override
+        public String version() {
+            return getPluginMeta().getVersion();
         }
     }
 }

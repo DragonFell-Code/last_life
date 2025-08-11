@@ -42,8 +42,6 @@ public class Loader implements PluginLoader {
 
         central.addRepository(new RemoteRepository.Builder("central", "default", MavenLibraryResolver.MAVEN_CENTRAL_DEFAULT_MIRROR).build());
         central.addDependency(new Dependency(new DefaultArtifact("org.json:json:" + properties.getProperty("json_version")), null));
-        central.addDependency(new Dependency(new DefaultArtifact("org.eclipse.jetty:jetty-server:" + properties.getProperty("jetty_server_version")), null));
-        central.addDependency(new Dependency(new DefaultArtifact("org.eclipse.jetty:jetty-servlet:" + properties.getProperty("jetty_servlet_version")), null));
 
         MavenLibraryResolver quipt = new MavenLibraryResolver();
         Authentication auth = new AuthenticationBuilder()
@@ -53,8 +51,6 @@ public class Loader implements PluginLoader {
 
         quipt.addRepository(new RemoteRepository.Builder("quipt", "default", "https://maven.pkg.github.com/Quipt-Minecraft/quipt").setAuthentication(auth).build());
         quipt.addDependency(new Dependency(new DefaultArtifact("com.quiptmc:core:" + properties.getProperty("quipt_version")), null));
-        quipt.addDependency(new Dependency(new DefaultArtifact("com.quiptmc:common:" + properties.getProperty("quipt_version")), null));
-        quipt.addDependency(new Dependency(new DefaultArtifact("com.quiptmc:paper:" + properties.getProperty("quipt_version")), null));
         classpathBuilder.addLibrary(quipt);
 
         classpathBuilder.addLibrary(central);

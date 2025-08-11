@@ -26,10 +26,6 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:${minecraft_version}-${paperweight_build}")
     implementation "org.json:json:$json_version"
     implementation "com.quiptmc:core:${quipt_version}"
-    implementation "com.quiptmc:common:${quipt_version}"
-    implementation "com.quiptmc:paper:${quipt_version}"
-    compileOnly "org.eclipse.jetty:jetty-server:$jetty_server_version"
-    compileOnly "org.eclipse.jetty:jetty-servlet:$jetty_servlet_version"
 }
 
 tasks {
