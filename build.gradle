@@ -20,12 +20,20 @@ repositories {
             password = System.getenv("PACKAGES_TOKEN")
         }
     }
+//    maven {
+//        name = "OffsetMods538"
+//        url = "https://maven.offsetmonkey538.top/releases"
+//        content {
+//            includeGroup "top.offsetmonkey538.meshlib"
+//        }
+//    }
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:${minecraft_version}-${paperweight_build}")
     implementation "org.json:json:$json_version"
     implementation "com.quiptmc:core:${quipt_version}"
+//    implementation "top.offsetmonkey538.meshlib:mesh-lib-paper:${mesh_version}"
 }
 
 tasks {

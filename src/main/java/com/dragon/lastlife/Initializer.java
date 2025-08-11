@@ -1,12 +1,15 @@
 package com.dragon.lastlife;
 
-import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
+import com.quiptmc.core.config.ConfigManager;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.dragon.lastlife.listeners.PlayerListener;
+
+import java.awt.*;
 import java.io.File;
-import java.util.Map;
 
 public final class Initializer extends JavaPlugin {
 
@@ -18,6 +21,7 @@ public final class Initializer extends JavaPlugin {
         integration.enable();
         Utils.init(this);
         getLogger().info("LastLife plugin has been enabled successfully.");
+        new PlayerListener(this);
     }
 
     public LastLife integration() {
@@ -26,6 +30,7 @@ public final class Initializer extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        ConfigManager.saveAll();
         // Plugin shutdown logic
     }
 
@@ -60,6 +65,10 @@ public final class Initializer extends JavaPlugin {
         @Override
         public String version() {
             return getPluginMeta().getVersion();
+        }
+
+        public void warn(String s, String id) {
+            getLogger().warning("[%s] %s".formatted(s, id));
         }
     }
 }
