@@ -3,6 +3,7 @@ package com.dragon.lastlife.utils;
 import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.config.Configs;
 import com.dragon.lastlife.utils.chat.MessageUtils;
+import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
 import com.quiptmc.core.config.ConfigManager;
 import com.quiptmc.core.heartbeat.Flutter;
 import com.quiptmc.core.heartbeat.HeartbeatUtils;
@@ -19,6 +20,7 @@ public class Utils {
     public static void init(Initializer init) {
         initializer = init;
         configs = new Configs(init);
+        PlaceholderUtils.registerPlaceholders();
 
         HeartbeatUtils.init(init.integration());
         HeartbeatUtils.heartbeat(init.integration()).flutter(new Flutter() {

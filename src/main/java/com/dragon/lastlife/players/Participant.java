@@ -4,6 +4,7 @@ import com.quiptmc.core.config.ConfigObject;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -16,6 +17,7 @@ public class Participant extends ConfigObject {
     public String team;
     public boolean boogie;
     public int lives;
+    private final LifeManager lifeManager = new LifeManager();
 
     public Participant(){
     }
@@ -27,44 +29,95 @@ public class Participant extends ConfigObject {
         this.boogie = false;
     }
 
-    public void addLife() {
-        addLife(1);
+    public LifeManager lives() {
+        return lifeManager;
     }
 
-    public void addLife(int amount) {
-        lives = lives + amount;
-       updateName();
+    public boolean spectating() {
+        Player player = player().getPlayer();
+        return player != null && player.isOnline() && player.getGameMode() == GameMode.SPECTATOR;
     }
 
-    public void updateName(){
-        if (lives == 0) {
-            setColor(NamedTextColor.GRAY);
-        }
-        if (lives == 1) {
-            setColor(NamedTextColor.RED);
-        }
-        if (lives == 2) {
-            setColor(NamedTextColor.YELLOW);
-        }
-        if (lives == 3) {
-            setColor(NamedTextColor.GREEN);
-        }
-        if (lives > 3) {
-            setColor(NamedTextColor.DARK_GREEN);
+    private void spectate(){
+        Player player = player().getPlayer();
+        if(player!= null && player.isOnline()){
+            player.setGameMode(GameMode.SPECTATOR);
+            player.setHealth(player.getHealthScale());
         }
     }
+
+
 
     public OfflinePlayer player() {
         return Bukkit.getOfflinePlayer(UUID.fromString(id));
     }
 
-    public void setColor(NamedTextColor color) {
+    public void color(NamedTextColor color) {
         Player player = player().getPlayer();
         if (player != null && player.isOnline()) {
             Component value = text(player.getName(), color);
             player.displayName(value);
             player.playerListName(value);
             player.customName(value);
+        }
+    }
+
+    public class LifeManager {
+
+        public void update(){
+            if(lives <= 0){
+                color(NamedTextColor.GRAY);
+                lives = 0;
+                spectate();
+            } else if (spectating()){
+                Player player = player().getPlayer();
+                if(player != null && player.isOnline()){
+                    player.setGameMode(GameMode.SURVIVAL);
+                    player.setHealth(player.getHealthScale());
+                }
+            }
+            if (lives == 1) {
+                color(NamedTextColor.RED);
+            }
+            if (lives == 2) {
+                color(NamedTextColor.YELLOW);
+            }
+            if (lives == 3) {
+                color(NamedTextColor.GREEN);
+            }
+            if (lives > 3) {
+                color(NamedTextColor.DARK_GREEN);
+            }
+        }
+        public int add() {
+            return edit(1);
+        }
+
+        public int add(int amount) {
+            return edit(amount);
+        }
+
+        public int remove() {
+            return edit(-1);
+        }
+
+        public int remove(int amount) {
+            return edit(-amount);
+        }
+
+        public int edit(int amount) {
+            int lives = Participant.this.lives + amount;
+            return set(lives);
+        }
+
+        public int set(int lives) {
+            Participant.this.lives = lives;
+            update();
+            return lives();
+        }
+
+        public int lives() {
+            return Participant.this.lives;
         }
     }
 }

@@ -7,6 +7,7 @@ import com.quiptmc.core.data.registries.Registries;
 import com.quiptmc.core.data.registries.Registry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +56,7 @@ public class MessageUtils {
         register("cmd.session.end", "{\"text\":\"Session ended\",\"color\":\"green\"}");
         register("cmd.session.reward", "{\"text\":\"You have been rewarded with [0]\",\"color\":\"green\"}");
         register("cmd.session.task", "{\"text\":\"You have been assigned the task [0]\",\"color\":\"green\"}");
+        register("lastlife.death.elimination", text("[0]", NamedTextColor.RED).append(text(" has been eliminated!", NamedTextColor.WHITE)));
     }
 
     public Component deserialize(JSONObject json) {

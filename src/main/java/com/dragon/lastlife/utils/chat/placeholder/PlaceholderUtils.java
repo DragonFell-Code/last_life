@@ -1,5 +1,6 @@
 package com.dragon.lastlife.utils.chat.placeholder;
 
+import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.data.registries.Registries;
 import com.quiptmc.core.data.registries.Registry;
 import net.kyori.adventure.identity.Identity;
@@ -17,16 +18,17 @@ public class PlaceholderUtils {
 
     public static void registerPlaceholders() {
         registerPlaceholder("name", player ->player.orElseThrow().getName());
+        registerPlaceholder("lives", player -> String.valueOf(Utils.configs().PARTICIPANT_CONFIG.get(player.orElseThrow().getUniqueId()).lives().lives()));
     }
 
     public static void registerPlaceholder(String key, Placeholder worker) {
-        registry.register("%" + key + "%", worker);
+        registry.register(key, worker);
     }
 
     public static Component replace(@Nullable Player player, Component component) {
         return component.replaceText(builder -> {
             for (Entry<String, Placeholder> e : registry.toMap().entrySet()) {
-                builder.match(e.getKey()).replacement(e.getValue().run(Optional.ofNullable(player)));
+                builder.match("\\$\\{" + e.getKey() + "\\}").replacement(e.getValue().run(Optional.ofNullable(player)));
             }
         });
     }
