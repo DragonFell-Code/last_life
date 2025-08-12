@@ -37,7 +37,6 @@ public class Loader implements PluginLoader {
             }
 
         }
-        System.out.println(properties);
         MavenLibraryResolver central = new MavenLibraryResolver();
 
         central.addRepository(new RemoteRepository.Builder("central", "default", MavenLibraryResolver.MAVEN_CENTRAL_DEFAULT_MIRROR).build());

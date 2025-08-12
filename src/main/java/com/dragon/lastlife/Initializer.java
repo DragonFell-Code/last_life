@@ -10,6 +10,7 @@ import com.dragon.lastlife.listeners.PlayerListener;
 
 import java.awt.*;
 import java.io.File;
+import java.lang.constant.DynamicConstantDesc;
 
 public final class Initializer extends JavaPlugin {
 
@@ -19,6 +20,7 @@ public final class Initializer extends JavaPlugin {
     public void onEnable() {
         integration = new LastLife();
         integration.enable();
+        System.out.println("TEST: " + namespace());
         Utils.init(this);
         getLogger().info("LastLife plugin has been enabled successfully.");
         new PlayerListener(this);
