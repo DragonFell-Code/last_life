@@ -6,6 +6,7 @@ import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.dragon.lastlife.utils.chat.MessageUtils;
 import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
+import com.quiptmc.core.config.ConfigManager;
 import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -38,13 +39,14 @@ public class PlayerListener implements Listener {
                     String[] args = argsRaw.contains(" ") ? argsRaw.split(" ") : new String[]{argsRaw};
                     System.out.println("Command: " + label + " Args: " + String.join(" ", args));
                     if (label.equals("packet")) {
-                        Utils.configs().PARTICIPANT_CONFIG.get(e.getPlayer().getUniqueId()).sync();
-//                        MessageChannelHandler handler = Utils.channelMessageHandler();
-//                        handler.send("data", e.getPlayer(), (byte) 1, json.toString(), 1);
-//                        Utils.channelMessageHandler().send(Utils.OUTGOING_CHANNEL, e.getPlayer(), json.toString(), 1, (byte) 1);
-
+                        Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId()).sync();
                         e.getPlayer().sendMessage(text("Sent packet!", NamedTextColor.GREEN));
                     }
+
+                    if(label.equalsIgnoreCase("config")){
+                        ConfigManager.reloadConfig(Utils.initializer().integration(), ParticipantConfig.class);
+                    }
+
                     if (label.equals("lives")) {
                         if (args.length != 2) {
                             e.getPlayer().sendMessage(text("Usage: !lives <player> <amount>", NamedTextColor.RED));
@@ -58,11 +60,11 @@ public class PlayerListener implements Listener {
                             e.getPlayer().sendMessage((text("Invalid number: " + args[1], NamedTextColor.RED)));
                             return;
                         }
-                        Participant participant = Utils.configs().PARTICIPANT_CONFIG.get(e.getPlayer().getUniqueId());
+                        Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId());
                         int lives = participant.lives().edit(amount);
                         MessageUtils messages = Utils.configs().MESSAGE_CONFIG;
                         e.getPlayer().sendMessage(PlaceholderUtils.replace(e.getPlayer(), "Lives: ${lives}"));
-                        Utils.configs().PARTICIPANT_CONFIG.save();
+                        Utils.configs().PARTICIPANT_CONFIG().save();
                     } else {
                         e.getPlayer().performCommand(label);
                     }
@@ -73,7 +75,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
-        ParticipantConfig config = Utils.configs().PARTICIPANT_CONFIG;
+        ParticipantConfig config = Utils.configs().PARTICIPANT_CONFIG();
         Participant participant = config.get(e.getEntity().getUniqueId());
         if (participant.lives().remove() <= 0) {
             e.setCancelled(true);
@@ -87,7 +89,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent e) {
         TaskScheduler.scheduleAsyncTask(() -> {
-            Utils.configs().PARTICIPANT_CONFIG.get(e.getPlayer().getUniqueId()).sync();
+            Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId()).sync();
 
         }, 500, TimeUnit.MILLISECONDS);
         e.getPlayer().sendMessage(Utils.configs().MESSAGE_CONFIG.parse(text("Welcome to Last Life! ${cmd.session.start}", NamedTextColor.GOLD)));

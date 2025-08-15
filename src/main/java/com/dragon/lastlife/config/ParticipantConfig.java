@@ -24,7 +24,7 @@ public class ParticipantConfig extends Config {
         if (cache.contains(uuid.toString())) {
             return cache.get(uuid.toString());
         }
-        Participant participant = new Participant(uuid.toString(), "none", 3);
+        Participant participant = new Participant(uuid.toString(), "none", 3, "null");
         cache.put(participant);
         save();
         return participant;

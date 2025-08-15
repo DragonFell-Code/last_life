@@ -7,6 +7,7 @@ import com.quiptmc.core.config.ConfigObject;
 public class Factories {
 
     public final ParticipantFactory PARTICIPANT_FACTORY = register(new ParticipantFactory());
+    public final DonationFactory DONATION_FACTORY = register(new DonationFactory());
 
     public <T extends ConfigObject.Factory<?>> T register(T factory) {
         Utils.initializer().integration().log("Factories", "Registering factory: " + factory.getClass().getName());

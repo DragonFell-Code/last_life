@@ -20,15 +20,17 @@ public class Participant extends ConfigObject {
     public String team;
     public boolean boogie;
     public int lives;
+    public String donorDriveId;
 
     public Participant() {
     }
 
-    public Participant(String id, String team, int lives) {
+    public Participant(String id, String team, int lives, String donorDriveId) {
         this.id = id;
         this.team = team;
         this.lives = lives;
         this.boogie = false;
+        this.donorDriveId = donorDriveId;
     }
 
     public LifeManager lives() {

@@ -2,6 +2,7 @@ package com.dragon.lastlife.utils;
 
 import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.config.Configs;
+import com.dragon.lastlife.donations.DonationFlutter;
 import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
 import com.dragon.lastlife.utils.net.MessageChannel;
 import com.dragon.lastlife.utils.net.MessageChannelHandler;
@@ -17,6 +18,25 @@ public class Utils {
     private static Configs configs;
 
     private static MessageChannelHandler channelMessageHandler;
+
+
+
+
+    private static final Flutter SAVE_FLUTTER = new Flutter() {
+        private long lastHeartbeat = 0;
+        private long delay = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
+
+        @Override
+        public boolean run() {
+
+            long now = System.currentTimeMillis();
+            if(lastHeartbeat + delay <= now) {
+                lastHeartbeat = now;
+                ConfigManager.saveAll();
+            }
+            return true;
+        }
+    };
 //    private static
 
 
@@ -33,22 +53,20 @@ public class Utils {
             init.integration().log("Utils", "Registered outgoing channel: " + channel.name);
         }
 
-        HeartbeatUtils.init(init.integration());
-        HeartbeatUtils.heartbeat(init.integration()).flutter(new Flutter() {
-            private long lastHeartbeat = 0;
-            private long delay = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
+        setupHeartbeat();
+    }
 
-            @Override
-            public boolean run() {
-                long now = System.currentTimeMillis();
-                if(lastHeartbeat + delay <= now) {
-                    lastHeartbeat = now;
-                    ConfigManager.saveAll();
-                }
-                return true;
-            }
-        });
+    private static void setupHeartbeat() {
+        System.out.println("Setting up heartbeats...");
 
+        try {
+            HeartbeatUtils.init(initializer().integration());
+
+            HeartbeatUtils.heartbeat(initializer().integration()).flutter(SAVE_FLUTTER);
+            HeartbeatUtils.heartbeat(initializer().integration()).flutter(new DonationFlutter(configs().DONATION_CONFIG()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Initializer initializer(){

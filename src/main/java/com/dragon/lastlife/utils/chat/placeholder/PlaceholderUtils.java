@@ -18,7 +18,7 @@ public class PlaceholderUtils {
 
     public static void registerPlaceholders() {
         registerPlaceholder("name", player ->player.orElseThrow().getName());
-        registerPlaceholder("lives", player -> String.valueOf(Utils.configs().PARTICIPANT_CONFIG.get(player.orElseThrow().getUniqueId()).lives().lives()));
+        registerPlaceholder("lives", player -> String.valueOf(Utils.configs().PARTICIPANT_CONFIG().get(player.orElseThrow().getUniqueId()).lives().lives()));
     }
 
     public static void registerPlaceholder(String key, Placeholder worker) {
