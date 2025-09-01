@@ -14,7 +14,6 @@ public class DonationFlutter implements Flutter {
     private final int MAX_LIMIT = 100;
     private final String API_ENDPOINT = "https://www.extra-life.org/api/";
     private final long LOOP_DELAY = 15000;
-    private final DonationConfig config;
     private long LAST_HEARTBEAT = 0;
     private NetworkUtils.Get GET;
 
@@ -22,7 +21,7 @@ public class DonationFlutter implements Flutter {
         if (config == null) {
             throw new IllegalArgumentException("DonationConfig cannot be null");
         }
-        this.config = config;
+//        this.config = config;
         GET = NetworkUtils.GET.defaults(config.etag);
     }
 
@@ -32,6 +31,7 @@ public class DonationFlutter implements Flutter {
         if (now - LAST_HEARTBEAT >= LOOP_DELAY) {
             System.out.println("Running DonationFlutter at " + now);
             LAST_HEARTBEAT = now;
+            DonationConfig config = Utils.configs().DONATION_CONFIG();
 
             try {
                 HttpResponse<String> response = NetworkUtils.get(GET, API_ENDPOINT + "teams/" + config.teamId);

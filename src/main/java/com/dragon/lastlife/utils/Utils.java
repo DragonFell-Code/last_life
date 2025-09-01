@@ -14,14 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Utils {
 
-    private static Initializer initializer;
-    private static Configs configs;
-
-    private static MessageChannelHandler channelMessageHandler;
-
-
-
-
     private static final Flutter SAVE_FLUTTER = new Flutter() {
         private long lastHeartbeat = 0;
         private long delay = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
@@ -30,15 +22,17 @@ public class Utils {
         public boolean run() {
 
             long now = System.currentTimeMillis();
-            if(lastHeartbeat + delay <= now) {
+            if (lastHeartbeat + delay <= now) {
                 lastHeartbeat = now;
                 ConfigManager.saveAll();
             }
             return true;
         }
     };
+    private static Initializer initializer;
+    private static Configs configs;
+    private static MessageChannelHandler channelMessageHandler;
 //    private static
-
 
     public static void init(Initializer init) {
         initializer = init;
@@ -47,12 +41,11 @@ public class Utils {
 
         channelMessageHandler = new MessageChannelHandler(init);
         MessageChannel channel = channelMessageHandler().register(MessageChannel.Type.OUTGOING, "data", null);
-        if(channel == null) {
+        if (channel == null) {
             init.integration().log("Utils", "Failed to register outgoing channel 'data'.");
         } else {
             init.integration().log("Utils", "Registered outgoing channel: " + channel.name);
         }
-
         setupHeartbeat();
     }
 
@@ -69,7 +62,7 @@ public class Utils {
         }
     }
 
-    public static Initializer initializer(){
+    public static Initializer initializer() {
         return initializer;
     }
 

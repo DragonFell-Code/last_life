@@ -1,6 +1,7 @@
 package com.dragon.lastlife.listeners;
 
 import com.dragon.lastlife.Initializer;
+import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
@@ -11,9 +12,11 @@ import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +47,7 @@ public class PlayerListener implements Listener {
                     }
 
                     if(label.equalsIgnoreCase("config")){
-                        ConfigManager.reloadConfig(Utils.initializer().integration(), ParticipantConfig.class);
+                        ConfigManager.reloadConfig(Utils.initializer().integration(), DonationConfig.class);
                     }
 
                     if (label.equals("lives")) {
@@ -82,6 +85,19 @@ public class PlayerListener implements Listener {
             e.getPlayer().getWorld().strikeLightningEffect(e.getPlayer().getLocation());
             Bukkit.broadcast(Utils.configs().MESSAGE_CONFIG.get("lastlife.death.elimination", e.getPlayer().name()));
         }
+        if(e.getDamageSource().getCausingEntity() != null && e.getDamageSource().getCausingEntity() instanceof Player killer){
+            Participant killerParticipant = config.get(killer.getUniqueId());
+            if(killerParticipant != null){
+                if(killerParticipant.boogey) {
+                    killer.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.cured"));
+                    killerParticipant.boogey = false;
+                }
+//                killerParticipant.stats.deaths++;
+//                killerParticipant.stats.kills++;
+                killerParticipant.sync();
+            }
+
+        }
         config.save();
 
     }
@@ -93,5 +109,14 @@ public class PlayerListener implements Listener {
 
         }, 500, TimeUnit.MILLISECONDS);
         e.getPlayer().sendMessage(Utils.configs().MESSAGE_CONFIG.parse(text("Welcome to Last Life! ${cmd.session.start}", NamedTextColor.GOLD)));
+        Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId());
+        if(participant.settings.get("boogey_particles") == null){
+            Participant.ConfigString string = new Participant.ConfigString("boogey_particles", "flame");
+            participant.settings.put(string);
+        }
+        JSONObject json = participant.settings.json();
+        e.getPlayer().sendMessage(participant.settings.get("boogey_particles").toString());
+        Utils.configs().PARTICIPANT_CONFIG().save();
+        System.out.println(json.toString(2));
     }
 }

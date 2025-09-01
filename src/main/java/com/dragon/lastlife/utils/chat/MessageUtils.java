@@ -57,6 +57,10 @@ public class MessageUtils {
         register("cmd.session.reward", "{\"text\":\"You have been rewarded with [0]\",\"color\":\"green\"}");
         register("cmd.session.task", "{\"text\":\"You have been assigned the task [0]\",\"color\":\"green\"}");
         register("lastlife.death.elimination", text("[0]", NamedTextColor.RED).append(text(" has been eliminated!", NamedTextColor.WHITE)));
+        register("cmd.boogey.set", text("[0]", NamedTextColor.GREEN).append(text(" boogeyman state set to ", NamedTextColor.YELLOW).append(text("[1]", NamedTextColor.GOLD))));
+        register("lastlife.boogey.roll.multiple", text("[0] boogeymen are about to be selected.", NamedTextColor.RED));
+        register("lastlife.boogey.roll", text("[0] boogeyman is about to be selected.", NamedTextColor.RED));
+        register("lastlife.boogey.cured", text("You've been cured! You are no longer a boogeyman.", NamedTextColor.GREEN));
     }
 
     public Component deserialize(JSONObject json) {

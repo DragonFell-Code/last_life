@@ -1,16 +1,17 @@
 package com.dragon.lastlife;
 
+import com.dragon.lastlife.commands.CommandExecutor;
+import com.dragon.lastlife.commands.executor.BoogeyCommand;
+import com.dragon.lastlife.commands.executor.ConfigCommand;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.ConfigManager;
-import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.dragon.lastlife.listeners.PlayerListener;
 
-import java.awt.*;
 import java.io.File;
-import java.lang.constant.DynamicConstantDesc;
 
 public final class Initializer extends JavaPlugin {
 
@@ -20,10 +21,15 @@ public final class Initializer extends JavaPlugin {
     public void onEnable() {
         integration = new LastLife();
         integration.enable();
-        System.out.println("TEST: " + namespace());
         Utils.init(this);
-        getLogger().info("LastLife plugin has been enabled successfully.");
+
+
+
         new PlayerListener(this);
+        new CommandExecutor.Builder(new ConfigCommand(this)).setDescription("Manage Last Life configuration files").register();
+        new CommandExecutor.Builder(new BoogeyCommand(this)).setDescription("Manage Last Life boogeys").register();
+
+        getLogger().info("LastLife plugin has been enabled successfully.");
     }
 
     public LastLife integration() {

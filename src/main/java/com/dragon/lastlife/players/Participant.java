@@ -2,13 +2,16 @@ package com.dragon.lastlife.players;
 
 import com.dragon.lastlife.utils.net.MessageChannelHandler;
 import com.dragon.lastlife.utils.Utils;
+import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigObject;
+import com.quiptmc.core.data.JsonSerializable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.json.JSONObject;
 
 import java.util.UUID;
 
@@ -18,9 +21,11 @@ public class Participant extends ConfigObject {
 
     private final LifeManager lifeManager = new LifeManager();
     public String team;
-    public boolean boogie;
+    public boolean boogey;
     public int lives;
     public String donorDriveId;
+    public boolean modded = false;
+    public ConfigMap<ConfigString> settings = new ConfigMap<>();
 
     public Participant() {
     }
@@ -29,7 +34,7 @@ public class Participant extends ConfigObject {
         this.id = id;
         this.team = team;
         this.lives = lives;
-        this.boogie = false;
+        this.boogey = false;
         this.donorDriveId = donorDriveId;
     }
 
@@ -71,6 +76,29 @@ public class Participant extends ConfigObject {
             player.displayName(value);
             player.playerListName(value);
             player.customName(value);
+        }
+    }
+
+
+    public static class ConfigString extends ConfigObject {
+
+        String value;
+        public ConfigString(String id, String value){
+            this.value = value;
+            super.id = id;
+        }
+
+        public ConfigString(JSONObject json){
+            fromJson(json);
+        }
+
+        public String value(){
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return value();
         }
     }
 
