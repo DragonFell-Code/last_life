@@ -6,25 +6,30 @@ import com.quiptmc.core.config.Config;
 import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigTemplate;
 import com.quiptmc.core.config.ConfigValue;
-import com.quiptmc.core.heartbeat.Flutter;
-import com.quiptmc.core.utils.NetworkUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.File;
 
 @ConfigTemplate(name = "donations")
 public class DonationConfig extends Config {
 
+    @ConfigValue
+    public String api_endpoint = "https://www.extra-life.org/api/";
 
     @ConfigValue
-    public int teamId = 69005;
+    public int seconds_per_check = 15;
+
+    @ConfigValue
+    public int team_id = 69005;
+
     @ConfigValue
     public int donations = 0;
+
     @ConfigValue
     public double total = 0.0;
+
     @ConfigValue
     public ConfigMap<Donation> processed = new ConfigMap<>();
+
     @ConfigValue
     public String etag = "null";
 
@@ -32,8 +37,16 @@ public class DonationConfig extends Config {
     public DonationConfig(File file, String name, ConfigTemplate.Extension extension, QuiptIntegration integration) {
         super(file, name, extension, integration);
 
-        System.out.println("DonationConfig initialized with teamId: " + teamId);
+        System.out.println("DonationConfig initialized with teamId: " + team_id);
     }
 
 
+    public void process(Donation donation) {
+        System.out.println(3);
+        donation.process();
+        System.out.println(13);
+        processed.put(donation);
+        System.out.println(14);
+        total += donation.amount;
+    }
 }

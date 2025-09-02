@@ -5,18 +5,23 @@ import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -52,8 +57,8 @@ public abstract class CommandExecutor {
     }
 
     public int logError(CommandSender sender, Component message) {
-        sender.sendMessage(message);
-        return Command.SINGLE_SUCCESS;
+        sender.sendMessage(message.style(Style.style().color(NamedTextColor.RED).build()));
+        return 0;
     }
 
     public int showUsage(CommandSender sender, String perm) {
@@ -63,6 +68,27 @@ public abstract class CommandExecutor {
 
     public int showUsage(CommandContext<CommandSourceStack> context, String perm) {
         return showUsage(context.getSource().getSender(), perm);
+    }
+
+    public CompletableFuture<Suggestions> onlySimilar(String[] values, String argumentName, CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        String value;
+        try {
+            value = context.getArgument(argumentName, String.class);
+        }catch (IllegalArgumentException ex){
+            value = "";
+        }
+        if(value == null || value.isBlank()){
+            for (String v : values) {
+                builder.suggest(v);
+            }
+            return builder.buildFuture();
+        }
+        for (String v : values) {
+            if (v.toLowerCase().startsWith(value.toLowerCase())) {
+                builder.suggest(v);
+            }
+        }
+        return builder.buildFuture();
     }
 
     public static class Builder {

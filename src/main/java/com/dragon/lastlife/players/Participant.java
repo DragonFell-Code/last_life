@@ -23,14 +23,17 @@ public class Participant extends ConfigObject {
     public String team;
     public boolean boogey;
     public int lives;
-    public String donorDriveId;
+    public long donorDriveId;
     public boolean modded = false;
     public ConfigMap<ConfigString> settings = new ConfigMap<>();
+    public String incentive_life;
+    public String incentive_boogey;
+    public String incentive_loot;
 
     public Participant() {
     }
 
-    public Participant(String id, String team, int lives, String donorDriveId) {
+    public Participant(String id, String team, int lives, long donorDriveId) {
         this.id = id;
         this.team = team;
         this.lives = lives;

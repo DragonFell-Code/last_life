@@ -41,6 +41,7 @@ public class Loader implements PluginLoader {
 
         central.addRepository(new RemoteRepository.Builder("central", "default", MavenLibraryResolver.MAVEN_CENTRAL_DEFAULT_MIRROR).build());
         central.addDependency(new Dependency(new DefaultArtifact("org.json:json:" + properties.getProperty("json_version")), null));
+        central.addDependency(new Dependency(new DefaultArtifact("com.github.shynixn.structureblocklib:structureblocklib-bukkit-api:" + properties.getProperty("structureblocklib_version")), null));
 
         MavenLibraryResolver quipt = new MavenLibraryResolver();
         Authentication auth = new AuthenticationBuilder()

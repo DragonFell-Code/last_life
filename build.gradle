@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id 'io.papermc.paperweight.userdev' version '2.0.0-beta.18'
 }
 
 group = "com.dragon"
@@ -30,9 +31,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:${minecraft_version}-${paperweight_build}")
+    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:${minecraft_version}-${paperweight_build}") // Add this line
+
+//    compileOnly("io.papermc.paper:paper-api:${minecraft_version}-${paperweight_build}")
     implementation "org.json:json:$json_version"
     implementation "com.quiptmc:core:${quipt_version}"
+    compileOnly "com.github.shynixn.structureblocklib:structureblocklib-bukkit-api:${structureblocklib_version}"
 //    implementation "top.offsetmonkey538.meshlib:mesh-lib-paper:${mesh_version}"
 }
 

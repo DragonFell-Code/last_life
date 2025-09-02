@@ -3,15 +3,18 @@ package com.dragon.lastlife.listeners;
 import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
+import com.dragon.lastlife.donations.Donation;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.dragon.lastlife.utils.chat.MessageUtils;
 import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
+import com.dragon.lastlife.world.Dungeon;
 import com.quiptmc.core.config.ConfigManager;
 import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -46,8 +49,38 @@ public class PlayerListener implements Listener {
                         e.getPlayer().sendMessage(text("Sent packet!", NamedTextColor.GREEN));
                     }
 
+                    if(label.equalsIgnoreCase("dungeon")){
+                        Dungeon dungeon = Utils.configs().DUNGEON_MANAGER.create("test");
+                        dungeon.generate("test", 0,100,0);
+                        e.getPlayer().teleport(new Location(dungeon.world(), 0, 150, 0));
+                    }
+
                     if(label.equalsIgnoreCase("config")){
                         ConfigManager.reloadConfig(Utils.initializer().integration(), DonationConfig.class);
+                    }
+
+                    if(label.equalsIgnoreCase("donation")){
+                        JSONObject json = new JSONObject()
+                                .put("displayName", "Test Donor")
+                                .put("donorId", "270CB800398A911A")
+                                .put("links", new JSONObject()
+                                        .put("recipient", "https://www.extra-life.org/participants/548726")
+                                        .put("donate", "https://www.extra-life.org/participants/548726/donate"))
+                                .put("isRegFee", false)
+                                .put("eventID", 559)
+                                .put("createdDateUTC", "2025-02-01T18:55:51.460+0000")
+                                .put("recipientName", "Test Participant (Elkhorn95)")
+                                .put("recipientImageURL", "https://donordrivecontent.com/extralife/images/$avatars$/constituent_09429FD9-D538-F066-0D0C8F329156DFD1.jpg?v=1756493068380")
+                                .put("participantID", 548926)
+                                .put("amount", "5.00")
+                                .put("avatarImageURL", "https://donordrivecontent.com/extralife/images/$avatars$/constituent_default_100.jpg?v=1756493068380")
+                                .put("teamID", Utils.configs().DONATION_CONFIG().team_id)
+                                .put("donationID", "53DFA757C375170D")
+                                .put("incentiveID", "D0AD363E-BA37-AD5A-15AFC5541F245399")
+                                .put("message", "what if you have to deal with it as a fish fight instead!!!");
+                        Donation donation = new Donation(json);
+                        Utils.configs().DONATION_CONFIG().process(donation);
+//                        donation.process();
                     }
 
                     if (label.equals("lives")) {

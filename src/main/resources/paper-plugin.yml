@@ -3,4 +3,13 @@ version: "${project_version}"
 author: "${author}"
 api-version: "${minecraft_version}"
 main: com.dragon.lastlife.Initializer
+bootstrapper: com.dragon.lastlife.Bootstrapper
 loader: com.dragon.lastlife.Loader
+dependencies:
+  server:
+    # Add a required "RequiredPlugin" dependency, which will load AFTER your plugin.
+    StructureBlockLib:
+      load: BEFORE
+      required: true
+      # This means that your plugin will not have access to their classpath
+      join-classpath: true

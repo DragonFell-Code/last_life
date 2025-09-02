@@ -62,27 +62,7 @@ public class BoogeyCommand extends CommandExecutor {
                                     return 1;
                                 })
                                 .then(argument("value", StringArgumentType.word())
-                                        .suggests((context, builder) -> {
-                                            String value;
-                                            try {
-                                                value = context.getArgument("value", String.class);
-                                            }catch (IllegalArgumentException ex){
-                                                value = "";
-                                            }
-                                            String[] values = {"true", "false"};
-                                            if(value == null || value.isBlank()){
-                                                for (String v : values) {
-                                                    builder.suggest(v);
-                                                }
-                                                return builder.buildFuture();
-                                            }
-                                            for (String v : values) {
-                                                if (v.startsWith(value.toLowerCase())) {
-                                                    builder.suggest(v);
-                                                }
-                                            }
-                                            return builder.buildFuture();
-                                        })
+                                        .suggests((context, builder) -> onlySimilar(new String[]{"true", "false"}, "value", context, builder))
                                         .executes(context -> {
                                             CommandSender superSender = context.getSource().getSender();
                                             if (!superSender.hasPermission("lastlife.boogey.set")) {
@@ -107,7 +87,7 @@ public class BoogeyCommand extends CommandExecutor {
                 .then(literal("roll")
                         .executes(context -> {
                             CommandSender superSender = context.getSource().getSender();
-                            if(!superSender.hasPermission("lastlife.boogey.roll")){
+                            if (!superSender.hasPermission("lastlife.boogey.roll")) {
                                 logError(superSender, "You do not have permission to use this command.");
                                 return 0;
                             }
@@ -117,7 +97,7 @@ public class BoogeyCommand extends CommandExecutor {
                         .then(argument("amount", IntegerArgumentType.integer())
                                 .executes(context -> {
                                     CommandSender superSender = context.getSource().getSender();
-                                    if(!superSender.hasPermission("lastlife.boogey.roll")){
+                                    if (!superSender.hasPermission("lastlife.boogey.roll")) {
                                         logError(superSender, "You do not have permission to use this command.");
                                         return 0;
                                     }
@@ -125,4 +105,6 @@ public class BoogeyCommand extends CommandExecutor {
                                     return 1;
                                 }))).build();
     }
+
+
 }

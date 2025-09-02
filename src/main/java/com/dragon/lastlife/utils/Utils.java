@@ -6,7 +6,9 @@ import com.dragon.lastlife.donations.DonationFlutter;
 import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
 import com.dragon.lastlife.utils.net.MessageChannel;
 import com.dragon.lastlife.utils.net.MessageChannelHandler;
+import com.dragon.lastlife.utils.net.listener.ClientToServerListener;
 import com.quiptmc.core.config.ConfigManager;
+import com.quiptmc.core.discord.WebhookManager;
 import com.quiptmc.core.heartbeat.Flutter;
 import com.quiptmc.core.heartbeat.HeartbeatUtils;
 
@@ -40,13 +42,22 @@ public class Utils {
         PlaceholderUtils.registerPlaceholders();
 
         channelMessageHandler = new MessageChannelHandler(init);
-        MessageChannel channel = channelMessageHandler().register(MessageChannel.Type.OUTGOING, "data", null);
-        if (channel == null) {
-            init.integration().log("Utils", "Failed to register outgoing channel 'data'.");
+        MessageChannel stc = channelMessageHandler().register(MessageChannel.Type.OUTGOING, "stc", null);
+        if (stc == null) {
+            init.integration().log("Utils", "Failed to register outgoing channel 'stc'.");
         } else {
-            init.integration().log("Utils", "Registered outgoing channel: " + channel.name);
+            init.integration().log("Utils", "Registered outgoing channel: " + stc.name);
+        }
+
+        MessageChannel cts = channelMessageHandler().register(MessageChannel.Type.INCOMING, "cts", new ClientToServerListener());
+        if (cts == null) {
+            init.integration().log("Utils", "Failed to register outgoing channel 'cts'.");
+        } else {
+            init.integration().log("Utils", "Registered outgoing channel: " + cts.name);
         }
         setupHeartbeat();
+        // https://discord.com/api/webhooks/1412263980898058320/-vIqhs5Wmc92ycrbO-ZMVH-Bo75tct7BApjMiT8x5y3wPRHKmtmY-DEGYH_ZWyx1wLX8
+        WebhookManager.add("donations", "1412263980898058320", "-vIqhs5Wmc92ycrbO-ZMVH-Bo75tct7BApjMiT8x5y3wPRHKmtmY-DEGYH_ZWyx1wLX8");
     }
 
     private static void setupHeartbeat() {

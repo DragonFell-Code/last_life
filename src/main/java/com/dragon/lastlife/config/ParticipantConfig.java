@@ -8,10 +8,13 @@ import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigTemplate;
 import com.quiptmc.core.config.ConfigValue;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,11 +38,20 @@ public class ParticipantConfig extends Config {
         super(file, name, extension, integration);
     }
 
+    public Participant get(int participantId){
+        for(Participant participant : cache.values()){
+            if(participant.donorDriveId == participantId){
+                return participant;
+            }
+        }
+        return null;
+    }
+
     public Participant get(UUID uuid) {
         if (cache.contains(uuid.toString())) {
             return cache.get(uuid.toString());
         }
-        Participant participant = new Participant(uuid.toString(), "none", 3, "null");
+        Participant participant = new Participant(uuid.toString(), "none", 3, 0);
         cache.put(participant);
         save();
         return participant;
@@ -47,6 +59,13 @@ public class ParticipantConfig extends Config {
 
     public BoogeymenManager boogeymen() {
         return boogeymen;
+    }
+
+    public void link(UUID uuid, long participantId) {
+        Participant participant = get(uuid);
+        participant.donorDriveId = participantId;
+        cache.put(participant);
+        save();
     }
 
     public class BoogeymenManager {
@@ -109,15 +128,15 @@ public class ParticipantConfig extends Config {
                         Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(player.getUniqueId());
                         if(participant == null || participant.lives().lives() <= 0) continue;
                         if(seconds_remaining >= 2) {
-                            player.showTitle(Title.title(text(seconds_remaining-1 + "...", color), text(""), 5,10, 5));
+                            player.showTitle(Title.title(text(seconds_remaining-1 + "...", color).style(Style.style().decorate(TextDecoration.BOLD).color(color)), text(""), 5,10, 5));
                         } else if (seconds_remaining == 1){
                             player.showTitle(Title.title(text("You are...", color), text(""), 5,10, 5));
                         }
                         else if (seconds_remaining == 0) {
                             if(selected.stream().anyMatch(p -> p.id.equals(player.getUniqueId().toString()))){
-                                player.showTitle(Title.title(text("The Boogeyman.", NamedTextColor.DARK_RED), text(""), 5,10, 20));
+                                player.showTitle(Title.title(text("The Boogeyman.", NamedTextColor.RED), text(""), 5,10, 20));
                             } else {
-                                player.showTitle(Title.title(text("NOT the Boogeyman.", NamedTextColor.DARK_GREEN), text(""), 5,10, 20));
+                                player.showTitle(Title.title(text("NOT the Boogeyman.", NamedTextColor.GREEN), text(""), 5,10, 20));
                             }
                         }
 

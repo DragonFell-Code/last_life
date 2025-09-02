@@ -3,13 +3,12 @@ package com.dragon.lastlife;
 import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.commands.executor.BoogeyCommand;
 import com.dragon.lastlife.commands.executor.ConfigCommand;
+import com.dragon.lastlife.commands.executor.DonationsCommand;
+import com.dragon.lastlife.listeners.PlayerListener;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.ConfigManager;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.dragon.lastlife.listeners.PlayerListener;
 
 import java.io.File;
 
@@ -24,11 +23,10 @@ public final class Initializer extends JavaPlugin {
         Utils.init(this);
 
 
-
         new PlayerListener(this);
         new CommandExecutor.Builder(new ConfigCommand(this)).setDescription("Manage Last Life configuration files").register();
         new CommandExecutor.Builder(new BoogeyCommand(this)).setDescription("Manage Last Life boogeys").register();
-
+        new CommandExecutor.Builder(new DonationsCommand(this)).setDescription("Base command for participants to link their ExtraLife accounts").register();
         getLogger().info("LastLife plugin has been enabled successfully.");
     }
 
@@ -75,8 +73,8 @@ public final class Initializer extends JavaPlugin {
             return getPluginMeta().getVersion();
         }
 
-        public void warn(String s, String id) {
-            getLogger().warning("[%s] %s".formatted(s, id));
+        public void warn(String tag, String message) {
+            getLogger().warning("[%s] %s".formatted(tag, message));
         }
     }
 }
