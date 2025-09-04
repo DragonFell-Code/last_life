@@ -47,13 +47,9 @@ public class Donation extends ConfigObject {
     }
 
     public void process() {
-        System.out.println(4);
         if (WebhookManager.get("donations") != null) {
-            System.out.println(5);
             NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
-            System.out.println(6);
             String withSymbol = formatter.format(amount);
-            System.out.println(7);
             Embed embed = new Embed()
                     .color(0xAF48EE)
                     .description("Amount: " + withSymbol + (isRegFee ? " (Registration Fee)" : ""))
@@ -65,18 +61,11 @@ public class Donation extends ConfigObject {
                 embed.title("New donation to " + participant.player().getName());
 
             }
-
-            System.out.println(8);
             if (!message.isEmpty())
                 embed.addField("Message", message, false);
-            System.out.println(9);
             Webhook webhook = WebhookManager.get("donations");
-            System.out.println(10);
             WebhookManager.send(webhook, embed);
-            System.out.println(11);
         }
-        System.out.println(12);
-
     }
 
     public static class Links implements JsonSerializable {

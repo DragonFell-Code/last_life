@@ -24,7 +24,7 @@ public class DonationFlutter implements Flutter {
         GET = NetworkUtils.GET.defaults(config.etag);
     }
 
-    private DonationConfig config(){
+    private DonationConfig config() {
         return Utils.configs().DONATION_CONFIG();
     }
 
@@ -32,12 +32,10 @@ public class DonationFlutter implements Flutter {
     public boolean run() {
         long now = System.currentTimeMillis();
         if (now - LAST_HEARTBEAT >= config().seconds_per_check * 1000L) {
-            System.out.println("Running DonationFlutter at " + now);
             LAST_HEARTBEAT = now;
-            DonationConfig config = Utils.configs().DONATION_CONFIG();
 
             try {
-                HttpResponse<String> response = NetworkUtils.get(GET, config.api_endpoint + "teams/" + config.team_id);
+                HttpResponse<String> response = NetworkUtils.get(GET, config().api_endpoint + "teams/" + config().team_id);
                 if (response.statusCode() != 200 && response.statusCode() != 304) {
                     Utils.initializer().integration().log("DonationFlutter", "Failed to fetch team data: " + response.statusCode() + " - " + response.body());
                     return true;
@@ -47,40 +45,21 @@ public class DonationFlutter implements Flutter {
                     return true; // No new donations, continue running
                 }
                 String etag = response.headers().firstValue("etag").orElse("");
-                if (!etag.equals(config.etag)) {
-                    //There has been a change in the donations, so we need to update the config
-                    config.etag = etag;
+                if (!etag.equals(config().etag)) {
+                    config().etag = etag;
                     JSONObject teamData = new JSONObject(response.body());
                     int allDonations = teamData.getInt("numDonations");
-                    if (config.donations < allDonations) {
-                        int diff = allDonations - config.donations;
-                        System.out.println("New donations available: " + (diff));
+                    if (config().donations < allDonations) {
+                        int diff = allDonations - config().donations;
+                        Utils.initializer().integration().log("DonationFlutter", "New donations available: " + (diff));
                         if (diff > MAX_LIMIT) {
-                            System.out.println("Limiting donations to " + MAX_LIMIT);
+                            Utils.initializer().integration().log("DonationFlutter", "Too many new donations (" + diff + "), limiting to " + MAX_LIMIT);
+
                             diff = MAX_LIMIT;
                         }
-                        HttpResponse<String> donationsResponse = NetworkUtils.get(NetworkUtils.GET, config().api_endpoint + "teams/" + config.team_id + "/donations?limit=" + diff);
-                        if (donationsResponse.statusCode() != 200 && donationsResponse.statusCode() != 304) {
-                            Utils.initializer().integration().log("DonationFlutter", "Failed to fetch donations: " + donationsResponse.statusCode() + " - " + donationsResponse.body());
-                            return true;
-                        }
-//                        if (donationsResponse.statusCode() == 304) {
-//                            Utils.initializer().getLogger().config("Failed to fetch donations: " + donationsResponse.statusCode() + " - " + donationsResponse.body());
-//                            return true; // No new donations, continue running
-//                        }
-                        JSONArray donationsArray = new JSONArray(donationsResponse.body());
-                        for (int i = 0; i < donationsArray.length(); i++) {
-                            System.out.println(1);
-                            JSONObject donationJson = donationsArray.getJSONObject(i);
-                            System.out.println(2);
-                            Donation donation = new Donation(donationJson);
-                            Utils.configs().DONATION_CONFIG().process(donation);
 
-                        }
-                        //Loop thru donations and process them
-                        config.donations = config.donations + diff;
-                        System.out.println("Total donations: " + config.donations);
-                        config.save();
+                        sync(diff);
+
 
                     }
                 }
@@ -89,6 +68,29 @@ public class DonationFlutter implements Flutter {
             }
         }
         return true; // Continue running
+    }
+
+    private void sync(int diff) {
+        HttpResponse<String> donationsResponse = NetworkUtils.get(NetworkUtils.GET, config().api_endpoint + "teams/" + config().team_id + "/donations?limit=" + (diff));
+        if (donationsResponse.statusCode() != 200 && donationsResponse.statusCode() != 304) {
+            Utils.initializer().integration().log("DonationFlutter", "Failed to fetch donations: " + donationsResponse.statusCode() + " - " + donationsResponse.body());
+            return;
+        }
+
+        JSONArray donationsArray = new JSONArray(donationsResponse.body());
+        for (int i = 0; i < donationsArray.length(); i++) {
+            JSONObject donationJson = donationsArray.getJSONObject(i);
+            Donation donation = new Donation(donationJson);
+            if (Utils.configs().DONATION_CONFIG().processed(donation)) {
+                Utils.initializer().integration().warn("DonationFlutter", "Skipping already processed donation: " + donation.donationID);
+            } else
+                Utils.configs().DONATION_CONFIG().process(donation);
+
+        }
+        //Loop thru donations and process them
+        config().donations = config().donations + diff;
+        Utils.initializer().integration().log("DonationFlutter", "Total donations: " + config().donations);
+        config().save();
     }
 
 }

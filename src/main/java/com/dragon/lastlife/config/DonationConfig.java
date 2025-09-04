@@ -9,7 +9,7 @@ import com.quiptmc.core.config.ConfigValue;
 
 import java.io.File;
 
-@ConfigTemplate(name = "donations")
+@ConfigTemplate(name = "donations", ext = ConfigTemplate.Extension.JSON)
 public class DonationConfig extends Config {
 
     @ConfigValue
@@ -42,11 +42,12 @@ public class DonationConfig extends Config {
 
 
     public void process(Donation donation) {
-        System.out.println(3);
         donation.process();
-        System.out.println(13);
         processed.put(donation);
-        System.out.println(14);
         total += donation.amount;
+    }
+
+    public boolean processed(Donation donation) {
+        return processed.contains(donation.id);
     }
 }
