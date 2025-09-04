@@ -16,10 +16,14 @@ public final class Initializer extends JavaPlugin {
 
     private LastLife integration;
 
-    @Override
-    public void onEnable() {
+    public void quipt(){
         integration = new LastLife();
         integration.enable();
+    }
+
+    @Override
+    public void onEnable() {
+        quipt();
         Utils.init(this);
 
 

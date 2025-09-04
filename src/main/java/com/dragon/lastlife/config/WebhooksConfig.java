@@ -37,15 +37,15 @@ public class WebhooksConfig extends Config {
 
     public void initialize(){
         if(initialized)
-            Utils.initializer().getComponentLogger().warn(text("[WebhooksConfig] Already initialized... Initializing again."));
+            integration().logger().warn("[WebhooksConfig] Already initialized... Initializing again.");
         initialized = true;
         if(webhooks.size() == 0){
-            Utils.initializer().getComponentLogger().warn(text("[WebhooksConfig] No webhooks registered, skipping..."));
+            integration().logger().warn("[WebhooksConfig] No webhooks registered, skipping...");
             return;
         }
 
         for(Webhook webhook : webhooks.values()){
-            Utils.initializer().getComponentLogger().info(text("[WebhooksConfig] Registering webhook: " + webhook.name()));
+            integration().logger().log("[WebhooksConfig] Registering webhook: " + webhook.name());
             WebhookManager.add(webhook);
         }
     }
