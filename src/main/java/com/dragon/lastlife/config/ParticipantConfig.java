@@ -7,6 +7,8 @@ import com.quiptmc.core.config.Config;
 import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigTemplate;
 import com.quiptmc.core.config.ConfigValue;
+import com.quiptmc.core.discord.WebhookManager;
+import com.quiptmc.core.discord.embed.Embed;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
@@ -16,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +26,7 @@ import java.util.UUID;
 
 import static net.kyori.adventure.text.Component.text;
 
-@ConfigTemplate(name = "participants")
+@ConfigTemplate(name = "participants", ext = ConfigTemplate.Extension.JSON)
 public class ParticipantConfig extends Config {
 
     @ConfigValue
@@ -32,7 +35,7 @@ public class ParticipantConfig extends Config {
     @ConfigValue
     public int queued_boogeymen = 0;
 
-    private BoogeymenManager boogeymen = new BoogeymenManager();
+    private final BoogeymenManager boogeymen = new BoogeymenManager();
 
     public ParticipantConfig(File file, String name, ConfigTemplate.Extension extension, QuiptIntegration integration) {
         super(file, name, extension, integration);
@@ -94,6 +97,14 @@ public class ParticipantConfig extends Config {
                 if(participant.player() == null) continue;
                 //todo add checks for if they are online, not modded, and haven't won in the last 7 days [ai]
                 selected.add(participant);
+                if(WebhookManager.get("boogeymen") != null){
+                    Embed embed = new Embed()
+                            .title("Boogeyman Selected!")
+                            .thumbnail("https://mc-heads.net/combo/" + participant.id)
+                            .description(participant.player().getName() + " has been selected as a boogeyman!")
+                            .color(0xE56144);
+                    WebhookManager.send("boogeymen", embed);
+                }
             }
             if(selected.size() < amount){
                 Utils.initializer().integration().warn("BoogeymenManager", "Failed to select enough boogeymen. Selected " + selected.size() + " out of " + amount);

@@ -23,6 +23,8 @@ public class Configs {
         ConfigManager.registerConfig(initializer.integration(), DefaultConfig.class);
         ConfigManager.registerConfig(initializer.integration(), ParticipantConfig.class);
         ConfigManager.registerConfig(initializer.integration(), DonationConfig.class);
+        WebhooksConfig webhooks = ConfigManager.registerConfig(initializer.integration(), WebhooksConfig.class);
+        webhooks.initialize();
     }
 
     public DefaultConfig DEFAULT_CONFIG() {
@@ -34,6 +36,11 @@ public class Configs {
     }
 
     public DonationConfig DONATION_CONFIG() {
+
         return ConfigManager.getConfig(initializer.integration(), DonationConfig.class);
+    }
+
+    public WebhooksConfig WEBHOOKS_CONFIG() {
+        return ConfigManager.getConfig(initializer.integration(), WebhooksConfig.class);
     }
 }

@@ -57,7 +57,6 @@ public class Utils {
         }
         setupHeartbeat();
         // https://discord.com/api/webhooks/1412263980898058320/-vIqhs5Wmc92ycrbO-ZMVH-Bo75tct7BApjMiT8x5y3wPRHKmtmY-DEGYH_ZWyx1wLX8
-        WebhookManager.add("donations", "1412263980898058320", "-vIqhs5Wmc92ycrbO-ZMVH-Bo75tct7BApjMiT8x5y3wPRHKmtmY-DEGYH_ZWyx1wLX8");
     }
 
     private static void setupHeartbeat() {
