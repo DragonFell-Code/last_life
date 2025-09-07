@@ -9,9 +9,12 @@ import com.dragon.lastlife.utils.net.MessageChannelHandler;
 import com.dragon.lastlife.utils.net.listener.ClientToServerListener;
 import com.quiptmc.core.config.ConfigManager;
 import com.quiptmc.core.discord.WebhookManager;
+import com.quiptmc.core.discord.embed.Embed;
 import com.quiptmc.core.heartbeat.Flutter;
 import com.quiptmc.core.heartbeat.HeartbeatUtils;
 
+import javax.annotation.Nullable;
+import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
@@ -82,5 +85,20 @@ public class Utils {
 
     public static MessageChannelHandler channelMessageHandler() {
         return channelMessageHandler;
+    }
+
+    public static void genericWebhook(String channelName, Color color, String title, @Nullable String image, String description, @Nullable Embed.Field... fields){
+        Embed.Builder builder = new Embed.Builder()
+                .title(title)
+                .description(description)
+                .color(color);
+        if(image != null) builder.thumbnail(image);
+        if(fields != null && fields.length > 0){
+            for(Embed.Field fieldItem : fields){
+                builder.field(fieldItem.name, fieldItem.value, fieldItem.inline);
+            }
+        }
+        System.out.println(builder.build().json().toString(2));
+        WebhookManager.send(channelName, builder.build());
     }
 }

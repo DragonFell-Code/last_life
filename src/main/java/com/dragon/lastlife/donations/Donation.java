@@ -10,6 +10,7 @@ import com.quiptmc.core.discord.embed.Embed;
 import org.bukkit.Bukkit;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.UUID;
@@ -50,21 +51,27 @@ public class Donation extends ConfigObject {
         if (WebhookManager.get("donations") != null) {
             NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
             String withSymbol = formatter.format(amount);
-            Embed embed = new Embed()
-                    .color(0xAF48EE)
-                    .description("Amount: " + withSymbol + (isRegFee ? " (Registration Fee)" : ""))
-                    .thumbnail(recipientImageURL);
             Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(participantID);
-            if (participant == null) {
-                embed.title("New donation to an unknown participant");
-            } else {
-                embed.title("New donation to " + participant.player().getName());
 
-            }
-            if (!message.isEmpty())
-                embed.addField("Message", message, false);
-            Webhook webhook = WebhookManager.get("donations");
-            WebhookManager.send(webhook, embed);
+            String title = participant == null ? "New donation to an unknown participant" : "New donation to " + participant.player().getName();
+            Embed.Field message = (this.message == null || this.message.isEmpty()) ? null : new Embed.Field("Message", this.message, false);
+            String desc = "Amount: " + withSymbol + (isRegFee ? " (Registration Fee)" : "");
+            Utils.genericWebhook("donations", new Color(0x44ff44), title, desc, recipientImageURL, message);
+//            String message = (this.message == null || this.message.isEmpty()) ? "" : this.message;
+//            Embed embed = new Embed()
+//                    .color(0xAF48EE)
+//                    .description()
+//                    .thumbnail(recipientImageURL);
+//            if (participant == null) {
+//                embed.title("New donation to an unknown participant");
+//            } else {
+//                embed.title("New donation to " + participant.player().getName());
+//
+//            }
+//            if (!message.isEmpty())
+//                embed.addField("Message", message, false);
+//            Webhook webhook = WebhookManager.get("donations");
+//            WebhookManager.send(webhook, embed);
         }
     }
 
