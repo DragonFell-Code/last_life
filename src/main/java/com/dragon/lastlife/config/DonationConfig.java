@@ -8,6 +8,7 @@ import com.quiptmc.core.config.ConfigTemplate;
 import com.quiptmc.core.config.ConfigValue;
 
 import java.io.File;
+import java.math.BigDecimal;
 
 @ConfigTemplate(name = "donations", ext = ConfigTemplate.Extension.JSON)
 public class DonationConfig extends Config {
@@ -25,7 +26,7 @@ public class DonationConfig extends Config {
     public int donations = 0;
 
     @ConfigValue
-    public double total = 0.0;
+    public BigDecimal total = BigDecimal.valueOf(0.0);
 
     @ConfigValue
     public ConfigMap<Donation> processed = new ConfigMap<>();
@@ -36,15 +37,13 @@ public class DonationConfig extends Config {
 
     public DonationConfig(File file, String name, ConfigTemplate.Extension extension, QuiptIntegration integration) {
         super(file, name, extension, integration);
-
-        System.out.println("DonationConfig initialized with teamId: " + team_id);
     }
 
 
     public void process(Donation donation) {
         donation.process();
         processed.put(donation);
-        total += donation.amount;
+        total = BigDecimal.valueOf(total.doubleValue() + donation.amount);
     }
 
     public boolean processed(Donation donation) {
