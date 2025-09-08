@@ -1,10 +1,9 @@
 package com.dragon.lastlife.players;
 
-import com.dragon.lastlife.utils.net.MessageChannelHandler;
 import com.dragon.lastlife.utils.Utils;
+import com.dragon.lastlife.utils.net.MessageChannelHandler;
 import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigObject;
-import com.quiptmc.core.data.JsonSerializable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -50,10 +49,13 @@ public class Participant extends ConfigObject {
         Player player = player().getPlayer();
         if (player == null || !player.isOnline()) return;
         MessageChannelHandler handler = Utils.channelMessageHandler();
-        handler.send("data", player, (byte) 1, json().toString(), 1);
-//        handler.send(Utils.initializer(), player(), json().toString(), 1, (byte) 1);
+        handler.send("stc", player, (byte) 1, json().toString(), 1);
     }
 
+    /**
+     * Check if the player is currently spectating
+     * @return true if the player is spectating, or offline. false otherwise.
+     */
     public boolean spectating() {
         Player player = player().getPlayer();
         return player != null && player.isOnline() && player.getGameMode() == GameMode.SPECTATOR;

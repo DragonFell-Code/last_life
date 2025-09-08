@@ -37,6 +37,11 @@ public class ParticipantConfig extends Config {
         super(file, name, extension, integration);
     }
 
+    /**
+     * Get a participant by their donor drive id from storage.
+     * @param participantId The donor drive id of the participant.
+     * @return {@link Participant} if found, null otherwise.
+     */
     public Participant get(int participantId) {
         for (Participant participant : cache.values()) {
             if (participant.donorDriveId == participantId) {
@@ -71,7 +76,7 @@ public class ParticipantConfig extends Config {
 
 
         public void roll() {
-            roll(1);
+            roll(0);
         }
 
         public void roll(int amount) {
@@ -149,9 +154,10 @@ public class ParticipantConfig extends Config {
                             setBoogey(participant, true);
                             Player player = participant.player().getPlayer();
                             if (player != null && player.isOnline()) {
-                                player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("cmd.boogey.set", player.getName(), participant.boogey));
+                                player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.set", player.getName(), participant.boogey));
                             }
                         }
+                        save();
                     }
 
                 }
@@ -166,6 +172,15 @@ public class ParticipantConfig extends Config {
                     Utils.genericWebhook("boogeymen", new Color(0xD27330), "Boogeyman Selected!", "https://mc-heads.net/head/" + participant.id + "/left.png", participant.player().getName() + " has been selected as a boogeyman!");
 
             }
+        }
+
+        public void queue() {
+            queue(1);
+        }
+
+        public void queue(int amount) {
+            queued_boogeymen = queued_boogeymen + amount;
+            save();
         }
     }
 }

@@ -59,7 +59,6 @@ public class Utils {
             init.integration().log("Utils", "Registered outgoing channel: " + cts.name);
         }
         setupHeartbeat();
-        // https://discord.com/api/webhooks/1412263980898058320/-vIqhs5Wmc92ycrbO-ZMVH-Bo75tct7BApjMiT8x5y3wPRHKmtmY-DEGYH_ZWyx1wLX8
     }
 
     private static void setupHeartbeat() {
@@ -87,18 +86,21 @@ public class Utils {
         return channelMessageHandler;
     }
 
-    public static void genericWebhook(String channelName, Color color, String title, @Nullable String image, String description, @Nullable Embed.Field... fields){
-        Embed.Builder builder = new Embed.Builder()
+    public static void genericWebhook(String channelName, Color color, String title, @Nullable String image, String description, @Nullable Embed.Field... fields) {
+        Embed.Builder builder = Embed.builder()
                 .title(title)
                 .description(description)
-                .color(color);
-        if(image != null) builder.thumbnail(image);
-        if(fields != null && fields.length > 0){
-            for(Embed.Field fieldItem : fields){
-                builder.field(fieldItem.name, fieldItem.value, fieldItem.inline);
+                .color(color.getRGB() & 0xFFFFFF);
+        if (image != null) builder.thumbnail(image);
+        if (fields != null && fields.length > 0) {
+            for (int i = 0; i < fields.length; i++) {
+                Embed.Field fieldItem = fields[i];
+                if (fieldItem != null) {
+                    builder.field(fieldItem.name, fieldItem.value, fieldItem.inline);
+                }
             }
+
         }
-        System.out.println(builder.build().json().toString(2));
         WebhookManager.send(channelName, builder.build());
     }
 }
