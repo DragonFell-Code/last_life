@@ -17,6 +17,8 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
+import static net.kyori.adventure.text.Component.text;
+
 public class Utils {
 
     private static final Flutter SAVE_FLUTTER = new Flutter() {
@@ -62,7 +64,7 @@ public class Utils {
     }
 
     private static void setupHeartbeat() {
-        System.out.println("Setting up heartbeats...");
+        initializer().getComponentLogger().info(text("Setting up heartbeats..."));
 
         try {
             HeartbeatUtils.init(initializer().integration());

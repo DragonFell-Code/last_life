@@ -116,7 +116,6 @@ public class MessageUtils {
             }
 
         });
-        System.out.println("Content: " + content);
         return result;
     }
 }

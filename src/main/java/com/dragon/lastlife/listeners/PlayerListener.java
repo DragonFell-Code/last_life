@@ -43,7 +43,6 @@ public class PlayerListener implements Listener {
                     String label = raw.substring(1, indexOfSpace);
                     String argsRaw = raw.length() == indexOfSpace ? "" : raw.substring(indexOfSpace + 1);
                     String[] args = argsRaw.contains(" ") ? argsRaw.split(" ") : new String[]{argsRaw};
-                    System.out.println("Command: " + label + " Args: " + String.join(" ", args));
                     if (label.equals("packet")) {
                         Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId()).sync();
                         e.getPlayer().sendMessage(text("Sent packet!", NamedTextColor.GREEN));
@@ -150,6 +149,5 @@ public class PlayerListener implements Listener {
         JSONObject json = participant.settings.json();
         e.getPlayer().sendMessage(participant.settings.get("boogey_particles").toString());
         Utils.configs().PARTICIPANT_CONFIG().save();
-        System.out.println(json.toString(2));
     }
 }

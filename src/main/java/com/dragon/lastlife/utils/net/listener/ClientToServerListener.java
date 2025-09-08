@@ -18,32 +18,33 @@ public class ClientToServerListener implements PluginMessageListener {
     @Override
     public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte @NotNull [] message) {
         try {
-            // Find the end of the JSON part (closing brace)
-            int jsonEndIndex = -1;
-            for (int i = 0; i < message.length; i++) {
-                if (message[i] == '}') {
-                    jsonEndIndex = i + 1; // Include the closing brace
-                    break;
-                }
-            }
-
-            if (jsonEndIndex == -1) {
-                throw new IllegalArgumentException("Could not find end of JSON data");
-            }
-
-            // Extract and parse the JSON part
-            String jsonPart = new String(message, 0, jsonEndIndex, StandardCharsets.UTF_8);
+            String jsonPart = extractJson(message);
             if (jsonPart.startsWith("$")) {
                 jsonPart = jsonPart.substring(1);
             }
-            System.out.println("JSON Part: " + jsonPart);
             Utils.configs().PARTICIPANT_CONFIG().get(player.getUniqueId()).modded = true;
             Utils.configs().PARTICIPANT_CONFIG().save();
 
         } catch (Exception e) {
             System.err.println("Error decoding message from player " + player.getName() + ": " + e.getMessage());
-            e.printStackTrace();
         }
+    }
+
+    private static @NotNull String extractJson(byte @NotNull [] message) {
+        int jsonEndIndex = -1;
+        for (int i = 0; i < message.length; i++) {
+            if (message[i] == '}') {
+                jsonEndIndex = i + 1; // Include the closing brace
+                break;
+            }
+        }
+
+        if (jsonEndIndex == -1) {
+            throw new IllegalArgumentException("Could not find end of JSON data");
+        }
+
+        // Extract and parse the JSON part
+        return new String(message, 0, jsonEndIndex, StandardCharsets.UTF_8);
     }
 
     private static @NotNull DataInputStream getDataInputStream(byte @NotNull [] message, int jsonEndIndex) throws IOException {
@@ -75,7 +76,7 @@ public class ClientToServerListener implements PluginMessageListener {
                 break;
             // Add more cases as needed
             default:
-                System.out.println("Unknown flag value: " + flag);
+                Utils.initializer().integration().logger().warn("Unknown flag value: " + flag);
         }
     }
 }
