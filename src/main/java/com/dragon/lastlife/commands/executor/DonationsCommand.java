@@ -6,7 +6,7 @@ import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import com.quiptmc.core.utils.NetworkUtils;
+import com.quiptmc.core.utils.net.NetworkUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 import java.net.http.HttpResponse;
 
-import static com.quiptmc.core.utils.NetworkUtils.GET;
+import static com.quiptmc.core.utils.net.NetworkUtils.GET;
 import static io.papermc.paper.command.brigadier.Commands.argument;
 import static io.papermc.paper.command.brigadier.Commands.literal;
 

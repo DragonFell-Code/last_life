@@ -50,34 +50,34 @@ public class Donation extends ConfigObject {
         super.id = donationID;
     }
 
-    public void process() {
+    public ProcessResult<?> process() {
         //todo process donation and check incentives
         if(incentiveID != null && !incentiveID.isEmpty()) {
             Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(participantID);
             if (participant != null) {
                 if (incentiveID.equals(participant.incentive_life)) {
-                    participant.lives().add(1);
-                    Utils.configs().PARTICIPANT_CONFIG().save();
-                    Utils.initializer().integration().log("Donation", "Added 1 life to " + participant.player().getName() + " for donation incentive.");
-                } else if (incentiveID.equals(participant.incentive_boogey)) {
-                    Utils.configs().PARTICIPANT_CONFIG().boogeymen().queue();
-                    Utils.genericWebhook("boogeymen", new Color(0xFFD738),
-                            "Boogeyman Queue",
-                            null,
-                            "A donation to " + participant.player().getName() + " has added 1 participant to the boogeyman queue!");
 
-                    Utils.initializer().integration().log("Donation", participant.player().getName() + " received a donation on their boogeyman incentive.");
-                } else if (incentiveID.equals(participant.incentive_loot)) {
+                    return new ProcessResult<>(IncentiveType.LIFE, participant);
+                }
+                if (incentiveID.equals(participant.incentive_boogey)) {
+
+                    return new ProcessResult<>(IncentiveType.BOOGEYMAN, participant);
+                }
+                if (incentiveID.equals(participant.incentive_loot)) {
                     Player player = participant.player().getPlayer();
                     if (player != null && player.isOnline()) {
 //                        Utils.lootManager().giveRandomLoot(player, "Donation Incentive");
                         Utils.initializer().integration().log("Donation", "Gave random loot to " + participant.player().getName() + " for donation incentive.");
+                        return new ProcessResult<>(IncentiveType.LOOT, 1);
                     }
                 }
             } else {
                 Utils.initializer().integration().log("Donation", "Participant with ID " + participantID + " not found for donation incentive.");
             }
+            return new ProcessResult<>(IncentiveType.NONE, participant);
         }
+        return new ProcessResult<>(IncentiveType.NONE, participantID);
+
     }
 
     public Embed embed() {
@@ -120,5 +120,9 @@ public class Donation extends ConfigObject {
         public Links(JSONObject json) {
             this.fromJson(json);
         }
+    }
+
+    public record ProcessResult<T>(IncentiveType type, T payload) {
+
     }
 }

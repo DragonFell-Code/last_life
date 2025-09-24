@@ -1,20 +1,29 @@
 package com.dragon.lastlife.donations;
 
 import com.dragon.lastlife.config.DonationConfig;
+import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.discord.WebhookManager;
 import com.quiptmc.core.heartbeat.Flutter;
-import com.quiptmc.core.utils.NetworkUtils;
+import com.quiptmc.core.utils.net.NetworkUtils;
+import com.quiptmc.core.utils.net.HttpHeaders;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.dragon.lastlife.donations.IncentiveType.LIFE;
 
 public class DonationFlutter implements Flutter {
 
     private final int MAX_LIMIT = 100;
     private long LAST_HEARTBEAT = 0;
-    private NetworkUtils.Get GET;
+    private final NetworkUtils.Get GET;
     private int offset = 0;
 
 
@@ -22,7 +31,7 @@ public class DonationFlutter implements Flutter {
         if (config == null) {
             throw new IllegalArgumentException("DonationConfig cannot be null");
         }
-        GET = NetworkUtils.GET.defaults(config.etag);
+        GET = NetworkUtils.Get.defaults(HttpHeaders.ETAG(config.etag));
     }
 
     private DonationConfig config() {
@@ -55,7 +64,7 @@ public class DonationFlutter implements Flutter {
                         Utils.initializer().integration().log("DonationFlutter", "New donations available: " + (diff));
                         if (diff > MAX_LIMIT) {
                             Utils.initializer().integration().log("DonationFlutter", "Too many new donations (" + diff + "), limiting to " + MAX_LIMIT);
-                            if(offset != diff-MAX_LIMIT) offset = offset + (diff - MAX_LIMIT);
+                            if (offset != diff - MAX_LIMIT) offset = offset + (diff - MAX_LIMIT);
                             diff = MAX_LIMIT;
                         }
 
@@ -72,7 +81,7 @@ public class DonationFlutter implements Flutter {
     }
 
     private void sync(int diff) {
-        String url = config().api_endpoint + "teams/" + config().team_id + "/donations?limit=" + (diff) + (offset > 0 ? "&offset=" + (offset+1) : "");
+        String url = config().api_endpoint + "teams/" + config().team_id + "/donations?limit=" + (diff) + (offset > 0 ? "&offset=" + (offset + 1) : "");
         HttpResponse<String> donationsResponse = NetworkUtils.get(NetworkUtils.GET, url);
         if (donationsResponse.statusCode() != 200 && donationsResponse.statusCode() != 304) {
             Utils.initializer().integration().log("DonationFlutter", "Failed to fetch donations: " + donationsResponse.statusCode() + " - " + donationsResponse.body());
@@ -82,6 +91,7 @@ public class DonationFlutter implements Flutter {
         JSONArray donationsArray = new JSONArray(donationsResponse.body());
         JSONArray embedArray = new JSONArray();
         final int preOffset = offset;
+        List<Donation.ProcessResult<?>> results = new ArrayList<>();
         for (int i = 0; i < donationsArray.length(); i++) {
             JSONObject donationJson = donationsArray.getJSONObject(i);
             Donation donation = new Donation(donationJson);
@@ -89,17 +99,47 @@ public class DonationFlutter implements Flutter {
                 Utils.initializer().integration().warn("DonationFlutter", "Skipping already processed donation: " + donation.donationID);
                 offset = offset + 1;
             } else {
-                Utils.configs().DONATION_CONFIG().process(donation);
+                Donation.ProcessResult<?> result = Utils.configs().DONATION_CONFIG().process(donation);
                 embedArray.put(donation.embed().json());
+                results.add(result);
             }
 
         }
-        if(offset != preOffset){
+        if (offset != preOffset) {
             Utils.configs().DONATION_CONFIG().save();
         } else {
             offset = Math.max(offset - diff, 0);
         }
-        if(WebhookManager.get("donations") != null){
+
+        Map<Participant, Integer> lifeMap = new HashMap<>();
+
+        if (!results.isEmpty()) {
+            Utils.initializer().integration().log("DonationFlutter", "Processed " + results.size() + " new donations.");
+            for (Donation.ProcessResult<?> result : results) {
+                switch (result.type()) {
+                    case LIFE -> {
+                        Participant participant = (Participant) result.payload();
+                        lifeMap.put(participant, lifeMap.getOrDefault(participant, 0) + 1);
+                    }
+                    case LOOT, NONE -> {
+                    }
+                    case BOOGEYMAN -> {
+                        Participant participant = (Participant) result.payload();
+                        Utils.configs().PARTICIPANT_CONFIG().boogeymen().queue();
+                        Utils.genericWebhook("boogeymen", new Color(0xFFD738), "Boogeyman Queue", null, "A donation to " + participant.player().getName() + " has added 1 participant to the boogeyman queue!");
+                        Utils.initializer().integration().log("Donation", participant.player().getName() + " received a donation on their boogeyman incentive.");
+                    }
+                }
+            }
+            for(Map.Entry<Participant, Integer> entry : lifeMap.entrySet()) {
+                entry.getKey().lives().add(entry.getValue());
+                Utils.configs().PARTICIPANT_CONFIG().save();
+                Utils.initializer().integration().log("Donation", "Added 1 life to " + entry.getKey().player().getName() + " for donation incentive.");
+            }
+        }
+
+
+        if (WebhookManager.get("donations") != null) {
 
             int batchSize = 10;
             int totalEmbeds = embedArray.length();
@@ -114,7 +154,7 @@ public class DonationFlutter implements Flutter {
                     batchArray.put(embedArray.getJSONObject(i));
                 }
 
-                if (batchArray.length() > 0) {
+                if (!batchArray.isEmpty()) {
                     JSONObject send = new JSONObject();
                     send.put("embeds", batchArray);
                     WebhookManager.send("donations", send);

@@ -40,10 +40,11 @@ public class DonationConfig extends Config {
     }
 
 
-    public void process(Donation donation) {
-        donation.process();
+    public Donation.ProcessResult<?> process(Donation donation) {
+        Donation.ProcessResult<?> result = donation.process();
         processed.put(donation);
         total = BigDecimal.valueOf(total.doubleValue() + donation.amount);
+        return result;
     }
 
     public boolean processed(Donation donation) {
