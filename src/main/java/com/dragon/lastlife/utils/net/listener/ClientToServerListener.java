@@ -1,12 +1,11 @@
 package com.dragon.lastlife.utils.net.listener;
 
 import com.dragon.lastlife.utils.Utils;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -14,21 +13,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class ClientToServerListener implements PluginMessageListener {
-
-    @Override
-    public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte @NotNull [] message) {
-        try {
-            String jsonPart = extractJson(message);
-            if (jsonPart.startsWith("$")) {
-                jsonPart = jsonPart.substring(1);
-            }
-            Utils.configs().PARTICIPANT_CONFIG().get(player.getUniqueId()).modded = true;
-            Utils.configs().PARTICIPANT_CONFIG().save();
-
-        } catch (Exception e) {
-            System.err.println("Error decoding message from player " + player.getName() + ": " + e.getMessage());
-        }
-    }
 
     private static @NotNull String extractJson(byte @NotNull [] message) {
         int jsonEndIndex = -1;
@@ -63,6 +47,25 @@ public class ClientToServerListener implements PluginMessageListener {
             dataStream = new DataInputStream(byteStream);
         }
         return dataStream;
+    }
+
+    @Override
+    public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte @NotNull [] message) {
+        try {
+            String jsonPart = extractJson(message);
+            if (jsonPart.startsWith("$")) {
+                jsonPart = jsonPart.substring(1);
+            }
+            JSONObject data = new JSONObject(jsonPart);
+            System.out.println(data.toString(2));
+            if (data.has("modded")) {
+                Utils.configs().PARTICIPANT_CONFIG().get(player.getUniqueId()).modded = data.getBoolean("modded");
+                Utils.configs().PARTICIPANT_CONFIG().save();
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error decoding message from player " + player.getName() + ": " + e.getMessage());
+        }
     }
 
     private void processClientData(Player player, String stringValue, int intValue, BlockPos blockPos, byte flag) {
