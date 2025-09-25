@@ -35,6 +35,15 @@ public class DungeonManager {
         }
         Dungeon dungeon = new Dungeon(world, this);
         registry.register(name, dungeon);
+        // Ensure spawn chunk is loaded and place the dungeon start at 0,64,0
+        world.getChunkAt(0, 0); // force load
+        Bukkit.getScheduler().runTask(initializer, () -> {
+            try {
+                dungeon.generate("dungeon/entrances/entrance_1_2", 0, 64, 0);
+            } catch (Exception e) {
+                initializer.getLogger().warning("Failed to generate dungeon structure: " + e.getMessage());
+            }
+        });
         initializer.getComponentLogger().info("Done! Dungeon world created: " + name, NamedTextColor.GREEN);
         return dungeon;
     }

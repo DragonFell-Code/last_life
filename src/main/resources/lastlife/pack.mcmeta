@@ -1,6 +1,10 @@
 {
-	"pack": {
-	  "description": "Also works as a resourcepack to give custom textures",
-	  "pack_format": 71
-	}
+  "pack": {
+    "description": "LastLife bundled datapack (structures + loot tables)",
+    "pack_format": 61,
+    "supported_formats": {
+      "min_inclusive": 61,
+      "max_inclusive": 61
+    }
   }
+}

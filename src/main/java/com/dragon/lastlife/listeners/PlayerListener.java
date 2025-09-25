@@ -21,6 +21,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.json.JSONObject;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import static net.kyori.adventure.text.Component.text;
@@ -49,8 +51,8 @@ public class PlayerListener implements Listener {
                     }
 
                     if(label.equalsIgnoreCase("dungeon")){
-                        Dungeon dungeon = Utils.configs().DUNGEON_MANAGER.create("test");
-                        dungeon.generate("test", 0,100,0);
+                        Dungeon dungeon = Utils.configs().DUNGEON_MANAGER.create(Date.from(Instant.EPOCH.plusMillis(System.currentTimeMillis())).toGMTString().replace(":","-"));
+                        dungeon.generate("dungeon/entrances/entrance_1", 0,100,0);
                         e.getPlayer().teleport(new Location(dungeon.world(), 0, 150, 0));
                     }
 

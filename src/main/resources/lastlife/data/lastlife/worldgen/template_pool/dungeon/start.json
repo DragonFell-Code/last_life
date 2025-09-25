@@ -8,7 +8,7 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "lastlife:dungeon/entrances/entrance_1",
-        "processors": "minecraft:empty"
+        "processors": "lastlife:dungeon_chest_loot"
       }
     },
     {
@@ -17,7 +17,25 @@
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "lastlife:dungeon/entrances/entrance_1_1",
-        "processors": "minecraft:empty"
+        "processors": "lastlife:dungeon_chest_loot"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "lastlife:dungeon/entrances/entrance_1_2",
+        "processors": "lastlife:dungeon_chest_loot"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "lastlife:dungeon/entrances/entrance_1_3",
+        "processors": "lastlife:dungeon_chest_loot"
       }
     }
   ]
