@@ -53,7 +53,7 @@ public class PlayerListener implements Listener {
                     if(label.equalsIgnoreCase("dungeon")){
                         Dungeon dungeon = Utils.configs().DUNGEON_MANAGER.create(Date.from(Instant.EPOCH.plusMillis(System.currentTimeMillis())).toGMTString().replace(":","-"));
                         dungeon.generate("dungeon/entrances/entrance_1", 0,100,0);
-                        e.getPlayer().teleport(new Location(dungeon.world(), 0, 150, 0));
+                        e.getPlayer().teleport(new Location(dungeon.world(), -3, 103, 3));
                     }
 
                     if(label.equalsIgnoreCase("config")){
