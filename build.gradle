@@ -32,6 +32,7 @@ repositories {
 
 dependencies {
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:${minecraft_version}-${paperweight_build}") // Add this line
+//    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.21.8-R0.1")
 
 //    compileOnly("io.papermc.paper:paper-api:${minecraft_version}-${paperweight_build}")
     implementation "org.json:json:$json_version"

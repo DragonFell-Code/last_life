@@ -7,13 +7,13 @@ import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
 import com.dragon.lastlife.utils.net.MessageChannel;
 import com.dragon.lastlife.utils.net.MessageChannelHandler;
 import com.dragon.lastlife.utils.net.listener.ClientToServerListener;
+import com.quiptmc.core.annotations.Nullable;
 import com.quiptmc.core.config.ConfigManager;
 import com.quiptmc.core.discord.WebhookManager;
 import com.quiptmc.core.discord.embed.Embed;
 import com.quiptmc.core.heartbeat.Flutter;
 import com.quiptmc.core.heartbeat.HeartbeatUtils;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 

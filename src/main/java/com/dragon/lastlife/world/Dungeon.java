@@ -54,8 +54,8 @@ public record Dungeon(World world, DungeonManager manager) {
 //             Load (or get cached) template
 //            StructureTemplate tpl = loadTemplate(world, key, "structures/" + structureName + ".nbt");
 
-            NamespacedKey key = NamespacedKey.minecraft("test");
-            StructureTemplate template = loadTemplate(world, key, "structures/test.nbt");
+            NamespacedKey key = NamespacedKey.minecraft("lastlife");
+            StructureTemplate template = loadTemplate(world, key, "dungeon/entrances/entrance_1.nbt");
 
             // Choose a random rotation + mirror
             Mirror mirror = Mirror.values()[ThreadLocalRandom.current().nextInt(Mirror.values().length)];
