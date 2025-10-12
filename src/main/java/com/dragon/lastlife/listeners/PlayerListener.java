@@ -8,20 +8,25 @@ import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.dragon.lastlife.utils.chat.MessageUtils;
 import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
-import com.dragon.lastlife.world.Dungeon;
 import com.quiptmc.core.config.ConfigManager;
 import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.structure.Structure;
 import org.json.JSONObject;
 
 import java.time.Instant;
@@ -38,10 +43,8 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncChatEvent e) {
-
-        for(NamespacedKey key : Bukkit.getServer().getStructureManager().getStructures().keySet()){
+        for (NamespacedKey key : Bukkit.getServer().getStructureManager().getStructures().keySet()) {
             Utils.initializer().getLogger().info("Structure: " + key.toString());
-
         }
 
         if (e.getPlayer().isOp()) {
@@ -59,17 +62,41 @@ public class PlayerListener implements Listener {
                         e.getPlayer().sendMessage(text("Sent packet!", NamedTextColor.GREEN));
                     }
 
-                    if(label.equalsIgnoreCase("dungeon")){
-                        Dungeon dungeon = Utils.configs().DUNGEON_MANAGER.create(Date.from(Instant.EPOCH.plusMillis(System.currentTimeMillis())).toGMTString().replace(":","-"));
-                        dungeon.generate("dungeon/entrances/entrance_1", 0,100,0);
-                        e.getPlayer().teleport(new Location(dungeon.world(), -3, 103, 3));
+                    if (label.equalsIgnoreCase("dungeon")) {
+                        String world_name = args.length >= 1 ? args[0] : Date.from(Instant.EPOCH.plusMillis(System.currentTimeMillis())).toString().replace(":", "-");
+                        ChunkPos pos = new ChunkPos(0, 0);
+                        Utils.configs().DUNGEON_MANAGER.create(world_name, pos, (dungeon -> {
+                            BlockPos origin = dungeon.origin;
+                            Player player = e.getPlayer();
+                            ServerPlayer serverPlayer = ((CraftPlayer)player).getHandle();
+                            ServerLevel level = ((CraftWorld) dungeon.world).getHandle();
+
+                            BlockPos spawn_pos = origin;
+                            LevelChunk chunk = level.getChunkAt(origin);
+
+                            // Origin is in the middle of the room vertically, bring it down to a solid surface so players dont
+                            // spawn midair. They could still spawn in the middle of a pillar tho.
+                            while (!level.loadedAndEntityCanStandOn(spawn_pos.below(), serverPlayer)) {
+                                spawn_pos = spawn_pos.below();
+                                // If we scanned all the way to the void and no valid block was found, just use the origin.
+                                if (level.isOutsideBuildHeight(spawn_pos)) {
+                                    spawn_pos = origin;
+                                    player.sendMessage(text("Reset to Origin!", NamedTextColor.GREEN));
+                                    break;
+                                }
+                            }
+
+                            Vec3 final_pos = spawn_pos.getBottomCenter();
+
+                            player.teleport(new Location(dungeon.world, final_pos.x(), final_pos.y(), final_pos.z()));
+                        }));
                     }
 
-                    if(label.equalsIgnoreCase("config")){
+                    if (label.equalsIgnoreCase("config")) {
                         ConfigManager.reloadConfig(Utils.initializer().integration(), DonationConfig.class);
                     }
 
-                    if(label.equalsIgnoreCase("donation")){
+                    if (label.equalsIgnoreCase("donation")) {
                         JSONObject json = new JSONObject()
                                 .put("displayName", "Test Donor")
                                 .put("donorId", "270CB800398A911A")
@@ -128,10 +155,10 @@ public class PlayerListener implements Listener {
             e.getPlayer().getWorld().strikeLightningEffect(e.getPlayer().getLocation());
             Bukkit.broadcast(Utils.configs().MESSAGE_CONFIG.get("lastlife.death.elimination", e.getPlayer().name()));
         }
-        if(e.getDamageSource().getCausingEntity() != null && e.getDamageSource().getCausingEntity() instanceof Player killer){
+        if (e.getDamageSource().getCausingEntity() != null && e.getDamageSource().getCausingEntity() instanceof Player killer) {
             Participant killerParticipant = config.get(killer.getUniqueId());
-            if(killerParticipant != null){
-                if(killerParticipant.boogey) {
+            if (killerParticipant != null) {
+                if (killerParticipant.boogey) {
                     killer.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.cured"));
                     killerParticipant.boogey = false;
                 }
@@ -142,18 +169,16 @@ public class PlayerListener implements Listener {
 
         }
         config.save();
-
     }
 
     @EventHandler
     public void onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent e) {
         TaskScheduler.scheduleAsyncTask(() -> {
             Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId()).sync();
-
         }, 500, TimeUnit.MILLISECONDS);
         e.getPlayer().sendMessage(Utils.configs().MESSAGE_CONFIG.parse(text("Welcome to Last Life! ${cmd.session.start}", NamedTextColor.GOLD)));
         Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId());
-        if(participant.settings.get("boogey_particles") == null){
+        if (participant.settings.get("boogey_particles") == null) {
             Participant.ConfigString string = new Participant.ConfigString("boogey_particles", "flame");
             participant.settings.put(string);
         }

@@ -33,13 +33,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-public record Dungeon(World world, DungeonManager manager) {
+public class Dungeon {
     static ResourceKey<Structure> DUNGEON_RESOURCE_KEY = ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("lastlife:lastlife_dungeon"));
 
-    public void generate(String structurePath, int x, int y, int z) {
-        Holder.Reference<Structure> structure = MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(DUNGEON_RESOURCE_KEY);
+    Dungeon(World world, DungeonManager manager) {
+        this.world = world;
+        this.manager = manager;
+    }
+
+    public World world;
+    public DungeonManager manager;
+    public BlockPos origin = null;
+
+    public void generate(ResourceKey<Structure> structurekey, ChunkPos pos) {
+        Holder.Reference<Structure> structure = MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(structurekey);
         ServerLevel level = ((CraftWorld) world).getHandle();
-        BlockPos pos = new BlockPos(x, y, z);
 
         Structure structure1 = structure.value();
         ChunkGenerator generator = level.getChunkSource().getGenerator();
@@ -52,7 +60,7 @@ public record Dungeon(World world, DungeonManager manager) {
                 level.getChunkSource().randomState(),
                 level.getStructureManager(),
                 level.getSeed(),
-                new ChunkPos(pos),
+                pos,
                 0,
                 level,
                 biome -> true
@@ -64,6 +72,8 @@ public record Dungeon(World world, DungeonManager manager) {
             BoundingBox boundingBox = structureStart.getBoundingBox();
             ChunkPos start = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.minX()), SectionPos.blockToSectionCoord(boundingBox.minZ()));
             ChunkPos end = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.maxX()), SectionPos.blockToSectionCoord(boundingBox.maxZ()));
+
+            origin = structureStart.getPieces().getFirst().getBoundingBox().getCenter();
 
             ChunkPos.rangeClosed(start, end).filter(chunkPos -> !level.isLoaded(chunkPos.getWorldPosition())).forEach(chunkPos -> {
                 world.getChunkAt(chunkPos.x, chunkPos.z); // force load
@@ -173,16 +183,15 @@ public record Dungeon(World world, DungeonManager manager) {
             // Programmatic jigsaw assembly using NMS JigsawPlacement (no vanilla commands involved)
             ServerLevel nmsLevel = ((CraftWorld) world).getHandle();
 
-            for(Map.Entry<ResourceLocation, Optional<StructureTemplate>> entry : nmsLevel.getStructureManager().structureRepository.entrySet()){
+            for (Map.Entry<ResourceLocation, Optional<StructureTemplate>> entry : nmsLevel.getStructureManager().structureRepository.entrySet()) {
                 System.out.println("Looking for \"lastlife\": " + entry.getKey().getNamespace());
-                if(!entry.getKey().getNamespace().equals("lastlife")) continue;
+                if (!entry.getKey().getNamespace().equals("lastlife")) continue;
                 String namespacedPath = entry.getKey().getNamespace() + ":" + entry.getKey().getPath();
                 System.out.println("Should start with \"" + startPoolId + "\": " + namespacedPath);
-                if(!namespacedPath.startsWith(startPoolId)) continue;
-
+                if (!namespacedPath.startsWith(startPoolId)) continue;
 
                 System.out.println(entry.getKey().getNamespace() + ":" + entry.getKey().getPath() + " -> " + (entry.getValue().isPresent() ? "LOADED" : "MISSING"));
-                if(entry.getValue().isPresent()){
+                if (entry.getValue().isPresent()) {
                     StructureTemplate template = entry.getValue().get();
                     System.out.println("  Size: " + template.getSize());
                     BlockPos pos = new BlockPos(x, y, z);
@@ -206,7 +215,7 @@ public record Dungeon(World world, DungeonManager manager) {
                 return true;
 
             }
-            if(true) return true;
+            if (true) return true;
             RegistryAccess access = nmsLevel.registryAccess();
 
             // Resolve start pool holder reflectively to avoid tight coupling to Mojang mappings between minor versions
@@ -294,7 +303,7 @@ public record Dungeon(World world, DungeonManager manager) {
 
     private String selectVillageStartPool() {
         // Standard vanilla village start pools
-        String[] pools = new String[] {
+        String[] pools = new String[]{
                 "lastlife:dungeon/start"
 //                "minecraft:village/plains/town_centers",
 //                "minecraft:village/desert/town_centers",

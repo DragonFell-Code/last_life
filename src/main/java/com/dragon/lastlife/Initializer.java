@@ -9,7 +9,6 @@ import com.dragon.lastlife.listeners.PlayerListener;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.ConfigManager;
-import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -27,7 +26,6 @@ public final class Initializer extends JavaPlugin {
     public void onEnable() {
         quipt();
         Utils.init(this);
-
 
         new PlayerListener(this);
         new LootListener(this);
@@ -49,9 +47,7 @@ public final class Initializer extends JavaPlugin {
     }
 
     public class LastLife extends QuiptIntegration {
-
         File dataFolder = new File("plugins/" + getName());
-
 
         @Override
         public void enable() {

@@ -3,13 +3,15 @@ package com.dragon.lastlife.world;
 import com.dragon.lastlife.Initializer;
 import com.quiptmc.core.data.registries.Registries;
 import com.quiptmc.core.data.registries.Registry;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.world.level.ChunkPos;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
+import java.util.function.Consumer;
+
+import static com.dragon.lastlife.world.Dungeon.DUNGEON_RESOURCE_KEY;
 import static net.kyori.adventure.text.Component.text;
 
 public class DungeonManager {
@@ -21,35 +23,33 @@ public class DungeonManager {
         this.initializer = initializer;
     }
 
-    public Dungeon create(String name) {
-
-
+    public void create(String name, ChunkPos pos, Consumer<Dungeon> callback) {
         initializer.getComponentLogger().info(text("Creating dungeon world: " + name));
-        if(registry.get(name).isPresent()){
+        if (registry.get(name).isPresent()) {
             initializer.getComponentLogger().warn(text("Dungeon with name " + name + " already exists!"), NamedTextColor.RED);
-            return registry.get(name).get();
+            callback.accept(registry.get(name).get());
+            return;
         }
-        World world;
-        if(Bukkit.getWorld(name) != null){
-            initializer.getComponentLogger().warn(text("World with name " + name + " already exists!"), NamedTextColor.RED);
-            world = Bukkit.getWorld(name);
-        } else {
-            world = Bukkit.createWorld(new WorldCreator(name).generator(new VoidChunkGenerator()));
-        }
-        Dungeon dungeon = new Dungeon(world, this);
-        registry.register(name, dungeon);
-        // Ensure spawn chunk is loaded and place the dungeon start at 0,64,0
-        world.getChunkAt(0, 0); // force load
+
         Bukkit.getScheduler().runTask(initializer, () -> {
+            World world = Bukkit.getWorld(name);
+
+            if (world != null) {
+                initializer.getComponentLogger().warn(text("World with name " + name + " already exists!"), NamedTextColor.RED);
+            } else {
+                world = Bukkit.createWorld(new WorldCreator(name).generator(new VoidChunkGenerator()));
+                initializer.getComponentLogger().info(text("Done! Dungeon world created: " + name), NamedTextColor.GREEN);
+            }
+            Dungeon dungeon = new Dungeon(world, this);
+
             try {
-                dungeon.generate("dungeon/entrances/entrance_1_2", 0, 64, 0);
+                dungeon.generate(DUNGEON_RESOURCE_KEY, pos);
+                registry.register(name, dungeon);
+
+                callback.accept(dungeon);
             } catch (Exception e) {
                 initializer.getLogger().warning("Failed to generate dungeon structure: " + e.getMessage());
             }
         });
-        initializer.getComponentLogger().info("Done! Dungeon world created: " + name, NamedTextColor.GREEN);
-        return dungeon;
     }
-
-
 }

@@ -22,9 +22,6 @@ public class LootListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLoot(LootGenerateEvent event) {
-
-
-
         NamespacedKey key = event.getLootTable().getKey();
         // Only target our dungeon chests
         if (!key.getNamespace().equals("lastlife") || !key.getKey().equals("chests/dungeon_scaled")) return;
@@ -32,7 +29,6 @@ public class LootListener implements Listener {
         // Determine the tier from donations
         DonationConfig config = Utils.configs().DONATION_CONFIG();
         Tier tier = Tier.of(config.total.doubleValue());
-
 
         LootTable table = Bukkit.getLootTable(tier.key());
         if (table != null) {
@@ -54,15 +50,15 @@ public class LootListener implements Listener {
             this.key = key;
         }
 
-        public static Tier of(double amount){
+        public static Tier of(double amount) {
             if (amount < 1000) return LOW;
             if (amount < 10000) return MID;
             return HIGH;
         }
 
-        public static Tier of(NamespacedKey key){
+        public static Tier of(NamespacedKey key) {
             for (Tier tier : values()) {
-                if(tier.key().equals(key)) return tier;
+                if (tier.key().equals(key)) return tier;
             }
             return null;
         }
@@ -70,8 +66,5 @@ public class LootListener implements Listener {
         public NamespacedKey key() {
             return key;
         }
-
     }
-
-
 }
