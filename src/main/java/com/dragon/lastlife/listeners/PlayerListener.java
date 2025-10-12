@@ -13,12 +13,15 @@ import com.quiptmc.core.config.ConfigManager;
 import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.structure.Structure;
 import org.json.JSONObject;
 
 import java.time.Instant;
@@ -35,6 +38,12 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncChatEvent e) {
+
+        for(NamespacedKey key : Bukkit.getServer().getStructureManager().getStructures().keySet()){
+            Utils.initializer().getLogger().info("Structure: " + key.toString());
+
+        }
+
         if (e.getPlayer().isOp()) {
             String raw = Utils.configs().MESSAGE_CONFIG.plainText(e.message());
             if (raw.startsWith("!")) {

@@ -6,6 +6,7 @@ import com.quiptmc.core.data.registries.Registry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 
@@ -21,6 +22,8 @@ public class DungeonManager {
     }
 
     public Dungeon create(String name) {
+
+
         initializer.getComponentLogger().info(text("Creating dungeon world: " + name));
         if(registry.get(name).isPresent()){
             initializer.getComponentLogger().warn(text("Dungeon with name " + name + " already exists!"), NamedTextColor.RED);

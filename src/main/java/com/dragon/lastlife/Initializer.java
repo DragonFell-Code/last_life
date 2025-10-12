@@ -9,6 +9,7 @@ import com.dragon.lastlife.listeners.PlayerListener;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.ConfigManager;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -34,6 +35,7 @@ public final class Initializer extends JavaPlugin {
         new CommandExecutor.Builder(new BoogeyCommand(this)).setDescription("Manage Last Life boogeys").register();
         new CommandExecutor.Builder(new DonationsCommand(this)).setDescription("Base command for participants to link their ExtraLife accounts").register();
         getLogger().info("LastLife plugin has been enabled successfully.");
+
     }
 
     public LastLife integration() {
