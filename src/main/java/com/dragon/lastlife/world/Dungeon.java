@@ -3,14 +3,20 @@ package com.dragon.lastlife.world;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.HolderGetter;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
@@ -28,15 +34,79 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 public record Dungeon(World world, DungeonManager manager) {
+    static ResourceKey<Structure> DUNGEON_RESOURCE_KEY = ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("lastlife:lastlife_dungeon"));
 
     public void generate(String structurePath, int x, int y, int z) {
-        // Generate a vanilla village via jigsaw blocks, fully programmatic (no commands).
-        String startPool = selectVillageStartPool();
-        boolean ok = generateJigsawFromPool(startPool, x, y, z, 7);
-        if (!ok) {
-            // Fallback: place provided template if village generation fails
-            placeTemplate(structurePath, x, y, z);
+        Holder.Reference<Structure> structure = MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(DUNGEON_RESOURCE_KEY);
+        ServerLevel level = ((CraftWorld) world).getHandle();
+        BlockPos pos = new BlockPos(x, y, z);
+
+        Structure structure1 = structure.value();
+        ChunkGenerator generator = level.getChunkSource().getGenerator();
+        StructureStart structureStart = structure1.generate(
+                structure,
+                level.dimension(),
+                level.registryAccess(),
+                generator,
+                generator.getBiomeSource(),
+                level.getChunkSource().randomState(),
+                level.getStructureManager(),
+                level.getSeed(),
+                new ChunkPos(pos),
+                0,
+                level,
+                biome -> true
+        );
+
+        if (!structureStart.isValid()) {
+            manager.initializer.getLogger().severe("StructureStart is not Valid");
+        } else {
+            BoundingBox boundingBox = structureStart.getBoundingBox();
+            ChunkPos start = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.minX()), SectionPos.blockToSectionCoord(boundingBox.minZ()));
+            ChunkPos end = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.maxX()), SectionPos.blockToSectionCoord(boundingBox.maxZ()));
+
+            ChunkPos.rangeClosed(start, end).filter(chunkPos -> !level.isLoaded(chunkPos.getWorldPosition())).forEach(chunkPos -> {
+                world.getChunkAt(chunkPos.x, chunkPos.z); // force load
+            });
+
+            ChunkPos.rangeClosed(start, end)
+                    .forEach(
+                            chunkPos2 -> structureStart.placeInChunk(
+                                    level,
+                                    level.structureManager(),
+                                    generator,
+                                    level.getRandom(),
+                                    new BoundingBox(
+                                            chunkPos2.getMinBlockX(),
+                                            level.getMinY(),
+                                            chunkPos2.getMinBlockZ(),
+                                            chunkPos2.getMaxBlockX(),
+                                            level.getMaxY() + 1,
+                                            chunkPos2.getMaxBlockZ()
+                                    ),
+                                    chunkPos2
+                            )
+                    );
+            manager.initializer.getLogger().info("Structure has been Generated !");
         }
+
+        // placeJigsaw(
+        // (CommandSourceStack)context.getSource(),
+        // ResourceKeyArgument.getStructureTemplatePool(context, "pool"),
+        // ResourceLocationArgument.getId(context, "target"),
+        // IntegerArgumentType.getInteger(context, "max_depth"),
+        // new BlockPos(x, y, z))
+
+        // JigsawPlacement.generateJigsaw(world, templatePool, target, 7, pos, false);
+
+        // configuredFeature.place(level, level.getChunkSource().getGenerator(), level.getRandom(), pos);
+        // String startPool = selectVillageStartPool();
+
+        // boolean ok = generateJigsawFromPool(startPool, x, y, z, 7);
+        // if (!ok) {
+        // Fallback: place provided template if village generation fails
+        // placeTemplate(structurePath, x, y, z);
+        //}
     }
 
     private StructureTemplate loadTemplate(World world, NamespacedKey key, String resourcePath) throws IOException {
