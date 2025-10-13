@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id 'io.papermc.paperweight.userdev' version '2.0.0-beta.18'
 }
@@ -30,6 +31,10 @@ repositories {
 //    }
 }
 
+configurations {
+    shade
+}
+
 dependencies {
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:${minecraft_version}-${paperweight_build}") // Add this line
 //    paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.21.8-R0.1")
@@ -37,6 +42,8 @@ dependencies {
 //    compileOnly("io.papermc.paper:paper-api:${minecraft_version}-${paperweight_build}")
     implementation "org.json:json:$json_version"
     implementation "com.quiptmc:core:${quipt_version}"
+    shade "org.json:json:$json_version"
+    shade "com.quiptmc:core:${quipt_version}"
 //    implementation "top.offsetmonkey538.meshlib:mesh-lib-paper:${mesh_version}"
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
@@ -88,4 +95,14 @@ processResources {
     filesMatching('paper-plugin.yml') {
         expand props
     }
+}
+
+shadowJar {
+    configurations = [project.configurations.shade]
+    archiveClassifier.set("")
+}
+
+// Ensure 'build' produces the shaded jar
+tasks.named("assemble") {
+    dependsOn tasks.named("shadowJar")
 }

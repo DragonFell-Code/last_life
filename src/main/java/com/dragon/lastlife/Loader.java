@@ -37,21 +37,21 @@ public class Loader implements PluginLoader {
             }
 
         }
-        MavenLibraryResolver central = new MavenLibraryResolver();
-
-        central.addRepository(new RemoteRepository.Builder("central", "default", MavenLibraryResolver.MAVEN_CENTRAL_DEFAULT_MIRROR).build());
-        central.addDependency(new Dependency(new DefaultArtifact("org.json:json:" + properties.getProperty("json_version")), null));
-
-        MavenLibraryResolver quipt = new MavenLibraryResolver();
-        Authentication auth = new AuthenticationBuilder()
-                .addUsername("QuickScythe")
-                .addPassword(System.getenv("PACKAGES_TOKEN"))
-                .build();
-
-        quipt.addRepository(new RemoteRepository.Builder("quipt", "default", "https://maven.pkg.github.com/Quipt-Minecraft/quipt").setAuthentication(auth).build());
-        quipt.addDependency(new Dependency(new DefaultArtifact("com.quiptmc:core:" + properties.getProperty("quipt_version")), null));
-        classpathBuilder.addLibrary(quipt);
-
-        classpathBuilder.addLibrary(central);
+//        MavenLibraryResolver central = new MavenLibraryResolver();
+//
+//        central.addRepository(new RemoteRepository.Builder("central", "default", MavenLibraryResolver.MAVEN_CENTRAL_DEFAULT_MIRROR).build());
+//        central.addDependency(new Dependency(new DefaultArtifact("org.json:json:" + properties.getProperty("json_version")), null));
+//
+//        MavenLibraryResolver quipt = new MavenLibraryResolver();
+//        Authentication auth = new AuthenticationBuilder()
+//                .addUsername("QuickScythe")
+//                .addPassword(System.getenv("PACKAGES_TOKEN"))
+//                .build();
+//
+//        quipt.addRepository(new RemoteRepository.Builder("quipt", "default", "https://maven.pkg.github.com/Quipt-Minecraft/quipt").setAuthentication(auth).build());
+//        quipt.addDependency(new Dependency(new DefaultArtifact("com.quiptmc:core:" + properties.getProperty("quipt_version")), null));
+//        classpathBuilder.addLibrary(quipt);
+//
+//        classpathBuilder.addLibrary(central);
     }
 }
