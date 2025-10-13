@@ -23,6 +23,7 @@ public class Configs {
         ConfigManager.registerConfig(initializer.integration(), DefaultConfig.class);
         ConfigManager.registerConfig(initializer.integration(), ParticipantConfig.class);
         ConfigManager.registerConfig(initializer.integration(), DonationConfig.class);
+        ConfigManager.registerConfig(initializer.integration(), PartyConfig.class);
         WebhooksConfig webhooks = ConfigManager.registerConfig(initializer.integration(), WebhooksConfig.class);
         webhooks.initialize();
     }
