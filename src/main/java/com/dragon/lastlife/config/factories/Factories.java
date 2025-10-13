@@ -14,6 +14,7 @@ public class Factories {
     public final GenericFactory<Donation> DONATION_FACTORY = register(new GenericFactory<>(Donation.class));
     public final GenericFactory<Webhook> WEBHOOK_FACTORY = register(new GenericFactory<>(Webhook .class));
     public final GenericFactory<Party> PARTY_FACTORY = register(new GenericFactory<>(Party.class));
+    public final GenericFactory<Participant.ConfigString> CONFIG_STRING_FACTORY = register(new GenericFactory<>(Participant.ConfigString.class));
 
     public <T extends ConfigObject.Factory<?>> T register(T factory) {
         Utils.initializer().integration().log("Factories", "Registering factory: " + factory.getClass().getName());
