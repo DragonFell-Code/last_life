@@ -34,7 +34,7 @@ jobs:
 
     - name: Build with Gradle Wrapper
       run: ./gradlew build
-      with:
+      env:
         PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
 
     - name: Upload artifact for deployment job
