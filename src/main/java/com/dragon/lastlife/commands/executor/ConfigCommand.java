@@ -22,7 +22,7 @@ public class ConfigCommand extends CommandExecutor {
 
     @Override
     public LiteralCommandNode<CommandSourceStack> execute() {
-        return literal(name()).executes(_ -> 1).then(argument("file", new ConfigFileArgument()).executes(_ -> 1).then(literal("reload").executes(context -> {
+        return literal(name()).executes(a -> 1).then(argument("file", new ConfigFileArgument()).executes(a -> 1).then(literal("reload").executes(context -> {
             Config configFile = context.getArgument("file", Config.class);
             if (configFile == null) {
                 context.getSource().getSender().sendMessage("No config file specified.");
@@ -32,7 +32,7 @@ public class ConfigCommand extends CommandExecutor {
             ConfigManager.reloadConfig(configFile.integration(), configFile.getClass());
             context.getSource().getSender().sendMessage(text("Success", NamedTextColor.GREEN));
             return 1;
-        })).then(literal("get").executes(_ -> 1).then(argument("path", StringArgumentType.greedyString()).executes(context -> {
+        })).then(literal("get").executes(a -> 1).then(argument("path", StringArgumentType.greedyString()).executes(context -> {
             Config config = context.getArgument("file", Config.class);
             String path = StringArgumentType.getString(context, "path");
             Object value = config.json().get(path);
