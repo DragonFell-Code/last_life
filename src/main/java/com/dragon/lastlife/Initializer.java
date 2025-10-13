@@ -4,8 +4,10 @@ import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.commands.executor.BoogeyCommand;
 import com.dragon.lastlife.commands.executor.ConfigCommand;
 import com.dragon.lastlife.commands.executor.DonationsCommand;
+import com.dragon.lastlife.config.PartyConfig;
 import com.dragon.lastlife.listeners.LootListener;
 import com.dragon.lastlife.listeners.PlayerListener;
+import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.ConfigManager;
@@ -33,7 +35,6 @@ public final class Initializer extends JavaPlugin {
         new CommandExecutor.Builder(new BoogeyCommand(this)).setDescription("Manage Last Life boogeys").register();
         new CommandExecutor.Builder(new DonationsCommand(this)).setDescription("Base command for participants to link their ExtraLife accounts").register();
         getLogger().info("LastLife plugin has been enabled successfully.");
-
     }
 
     public LastLife integration() {

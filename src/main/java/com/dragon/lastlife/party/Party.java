@@ -9,7 +9,7 @@ import org.json.JSONObject;
 public class Party extends ConfigObject {
 
 
-    ConfigMap<Participant> members = new ConfigMap<>();
+    public ConfigMap<Participant> members = new ConfigMap<>();
 
     public Party() {
 
@@ -18,5 +18,7 @@ public class Party extends ConfigObject {
     public Party(JSONObject json) {
         this.fromJson(json);
     }
+
+
 
 }

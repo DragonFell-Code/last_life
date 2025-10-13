@@ -1,6 +1,7 @@
 package com.dragon.lastlife.config;
 
 import com.dragon.lastlife.party.Party;
+import com.dragon.lastlife.players.Participant;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.Config;
 import com.quiptmc.core.config.ConfigMap;
@@ -9,6 +10,7 @@ import com.quiptmc.core.config.ConfigValue;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Optional;
 
 @ConfigTemplate(name = "party", ext = ConfigTemplate.Extension.JSON)
 public class PartyConfig extends Config {
@@ -34,11 +36,21 @@ public class PartyConfig extends Config {
         partyData.put("id", name);
         Party party = new Party(partyData);
         parties.put(party);
+        save();
         return party;
     }
 
     public Party get(String name){
         if(!parties.contains(name)) return null;
         return parties.get(name);
+    }
+
+    public Optional<Party> get(Participant participant){
+        for(Party party : parties.values()){
+            if(party.members.contains(participant.id)){
+                return Optional.of(party);
+            }
+        }
+        return Optional.empty();
     }
 }

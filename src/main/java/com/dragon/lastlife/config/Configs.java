@@ -44,4 +44,8 @@ public class Configs {
     public WebhooksConfig WEBHOOKS_CONFIG() {
         return ConfigManager.getConfig(initializer.integration(), WebhooksConfig.class);
     }
+
+    public PartyConfig PARTY_CONFIG() {
+        return ConfigManager.getConfig(initializer.integration(), PartyConfig.class);
+    }
 }
