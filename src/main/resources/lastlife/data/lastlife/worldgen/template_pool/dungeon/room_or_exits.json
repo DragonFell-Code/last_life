@@ -1,9 +1,9 @@
 {
-  "name": "lastlife:dungeon/rooms2",
+  "name": "lastlife:dungeon/rooms",
   "fallback": "lastlife:dungeon/exits",
   "elements": [
     {
-      "weight": 1,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -12,7 +12,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -21,7 +21,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -30,7 +30,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -39,7 +39,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -48,7 +48,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -57,7 +57,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -66,7 +66,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "weight": 1,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -84,7 +84,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -93,7 +93,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -102,7 +102,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -111,7 +111,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -120,7 +120,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -129,7 +129,7 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -138,11 +138,20 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 5,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "lastlife:dungeon/rooms/room_4_4",
+        "processors": "lastlife:dungeon_chest_loot"
+      }
+    },
+    {
+      "weight": 3,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "lastlife:dungeon/exits/portal_1_1",
         "processors": "lastlife:dungeon_chest_loot"
       }
     }

@@ -3,9 +3,11 @@
     { "structure": "lastlife:lastlife_dungeon", "weight": 1 }
   ],
   "placement": {
-    "type": "minecraft:random_spread",
-    "spacing": 24,
-    "separation": 8,
+    "type": "minecraft:concentric_rings",
+    "preferred_biomes": ["lastlife:void"],
+    "distance": 0,
+    "count": 1,
+    "spread": 0,
     "salt": 142315231
   }
 }

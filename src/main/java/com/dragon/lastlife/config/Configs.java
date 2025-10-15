@@ -37,7 +37,6 @@ public class Configs {
     }
 
     public DonationConfig DONATION_CONFIG() {
-
         return ConfigManager.getConfig(initializer.integration(), DonationConfig.class);
     }
 

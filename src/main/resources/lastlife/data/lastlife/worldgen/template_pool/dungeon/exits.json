@@ -1,0 +1,24 @@
+{
+  "name": "lastlife:dungeon/exits",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 1,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "lastlife:dungeon/exits/portal_1_1",
+        "processors": "lastlife:dungeon_chest_loot"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "lastlife:dungeon/exits/empty_1_1",
+        "processors": "lastlife:dungeon_chest_loot"
+      }
+    }
+  ]
+}

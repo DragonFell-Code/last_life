@@ -3,12 +3,6 @@ package com.dragon.lastlife;
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
 import io.papermc.paper.plugin.loader.PluginLoader;
 import io.papermc.paper.plugin.loader.library.impl.JarLibrary;
-import io.papermc.paper.plugin.loader.library.impl.MavenLibraryResolver;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.repository.Authentication;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
