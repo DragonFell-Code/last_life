@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import java.net.http.HttpResponse;
 
-import static com.quiptmc.core.utils.net.NetworkUtils.GET;
 import static io.papermc.paper.command.brigadier.Commands.argument;
 import static io.papermc.paper.command.brigadier.Commands.literal;
 
@@ -67,7 +66,7 @@ public class DonationsCommand extends CommandExecutor {
                                                 return builder.buildFuture();
                                             }
 
-                                            HttpResponse<String> response = NetworkUtils.get(GET, Utils.configs().DONATION_CONFIG().api_endpoint + "participants/" + participant.donorDriveId + "/incentives");
+                                            HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "participants/" + participant.donorDriveId + "/incentives");
                                             JSONArray raw = new JSONArray(response.body());
                                             String[] values = new String[raw.length()];
                                             for (int i = 0; i < raw.length(); i++) {
@@ -90,7 +89,7 @@ public class DonationsCommand extends CommandExecutor {
                                                 return logError(context, "You must link your Extra Life account first using /donations link <participantName>");
                                             }
 
-                                            HttpResponse<String> response = NetworkUtils.get(GET, Utils.configs().DONATION_CONFIG().api_endpoint + "participants/" + participant.donorDriveId + "/incentives");
+                                            HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "participants/" + participant.donorDriveId + "/incentives");
                                             JSONArray raw = new JSONArray(response.body());
                                             for (int i = 0; i < raw.length(); i++) {
                                                 JSONObject incentive = raw.getJSONObject(i);
@@ -112,7 +111,7 @@ public class DonationsCommand extends CommandExecutor {
                         .executes(context -> logError(context, "Usage: /donations link <participantName>"))
                         .then(argument("participantName", StringArgumentType.greedyString())
                                 .suggests((context, builder) -> {
-                                    HttpResponse<String> response = NetworkUtils.get(GET, Utils.configs().DONATION_CONFIG().api_endpoint + "teams/" + Utils.configs().DONATION_CONFIG().team_id + "/participants");
+                                    HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "teams/" + Utils.configs().DONATION_CONFIG().team_id + "/participants");
                                     JSONArray raw = new JSONArray(response.body());
                                     String[] values = new String[raw.length()];
                                     for (int i = 0; i < raw.length(); i++) {
@@ -125,7 +124,7 @@ public class DonationsCommand extends CommandExecutor {
                                     CommandSender sender = context.getSource().getSender();
                                     if (!(sender instanceof Player player))
                                         return logError(context, "Only players can link to participants.");
-                                    HttpResponse<String> response = NetworkUtils.get(GET, Utils.configs().DONATION_CONFIG().api_endpoint + "teams/" + Utils.configs().DONATION_CONFIG().team_id + "/participants");
+                                    HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "teams/" + Utils.configs().DONATION_CONFIG().team_id + "/participants");
                                     JSONArray raw = new JSONArray(response.body());
                                     String participantName = StringArgumentType.getString(context, "participantName");
                                     for (int i = 0; i < raw.length(); i++) {

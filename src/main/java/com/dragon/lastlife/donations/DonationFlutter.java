@@ -5,6 +5,7 @@ import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.discord.WebhookManager;
 import com.quiptmc.core.heartbeat.Flutter;
+import com.quiptmc.core.utils.net.HttpConfig;
 import com.quiptmc.core.utils.net.NetworkUtils;
 import com.quiptmc.core.utils.net.HttpHeaders;
 import org.json.JSONArray;
@@ -17,13 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.dragon.lastlife.donations.IncentiveType.LIFE;
-
 public class DonationFlutter implements Flutter {
 
     private final int MAX_LIMIT = 100;
     private long LAST_HEARTBEAT = 0;
-    private final NetworkUtils.Get GET;
+    private final HttpConfig GET;
     private int offset = 0;
 
 
@@ -31,7 +30,7 @@ public class DonationFlutter implements Flutter {
         if (config == null) {
             throw new IllegalArgumentException("DonationConfig cannot be null");
         }
-        GET = NetworkUtils.Get.defaults(HttpHeaders.ETAG(config.etag));
+        GET = HttpConfig.defaults(HttpHeaders.ETAG(config.etag));
     }
 
     private DonationConfig config() {
@@ -52,7 +51,7 @@ public class DonationFlutter implements Flutter {
                 }
                 if (response.statusCode() == 304 && offset <= 0) {
                     Utils.initializer().getLogger().config("No new donations available. Continuing...");
-                    return true; // No new donations, continue running
+                    return true; // No new donations continue running
                 }
                 String etag = response.headers().firstValue("etag").orElse("");
                 if (!etag.equals(config().etag) || offset > 0) {
@@ -82,7 +81,7 @@ public class DonationFlutter implements Flutter {
 
     private void sync(int diff) {
         String url = config().api_endpoint + "teams/" + config().team_id + "/donations?limit=" + (diff) + (offset > 0 ? "&offset=" + (offset + 1) : "");
-        HttpResponse<String> donationsResponse = NetworkUtils.get(NetworkUtils.GET, url);
+        HttpResponse<String> donationsResponse = NetworkUtils.get(NetworkUtils.DEFAULT, url);
         if (donationsResponse.statusCode() != 200 && donationsResponse.statusCode() != 304) {
             Utils.initializer().integration().log("DonationFlutter", "Failed to fetch donations: " + donationsResponse.statusCode() + " - " + donationsResponse.body());
             return;

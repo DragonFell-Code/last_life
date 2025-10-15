@@ -30,7 +30,7 @@ public class ConfigFileArgument implements CustomArgumentType.Converted<@NotNull
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
 
         for(String key : ConfigManager.getAll()) {
-            builder.suggest(key);
+            builder.suggest("\"" + key + "\"");
         }
 
         return builder.buildFuture();

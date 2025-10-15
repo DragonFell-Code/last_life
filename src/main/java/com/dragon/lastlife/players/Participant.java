@@ -4,6 +4,7 @@ import com.dragon.lastlife.utils.Utils;
 import com.dragon.lastlife.utils.net.MessageChannelHandler;
 import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigObject;
+import com.quiptmc.core.config.objects.ConfigString;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -85,27 +86,7 @@ public class Participant extends ConfigObject {
     }
 
 
-    public static class ConfigString extends ConfigObject {
 
-        String value;
-        public ConfigString(String id, String value){
-            this.value = value;
-            super.id = id;
-        }
-
-        public ConfigString(JSONObject json){
-            fromJson(json);
-        }
-
-        public String value(){
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return value();
-        }
-    }
 
     public class LifeManager {
 

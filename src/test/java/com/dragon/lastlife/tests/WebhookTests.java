@@ -1,15 +1,6 @@
 package com.dragon.lastlife.tests;
 
-import com.dragon.lastlife.config.WebhooksConfig;
-import com.dragon.lastlife.config.factories.GenericFactory;
-import com.dragon.lastlife.tests.factory.FakeIntegration;
-import com.dragon.lastlife.utils.Utils;
-import com.quiptmc.core.config.ConfigManager;
-import com.quiptmc.core.discord.Webhook;
-import com.quiptmc.core.discord.embed.Embed;
 import org.junit.jupiter.api.Test;
-
-import java.awt.*;
 
 public class WebhookTests {
 

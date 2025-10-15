@@ -9,6 +9,7 @@ import com.dragon.lastlife.utils.Utils;
 import com.dragon.lastlife.utils.chat.MessageUtils;
 import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
 import com.quiptmc.core.config.ConfigManager;
+import com.quiptmc.core.config.objects.ConfigString;
 import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -179,7 +180,7 @@ public class PlayerListener implements Listener {
         e.getPlayer().sendMessage(Utils.configs().MESSAGE_CONFIG.parse(text("Welcome to Last Life! ${cmd.session.start}", NamedTextColor.GOLD)));
         Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId());
         if (participant.settings.get("boogey_particles") == null) {
-            Participant.ConfigString string = new Participant.ConfigString("boogey_particles", "flame");
+            ConfigString string = new ConfigString("boogey_particles", "flame");
             participant.settings.put(string);
         }
         JSONObject json = participant.settings.json();
