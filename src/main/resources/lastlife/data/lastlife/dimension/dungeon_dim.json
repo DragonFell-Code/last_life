@@ -1,0 +1,11 @@
+{
+  "type": "lastlife:dungeon_dim_type",
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "biome": "lastlife:void",
+      "layers": [],
+      "structure_overrides": ["lastlife:lastlife_dungeons"]
+    }
+  }
+}

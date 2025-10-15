@@ -13,25 +13,19 @@ import com.quiptmc.core.config.objects.ConfigString;
 import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.json.JSONObject;
 
-import java.time.Instant;
-import java.util.Date;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static net.kyori.adventure.text.Component.text;
@@ -64,33 +58,22 @@ public class PlayerListener implements Listener {
                     }
 
                     if (label.equalsIgnoreCase("dungeon")) {
-                        String world_name = args.length >= 1 ? args[0] : Date.from(Instant.EPOCH.plusMillis(System.currentTimeMillis())).toString().replace(":", "-");
-                        ChunkPos pos = new ChunkPos(0, 0);
-                        Utils.configs().DUNGEON_MANAGER.create(world_name, pos, (dungeon -> {
-                            BlockPos origin = dungeon.origin;
-                            Player player = e.getPlayer();
-                            ServerPlayer serverPlayer = ((CraftPlayer)player).getHandle();
-                            ServerLevel level = ((CraftWorld) dungeon.world).getHandle();
+                        World world = Bukkit.getWorld("world_lastlife_dungeon_dim");
+                        Player player = e.getPlayer();
 
-                            BlockPos spawn_pos = origin;
-                            LevelChunk chunk = level.getChunkAt(origin);
+                        if (world == null) {
+                            player.sendMessage(text("Failed to detect dungeon world", NamedTextColor.RED));
+                            return;
+                        }
+                        Location tp_location = new Location(world, -96, 100, -32);
+                        Collection<Entity> entities = world.getNearbyEntities(tp_location, 7, 1, 7);
+                        Optional<Entity> spawn_marker = entities.stream().filter(entity -> "lastlife:dungeon/spawn".equals(entity.getName())).findFirst();
 
-                            // Origin is in the middle of the room vertically, bring it down to a solid surface so players dont
-                            // spawn midair. They could still spawn in the middle of a pillar tho.
-                            while (!level.loadedAndEntityCanStandOn(spawn_pos.below(), serverPlayer)) {
-                                spawn_pos = spawn_pos.below();
-                                // If we scanned all the way to the void and no valid block was found, just use the origin.
-                                if (level.isOutsideBuildHeight(spawn_pos)) {
-                                    spawn_pos = origin;
-                                    player.sendMessage(text("Reset to Origin!", NamedTextColor.GREEN));
-                                    break;
-                                }
-                            }
-
-                            Vec3 final_pos = spawn_pos.getBottomCenter();
-
-                            player.teleport(new Location(dungeon.world, final_pos.x(), final_pos.y(), final_pos.z()));
-                        }));
+                        if (spawn_marker.isPresent()) {
+                            player.teleport(spawn_marker.get());
+                        } else {
+                            player.teleport(tp_location);
+                        }
                     }
 
                     if (label.equalsIgnoreCase("config")) {
