@@ -3,6 +3,7 @@ package com.dragon.lastlife.utils;
 import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.config.Configs;
 import com.dragon.lastlife.donations.DonationFlutter;
+import com.dragon.lastlife.loot.LootManager;
 import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
 import com.dragon.lastlife.utils.net.MessageChannel;
 import com.dragon.lastlife.utils.net.MessageChannelHandler;
@@ -39,11 +40,13 @@ public class Utils {
     private static Initializer initializer;
     private static Configs configs;
     private static MessageChannelHandler channelMessageHandler;
+    private static LootManager lootManager;
 //    private static
 
     public static void init(Initializer init) {
         initializer = init;
         configs = new Configs(init);
+        lootManager = new LootManager();
         PlaceholderUtils.registerPlaceholders();
 
         channelMessageHandler = new MessageChannelHandler(init);
@@ -61,6 +64,10 @@ public class Utils {
             init.integration().log("Utils", "Registered outgoing channel: " + cts.name);
         }
         setupHeartbeat();
+    }
+
+    public static LootManager loot() {
+        return lootManager;
     }
 
     private static void setupHeartbeat() {
@@ -94,9 +101,8 @@ public class Utils {
                 .description(description)
                 .color(color.getRGB() & 0xFFFFFF);
         if (image != null) builder.thumbnail(image);
-        if (fields != null && fields.length > 0) {
-            for (int i = 0; i < fields.length; i++) {
-                Embed.Field fieldItem = fields[i];
+        if (fields != null) {
+            for (Embed.Field fieldItem : fields) {
                 if (fieldItem != null) {
                     builder.field(fieldItem.name, fieldItem.value, fieldItem.inline);
                 }

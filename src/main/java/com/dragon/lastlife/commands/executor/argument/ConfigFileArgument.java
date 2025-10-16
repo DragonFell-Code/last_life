@@ -15,21 +15,20 @@ import java.util.concurrent.CompletableFuture;
 public class ConfigFileArgument implements CustomArgumentType.Converted<@NotNull Config, @NotNull String> {
 
 
-
     @Override
     public Config convert(@NotNull String nativeType) {
-        return ConfigManager.getConfig(nativeType);
+        return ConfigManager.getConfig(nativeType.replaceAll("\"", ""));
     }
 
     @Override
     public @NotNull ArgumentType<String> getNativeType() {
-        return StringArgumentType.string();
+        return StringArgumentType.greedyString();
     }
 
     @Override
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
 
-        for(String key : ConfigManager.getAll()) {
+        for (String key : ConfigManager.getAll()) {
             builder.suggest("\"" + key + "\"");
         }
 

@@ -31,6 +31,7 @@ public final class Initializer extends JavaPlugin {
 
         new PlayerListener(this);
         new LootListener(this);
+        new com.dragon.lastlife.listeners.FoxPersistenceListener(this);
         new CommandExecutor.Builder(new ConfigCommand(this)).setDescription("Manage Last Life configuration files").register();
         new CommandExecutor.Builder(new BoogeyCommand(this)).setDescription("Manage Last Life boogeys").register();
         new CommandExecutor.Builder(new DonationsCommand(this)).setDescription("Base command for participants to link their ExtraLife accounts").register();

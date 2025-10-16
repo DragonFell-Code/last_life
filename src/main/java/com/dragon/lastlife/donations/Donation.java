@@ -1,5 +1,6 @@
 package com.dragon.lastlife.donations;
 
+import com.dragon.lastlife.loot.LootManager;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.config.ConfigObject;
@@ -66,6 +67,7 @@ public class Donation extends ConfigObject {
                 if (incentiveID.equals(participant.incentive_loot)) {
                     Player player = participant.player().getPlayer();
                     if (player != null && player.isOnline()) {
+                        Utils.loot().generate(LootManager.LootType.BUNDLE, participant);
 //                        Utils.lootManager().giveRandomLoot(player, "Donation Incentive");
                         Utils.initializer().integration().log("Donation", "Gave random loot to " + participant.player().getName() + " for donation incentive.");
                         return new ProcessResult<>(IncentiveType.LOOT, 1);

@@ -1,28 +1,28 @@
 package com.dragon.lastlife.donations;
 
 import com.dragon.lastlife.config.DonationConfig;
+import com.dragon.lastlife.loot.LootManager;
+import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.discord.WebhookManager;
 import com.quiptmc.core.heartbeat.Flutter;
 import com.quiptmc.core.utils.net.HttpConfig;
-import com.quiptmc.core.utils.net.NetworkUtils;
 import com.quiptmc.core.utils.net.HttpHeaders;
+import com.quiptmc.core.utils.net.NetworkUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.awt.*;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class DonationFlutter implements Flutter {
 
     private final int MAX_LIMIT = 100;
-    private long LAST_HEARTBEAT = 0;
     private final HttpConfig GET;
+    private long LAST_HEARTBEAT = 0;
     private int offset = 0;
 
 
@@ -115,22 +115,26 @@ public class DonationFlutter implements Flutter {
         if (!results.isEmpty()) {
             Utils.initializer().integration().log("DonationFlutter", "Processed " + results.size() + " new donations.");
             for (Donation.ProcessResult<?> result : results) {
+                Participant participant = (Participant) result.payload();
                 switch (result.type()) {
+
                     case LIFE -> {
-                        Participant participant = (Participant) result.payload();
                         lifeMap.put(participant, lifeMap.getOrDefault(participant, 0) + 1);
                     }
-                    case LOOT, NONE -> {
+                    case LOOT -> {
+                        Optional<Party> partyOptional = Utils.configs().PARTY_CONFIG().get(participant);
+                        Utils.loot().generate(LootManager.LootType.BUNDLE, participant);
+                    }
+                    case NONE -> {
                     }
                     case BOOGEYMAN -> {
-                        Participant participant = (Participant) result.payload();
                         Utils.configs().PARTICIPANT_CONFIG().boogeymen().queue();
                         Utils.genericWebhook("boogeymen", new Color(0xFFD738), "Boogeyman Queue", null, "A donation to " + participant.player().getName() + " has added 1 participant to the boogeyman queue!");
                         Utils.initializer().integration().log("Donation", participant.player().getName() + " received a donation on their boogeyman incentive.");
                     }
                 }
             }
-            for(Map.Entry<Participant, Integer> entry : lifeMap.entrySet()) {
+            for (Map.Entry<Participant, Integer> entry : lifeMap.entrySet()) {
                 entry.getKey().lives().add(entry.getValue());
                 Utils.configs().PARTICIPANT_CONFIG().save();
                 Utils.initializer().integration().log("Donation", "Added 1 life to " + entry.getKey().player().getName() + " for donation incentive.");

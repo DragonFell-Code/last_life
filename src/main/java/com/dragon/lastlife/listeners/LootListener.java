@@ -22,6 +22,7 @@ public class LootListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLoot(LootGenerateEvent event) {
+        System.out.println("Loot generated!");
         NamespacedKey key = event.getLootTable().getKey();
         // Only target our dungeon chests
         if (!key.getNamespace().equals("lastlife") || !key.getKey().equals("chests/dungeon_scaled")) return;
