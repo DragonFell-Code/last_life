@@ -1,6 +1,5 @@
 package com.dragon.lastlife.listeners;
 
-import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.utils.Utils;
 import org.bukkit.Bukkit;
@@ -15,11 +14,6 @@ import java.util.Collection;
 import java.util.Random;
 
 public class LootListener implements Listener {
-
-    public LootListener(Initializer initializer) {
-        initializer.getServer().getPluginManager().registerEvents(this, initializer);
-    }
-
     @EventHandler(ignoreCancelled = true)
     public void onLoot(LootGenerateEvent event) {
         System.out.println("Loot generated!");
