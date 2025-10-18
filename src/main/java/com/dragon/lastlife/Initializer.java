@@ -4,22 +4,34 @@ import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.commands.executor.BoogeyCommand;
 import com.dragon.lastlife.commands.executor.ConfigCommand;
 import com.dragon.lastlife.commands.executor.DonationsCommand;
-import com.dragon.lastlife.config.PartyConfig;
+import com.dragon.lastlife.listeners.FoxPersistenceListener;
 import com.dragon.lastlife.listeners.LootListener;
 import com.dragon.lastlife.listeners.PlayerListener;
-import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.ConfigManager;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Fox;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 public final class Initializer extends JavaPlugin {
-
     private LastLife integration;
 
-    public void quipt(){
+    public PlayerListener PLAYER_LISTENER = new PlayerListener();
+    public LootListener LOOT_LISTENER = new LootListener();
+    public FoxPersistenceListener FOX_PERSISTENCE_LISTENER = new FoxPersistenceListener();
+
+    private final List<Listener> listeners = Arrays.asList(
+            PLAYER_LISTENER, LOOT_LISTENER, FOX_PERSISTENCE_LISTENER
+    );
+
+    public void quipt() {
         integration = new LastLife();
         integration.enable();
     }
@@ -29,9 +41,11 @@ public final class Initializer extends JavaPlugin {
         quipt();
         Utils.init(this);
 
-        new PlayerListener(this);
-        new LootListener(this);
-        new com.dragon.lastlife.listeners.FoxPersistenceListener(this);
+        PluginManager pluginManager = this.getServer().getPluginManager();
+        listeners.forEach(listener -> pluginManager.registerEvents(listener, this));
+
+        Bukkit.getWorlds().forEach(world -> world.getEntitiesByClass(Fox.class).forEach(fox -> FOX_PERSISTENCE_LISTENER.handleFoxEntity(fox)));
+
         new CommandExecutor.Builder(new ConfigCommand(this)).setDescription("Manage Last Life configuration files").register();
         new CommandExecutor.Builder(new BoogeyCommand(this)).setDescription("Manage Last Life boogeys").register();
         new CommandExecutor.Builder(new DonationsCommand(this)).setDescription("Base command for participants to link their ExtraLife accounts").register();

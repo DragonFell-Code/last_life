@@ -1,6 +1,5 @@
 package com.dragon.lastlife.listeners;
 
-import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
 import com.dragon.lastlife.donations.Donation;
@@ -9,21 +8,17 @@ import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.dragon.lastlife.utils.chat.MessageUtils;
 import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
+import com.dragon.lastlife.world.DungeonManager;
 import com.quiptmc.core.config.ConfigManager;
 import com.quiptmc.core.config.objects.ConfigString;
 import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.phys.Vec3;
-import org.bukkit.*;
-import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,40 +27,28 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.json.JSONObject;
 
-import java.time.Instant;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import static net.kyori.adventure.text.Component.text;
 
 public class PlayerListener implements Listener {
-
-    public PlayerListener(Initializer initializer) {
-        initializer.getServer().getPluginManager().registerEvents(this, initializer);
-    }
-
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEntityEvent event){
-        if(((CraftEntity) event.getRightClicked()).getHandle() instanceof CustomFox fox){
-            if(fox.state().equals(CustomFox.State.WAITING)){
-                fox.state(CustomFox.State.DROPPING_OFF);
-                Fox bukkitFox = (Fox)fox.getBukkitEntity();
-                // Update PDC to persist state change across restart
-                net.minecraft.world.phys.Vec3 vec = CustomFox.readTarget(bukkitFox);
-                CustomFox.writePersistentData(bukkitFox, CustomFox.State.DROPPING_OFF, vec);
+    public void onPlayerInteract(PlayerInteractEntityEvent event) {
+        if (((CraftEntity) event.getRightClicked()).getHandle() instanceof CustomFox fox) {
+            if (fox.getState().equals(CustomFox.State.WAITING)) {
+                fox.setState(CustomFox.State.DROPPING_OFF);
+                Fox bukkitFox = (Fox) fox.getBukkitEntity();
 
                 bukkitFox.setSitting(false);
                 bukkitFox.setLeaping(true);
                 bukkitFox.getWorld().dropItem(bukkitFox.getLocation(), bukkitFox.getEquipment().getItemInMainHand());
                 bukkitFox.clearActiveItem();
-                Bukkit.getScheduler().runTaskLater(Utils.initializer(), ()-> {
+                Bukkit.getScheduler().runTaskLater(Utils.initializer(), () -> {
                     World world = bukkitFox.getWorld();
                     world.spawnParticle(Particle.CLOUD, bukkitFox.getLocation(), 10);
 
                     bukkitFox.remove();
-
-                },20);
-
+                }, 20);
             }
         }
     }
@@ -88,33 +71,15 @@ public class PlayerListener implements Listener {
                     }
 
                     if (label.equalsIgnoreCase("dungeon")) {
-                        String world_name = args.length >= 1 ? args[0] : Date.from(Instant.EPOCH.plusMillis(System.currentTimeMillis())).toString().replace(":", "-");
-                        ChunkPos pos = new ChunkPos(0, 0);
-                        Utils.configs().DUNGEON_MANAGER.create(world_name, pos, (dungeon -> {
-                            BlockPos origin = dungeon.origin;
-                            Player player = e.getPlayer();
-                            ServerPlayer serverPlayer = ((CraftPlayer)player).getHandle();
-                            ServerLevel level = ((CraftWorld) dungeon.world).getHandle();
+                        Player player = e.getPlayer();
+                        Location tp_location = DungeonManager.getDungeonEntranceLocation();
 
-                            BlockPos spawn_pos = origin;
-                            LevelChunk chunk = level.getChunkAt(origin);
+                        if (tp_location == null) {
+                            player.sendMessage(text("Failed to detect dungeon world", NamedTextColor.RED));
+                            return;
+                        }
 
-                            // Origin is in the middle of the room vertically, bring it down to a solid surface so players dont
-                            // spawn midair. They could still spawn in the middle of a pillar tho.
-                            while (!level.loadedAndEntityCanStandOn(spawn_pos.below(), serverPlayer)) {
-                                spawn_pos = spawn_pos.below();
-                                // If we scanned all the way to the void and no valid block was found, just use the origin.
-                                if (level.isOutsideBuildHeight(spawn_pos)) {
-                                    spawn_pos = origin;
-                                    player.sendMessage(text("Reset to Origin!", NamedTextColor.GREEN));
-                                    break;
-                                }
-                            }
-
-                            Vec3 final_pos = spawn_pos.getBottomCenter();
-
-                            player.teleport(new Location(dungeon.world, final_pos.x(), final_pos.y(), final_pos.z()));
-                        }));
+                        player.teleport(tp_location);
                     }
 
                     if (label.equalsIgnoreCase("config")) {

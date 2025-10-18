@@ -22,7 +22,7 @@ public final class NmsEntityFactory {
         ServerLevel level = ((CraftWorld) spawn.getWorld()).getHandle();
 
         T entity = entityClass.getConstructor(net.minecraft.world.level.Level.class).newInstance(level);
-        entity.pos(spawn);
+        entity.setPos(spawn);
         level.addFreshEntity((Entity) entity);
         return entity;
     }

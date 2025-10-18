@@ -57,11 +57,9 @@ public class Donation extends ConfigObject {
             Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(participantID);
             if (participant != null) {
                 if (incentiveID.equals(participant.incentive_life)) {
-
                     return new ProcessResult<>(IncentiveType.LIFE, participant);
                 }
                 if (incentiveID.equals(participant.incentive_boogey)) {
-
                     return new ProcessResult<>(IncentiveType.BOOGEYMAN, participant);
                 }
                 if (incentiveID.equals(participant.incentive_loot)) {
@@ -93,7 +91,6 @@ public class Donation extends ConfigObject {
         String dateTimeString = createdDateUTC;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-
 
         Embed.Builder builder = Embed.builder()
                 .title(title)

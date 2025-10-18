@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.json.JSONObject;
 
 import java.util.UUID;
 
@@ -55,6 +54,7 @@ public class Participant extends ConfigObject {
 
     /**
      * Check if the player is currently spectating
+     *
      * @return true if the player is spectating, or offline. false otherwise.
      */
     public boolean spectating() {
@@ -84,9 +84,6 @@ public class Participant extends ConfigObject {
             player.customName(value);
         }
     }
-
-
-
 
     public class LifeManager {
 

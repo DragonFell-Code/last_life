@@ -6,9 +6,13 @@ import com.quiptmc.core.data.registries.Registry;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.ChunkPos;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.entity.Entity;
 
+import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.dragon.lastlife.world.Dungeon.DUNGEON_RESOURCE_KEY;
@@ -21,6 +25,28 @@ public class DungeonManager {
 
     public DungeonManager(Initializer initializer) {
         this.initializer = initializer;
+    }
+
+    public static Location getDungeonEntranceLocation() {
+        World world = Bukkit.getWorld("world_lastlife_dungeon_dim");
+
+        if (world == null) {
+            return null;
+        }
+        // These coordinates are always the same, because of how the dungeon is generated in the custom dimension
+        Location tp_location = new Location(world, -96, 100, -32);
+        Collection<Entity> entities = world.getNearbyEntities(tp_location, 7, 1, 7);
+        Optional<Entity> spawn_marker = entities.stream().filter(entity -> "lastlife:dungeon/spawn".equals(entity.getName())).findFirst();
+
+        if (spawn_marker.isPresent()) {
+            tp_location = spawn_marker.get().getLocation();
+        }
+        return tp_location;
+    }
+
+    public static Location getDungeonExitLocation() {
+        // TODO: Will need to detect the spawn coordinates somehow
+        return new Location(Bukkit.getWorlds().getFirst(), 182, 74, 338);
     }
 
     public void create(String name, ChunkPos pos, Consumer<Dungeon> callback) {
