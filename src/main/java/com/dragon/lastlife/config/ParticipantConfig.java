@@ -39,6 +39,7 @@ public class ParticipantConfig extends Config {
 
     /**
      * Get a participant by their donor drive id from storage.
+     *
      * @param participantId The donor drive id of the participant.
      * @return {@link Participant} if found, null otherwise.
      */
@@ -73,8 +74,6 @@ public class ParticipantConfig extends Config {
     }
 
     public class BoogeymenManager {
-
-
         public void roll() {
             roll(0);
         }
