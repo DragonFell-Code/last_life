@@ -4,6 +4,7 @@ import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
 import com.dragon.lastlife.donations.Donation;
 import com.dragon.lastlife.nms.CustomFox;
+import com.dragon.lastlife.players.InventorySnapshot;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.dragon.lastlife.utils.chat.MessageUtils;
@@ -14,11 +15,13 @@ import com.quiptmc.core.config.objects.ConfigString;
 import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -72,7 +75,7 @@ public class PlayerListener implements Listener {
 
                     if (label.equalsIgnoreCase("dungeon")) {
                         Player player = e.getPlayer();
-                        Location tp_location = DungeonManager.getDungeonEntranceLocation();
+                        Location tp_location = Utils.configs().DUNGEON_MANAGER.getDungeonEntranceLocation();
 
                         if (tp_location == null) {
                             player.sendMessage(text("Failed to detect dungeon world", NamedTextColor.RED));
@@ -138,13 +141,14 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
+        Player player = e.getPlayer();
+        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         ParticipantConfig config = Utils.configs().PARTICIPANT_CONFIG();
-        Participant participant = config.get(e.getEntity().getUniqueId());
-        if (participant.lives().remove() <= 0) {
-            e.setCancelled(true);
-            e.getPlayer().getWorld().strikeLightningEffect(e.getPlayer().getLocation());
-            Bukkit.broadcast(Utils.configs().MESSAGE_CONFIG.get("lastlife.death.elimination", e.getPlayer().name()));
-        }
+        Participant participant = config.get(player.getUniqueId());
+
+        Utils.initializer().getComponentLogger().info("{} lost a life !", player.getName());
+
+        // Boogey curing
         if (e.getDamageSource().getCausingEntity() != null && e.getDamageSource().getCausingEntity() instanceof Player killer) {
             Participant killerParticipant = config.get(killer.getUniqueId());
             if (killerParticipant != null) {
@@ -156,8 +160,30 @@ public class PlayerListener implements Listener {
 //                killerParticipant.stats.kills++;
                 killerParticipant.sync();
             }
-
         }
+
+        // Last life
+        if (participant.lives().remove() <= 0) {
+            e.setCancelled(true);
+            player.getWorld().strikeLightningEffect(e.getPlayer().getLocation());
+            Bukkit.broadcast(Utils.configs().MESSAGE_CONFIG.get("lastlife.death.elimination", e.getPlayer().name()));
+
+//            // TODO: Drop player loot ?
+//            // Could also push the items in e.getDrops() - I think its mutable ?
+//            for (ItemStack item : serverPlayer.getInventory().getContents()) {
+//                if (!item.isEmpty() && !EnchantmentHelper.has(item, net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP)) {
+//                    serverPlayer.drop(item, true, false, false, null);
+//                }
+//            }
+        } else { // Player is still alive
+            DungeonManager manager = Utils.configs().DUNGEON_MANAGER;
+
+            // Dungeon Death with keepInventory ON
+            if (player.getWorld().equals(manager.dungeon_world) && e.getKeepInventory()) {
+                InventorySnapshot.applyPlayerInventorySnapshot(serverPlayer, e);
+            }
+        }
+
         config.save();
     }
 
