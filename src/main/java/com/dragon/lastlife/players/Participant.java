@@ -147,5 +147,9 @@ public class Participant extends ConfigObject {
         public int lives() {
             return Participant.this.lives;
         }
+
+        public int get() {
+            return Participant.this.lives;
+        }
     }
 }

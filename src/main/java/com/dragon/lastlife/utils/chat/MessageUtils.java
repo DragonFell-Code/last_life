@@ -62,6 +62,8 @@ public class MessageUtils {
         register("lastlife.boogey.roll", text("[0] boogeyman is about to be selected.", NamedTextColor.RED));
         register("lastlife.boogey.cured", text("You've been cured! You are no longer a boogeyman.", NamedTextColor.GREEN));
         register("lastlife.boogey.set", text("You are now a boogeyman!", NamedTextColor.RED));
+        register("lastlife.cmd.life.view", text("[0]'s lives: [1]", NamedTextColor.YELLOW));
+        register("lastlife.cmd.life.set", text("Set [0]'s lives to [1].", NamedTextColor.GREEN));
     }
 
     public Component deserialize(JSONObject json) {
