@@ -5,6 +5,7 @@ import com.dragon.lastlife.commands.executor.BoogeyCommand;
 import com.dragon.lastlife.commands.executor.ConfigCommand;
 import com.dragon.lastlife.commands.executor.DonationsCommand;
 import com.dragon.lastlife.commands.executor.LifeCommand;
+import com.dragon.lastlife.listeners.EntityTeleportEventListener;
 import com.dragon.lastlife.listeners.FoxPersistenceListener;
 import com.dragon.lastlife.listeners.LootListener;
 import com.dragon.lastlife.listeners.PlayerListener;
@@ -27,9 +28,10 @@ public final class Initializer extends JavaPlugin {
     public PlayerListener PLAYER_LISTENER = new PlayerListener();
     public LootListener LOOT_LISTENER = new LootListener();
     public FoxPersistenceListener FOX_PERSISTENCE_LISTENER = new FoxPersistenceListener();
+    public EntityTeleportEventListener ENTITY_TELEPORT_LISTENER = new EntityTeleportEventListener();
 
     private final List<Listener> listeners = Arrays.asList(
-            PLAYER_LISTENER, LOOT_LISTENER, FOX_PERSISTENCE_LISTENER
+            PLAYER_LISTENER, LOOT_LISTENER, FOX_PERSISTENCE_LISTENER, ENTITY_TELEPORT_LISTENER
     );
 
     public void quipt() {

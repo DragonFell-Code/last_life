@@ -70,7 +70,6 @@ public class Participant extends ConfigObject {
         }
     }
 
-
     public OfflinePlayer player() {
         return Bukkit.getOfflinePlayer(UUID.fromString(id));
     }
@@ -86,7 +85,6 @@ public class Participant extends ConfigObject {
     }
 
     public class LifeManager {
-
         public void update() {
             if (lives <= 0) {
                 color(NamedTextColor.GRAY);
