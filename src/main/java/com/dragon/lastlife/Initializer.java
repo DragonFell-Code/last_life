@@ -52,6 +52,7 @@ public final class Initializer extends JavaPlugin {
         new CommandExecutor.Builder(new LifeCommand(this)).setDescription("Manage player lives").register();
         new CommandExecutor.Builder(new DungeonCommand(this)).register();
         new CommandExecutor.Builder(new PartyCommand(this)).register();
+        new CommandExecutor.Builder(new FoxTestCommand(this)).setDescription("Test fox delivery behavior for debugging").register();
         getLogger().info("LastLife plugin has been enabled successfully.");
     }
 

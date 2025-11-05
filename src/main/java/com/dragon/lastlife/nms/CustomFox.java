@@ -121,6 +121,9 @@ public class CustomFox extends Fox implements NmsEntity {
 
                 if (this.reachedTarget()) {
                     this.getNavigation().stop();
+                    // Prevent residual motion causing the fox to drift past the target
+                    // and flip back into DELIVERING. Zero the entity velocity explicitly.
+                    this.setDeltaMovement(new Vec3(0, 0, 0));
                     this.setState(State.WAITING);
                     this.setSitting(true);
                 }
