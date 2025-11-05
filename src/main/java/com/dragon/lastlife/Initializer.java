@@ -1,10 +1,7 @@
 package com.dragon.lastlife;
 
 import com.dragon.lastlife.commands.CommandExecutor;
-import com.dragon.lastlife.commands.executor.BoogeyCommand;
-import com.dragon.lastlife.commands.executor.ConfigCommand;
-import com.dragon.lastlife.commands.executor.DonationsCommand;
-import com.dragon.lastlife.commands.executor.LifeCommand;
+import com.dragon.lastlife.commands.executor.*;
 import com.dragon.lastlife.listeners.EntityTeleportEventListener;
 import com.dragon.lastlife.listeners.FoxPersistenceListener;
 import com.dragon.lastlife.listeners.LootListener;
@@ -53,6 +50,8 @@ public final class Initializer extends JavaPlugin {
         new CommandExecutor.Builder(new BoogeyCommand(this)).setDescription("Manage Last Life boogeys").register();
         new CommandExecutor.Builder(new DonationsCommand(this)).setDescription("Base command for participants to link their ExtraLife accounts").register();
         new CommandExecutor.Builder(new LifeCommand(this)).setDescription("Manage player lives").register();
+        new CommandExecutor.Builder(new DungeonCommand(this)).register();
+        new CommandExecutor.Builder(new PartyCommand(this)).register();
         getLogger().info("LastLife plugin has been enabled successfully.");
     }
 

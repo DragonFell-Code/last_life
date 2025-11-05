@@ -5,6 +5,7 @@ import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.quiptmc.core.utils.net.NetworkUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -27,8 +28,7 @@ public class DonationsCommand extends CommandExecutor {
         super(initializer, "donations");
     }
 
-    @Override
-    public LiteralCommandNode<CommandSourceStack> execute() {
+    public LiteralArgumentBuilder<CommandSourceStack> arguments() {
         return literal(name())
                 .executes(context -> showUsage(context, ""))
                 .then(literal("incentives")
@@ -136,7 +136,6 @@ public class DonationsCommand extends CommandExecutor {
                                         }
                                     }
                                     return logError(context, "Could not find participant with name " + participantName);
-                                })))
-                .build();
+                                })));
     }
 }

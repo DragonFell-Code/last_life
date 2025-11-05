@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
-public class ConfigFileArgument implements CustomArgumentType.Converted<@NotNull Config, @NotNull String> {
+public class ConfigFileArgument extends CustomArgumentConverter<@NotNull Config, @NotNull String> {
 
 
     @Override
@@ -22,7 +22,7 @@ public class ConfigFileArgument implements CustomArgumentType.Converted<@NotNull
 
     @Override
     public @NotNull ArgumentType<String> getNativeType() {
-        return StringArgumentType.greedyString();
+        return StringArgumentType.string();
     }
 
     @Override

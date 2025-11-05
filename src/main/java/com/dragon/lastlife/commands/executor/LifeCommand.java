@@ -7,6 +7,7 @@ import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -22,8 +23,8 @@ public class LifeCommand extends CommandExecutor {
     public LifeCommand(Initializer initializer) {
         super(initializer, "lives");
     }
-    @Override
-    public LiteralCommandNode<CommandSourceStack> execute() {
+
+    public LiteralArgumentBuilder<CommandSourceStack> arguments() {
         return literal(name()).executes((context) -> {
             if (!context.getSource().getSender().hasPermission("lastlife.admin"))
                 return logError(context, "You do not have permission to use this command.");
@@ -69,6 +70,6 @@ public class LifeCommand extends CommandExecutor {
                 return Command.SINGLE_SUCCESS;
             }
             return logError(context, "Invalid action specified.");
-        })))).build();
+        }))));
     }
 }

@@ -4,6 +4,7 @@ package com.dragon.lastlife.commands;
 import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static com.dragon.lastlife.commands.executor.argument.CustomArgumentConverter.getSuggestionsCompletableFuture;
 import static net.kyori.adventure.text.Component.text;
 
 public abstract class CommandExecutor {
@@ -42,7 +44,11 @@ public abstract class CommandExecutor {
         return initializer;
     }
 
-    public abstract LiteralCommandNode<CommandSourceStack> execute();
+    public LiteralCommandNode<CommandSourceStack> execute(){
+        return arguments().build();
+    }
+
+    public abstract LiteralArgumentBuilder<CommandSourceStack> arguments();
 
     public int logError(CommandContext<CommandSourceStack> context, String message) {
         return logError(context.getSource().getSender(), message);
@@ -77,18 +83,7 @@ public abstract class CommandExecutor {
         }catch (IllegalArgumentException ex){
             value = "";
         }
-        if(value == null || value.isBlank()){
-            for (String v : values) {
-                builder.suggest(v);
-            }
-            return builder.buildFuture();
-        }
-        for (String v : values) {
-            if (v.toLowerCase().startsWith(value.toLowerCase())) {
-                builder.suggest(v);
-            }
-        }
-        return builder.buildFuture();
+        return getSuggestionsCompletableFuture(values, value, builder);
     }
 
     public static class Builder {

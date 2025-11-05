@@ -4,6 +4,7 @@ import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.commands.executor.argument.ConfigFileArgument;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.quiptmc.core.config.Config;
 import com.quiptmc.core.config.ConfigManager;
@@ -20,8 +21,7 @@ public class ConfigCommand extends CommandExecutor {
         super(initializer, "config");
     }
 
-    @Override
-    public LiteralCommandNode<CommandSourceStack> execute() {
+    public LiteralArgumentBuilder<CommandSourceStack> arguments() {
         return literal(name()).executes(a -> 1).then(argument("file", new ConfigFileArgument()).executes(a -> 1).then(literal("reload").executes(context -> {
             Config configFile = context.getArgument("file", Config.class);
             if (configFile == null) {
@@ -45,6 +45,6 @@ public class ConfigCommand extends CommandExecutor {
                 builder.suggest(key);
             }
             return builder.buildFuture();
-        })))).build();
+        }))));
     }
 }

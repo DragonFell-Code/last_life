@@ -6,6 +6,7 @@ import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
@@ -27,7 +28,7 @@ public class BoogeyCommand extends CommandExecutor {
     }
 
     @Override
-    public LiteralCommandNode<CommandSourceStack> execute() {
+    public LiteralArgumentBuilder<CommandSourceStack> arguments() {
         return literal(name())
                 .executes(context -> showUsage(context, "lastlife.boogey"))
                 .then(literal("set")
@@ -102,7 +103,7 @@ public class BoogeyCommand extends CommandExecutor {
                                     }
                                     Utils.configs().PARTICIPANT_CONFIG().boogeymen().roll(context.getArgument("amount", Integer.class));
                                     return 1;
-                                }))).build();
+                                })));
     }
 
 
