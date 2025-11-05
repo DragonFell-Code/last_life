@@ -4,6 +4,7 @@ import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
 import com.dragon.lastlife.donations.Donation;
 import com.dragon.lastlife.nms.CustomFox;
+import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.InventorySnapshot;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
@@ -14,6 +15,7 @@ import com.quiptmc.core.config.ConfigManager;
 import com.quiptmc.core.config.objects.ConfigString;
 import com.quiptmc.core.utils.TaskScheduler;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
@@ -41,9 +43,11 @@ public class PlayerListener implements Listener {
             if (fox.getState().equals(CustomFox.State.WAITING)) {
                 fox.setState(CustomFox.State.DROPPING_OFF);
                 Fox bukkitFox = (Fox) fox.getBukkitEntity();
-
+                Location target = event.getPlayer().getLocation();
+                fox.getNavigation().moveTo(target.getX(), target.getY(), target.getZ(), 1);
                 bukkitFox.setSitting(false);
                 bukkitFox.setLeaping(true);
+                fox.getJumpControl().jump();
                 bukkitFox.getWorld().dropItem(bukkitFox.getLocation(), bukkitFox.getEquipment().getItemInMainHand());
                 bukkitFox.clearActiveItem();
                 Bukkit.getScheduler().runTaskLater(Utils.initializer(), () -> {
@@ -135,7 +139,17 @@ public class PlayerListener implements Listener {
                         e.getPlayer().performCommand(label);
                     }
                 }, 0);
+                return;
             }
+            //this code will be removed later. This is for debugging purposes only
+            e.setCancelled(true);
+            Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId());
+            Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
+            Component prefix = text((party== null || participant == null) ? "" : "[" + party.id() + "] ", NamedTextColor.GREEN);
+            Component name = text(e.getPlayer().getName(), NamedTextColor.YELLOW);
+            Component message = text(raw, NamedTextColor.GRAY);
+            e.getPlayer().sendMessage(prefix.append(name).append(text(": ", NamedTextColor.GRAY)).append(message));
+
         }
     }
 
