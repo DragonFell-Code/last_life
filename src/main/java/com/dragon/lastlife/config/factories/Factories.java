@@ -12,11 +12,11 @@ import com.quiptmc.core.discord.Webhook;
 
 public class Factories {
 
-    public final GenericFactory<Participant> PARTICIPANT_FACTORY = register(new GenericFactory<>(Participant.class));
-    public final GenericFactory<Donation> DONATION_FACTORY = register(new GenericFactory<>(Donation.class));
-    public final GenericFactory<Webhook> WEBHOOK_FACTORY = register(new GenericFactory<>(Webhook .class));
-    public final GenericFactory<Party> PARTY_FACTORY = register(new GenericFactory<>(Party.class));
-    public final GenericFactory<ConfigString> CONFIG_STRING_FACTORY = register(new GenericFactory<>(ConfigString.class));
+    public final ConfigObject.Factory<Participant> PARTICIPANT_FACTORY = register(new GenericFactory<>(Participant.class));
+    public final ConfigObject.Factory<Donation> DONATION_FACTORY = register(new GenericFactory<>(Donation.class));
+    public final ConfigObject.Factory<Webhook> WEBHOOK_FACTORY = register(new GenericFactory<>(Webhook .class));
+    public final ConfigObject.Factory<Party> PARTY_FACTORY = register(new GenericFactory<>(Party.class));
+    public final ConfigObject.Factory<ConfigString> CONFIG_STRING_FACTORY = register(new ConfigStringFactory());
 
     public <T extends ConfigObject.Factory<?>> T register(T factory) {
         Utils.initializer().integration().log("Factories", "Registering factory: " + factory.getClass().getName());
