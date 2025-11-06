@@ -35,17 +35,17 @@ public class BoogeyCommand extends CommandExecutor {
                         .executes(context -> {
                             CommandSender superSender = context.getSource().getSender();
                             if (!superSender.hasPermission("lastlife.boogey.set")) {
-                                logError(superSender, "You do not have permission to use this command.");
+                                logError(context, "You do not have permission to use this command.");
                                 return 0;
                             }
-                            logError(superSender, "Usage: /boogey set <player> [true|false]");
+                            logError(context, "Usage: /boogey set <player> [true|false]");
                             return 1;
                         })
                         .then(argument("target", ArgumentTypes.players())
                                 .executes(context -> {
                                     CommandSender superSender = context.getSource().getSender();
                                     if (!superSender.hasPermission("lastlife.boogey.set")) {
-                                        logError(superSender, "You do not have permission to use this command.");
+                                        logError(context, "You do not have permission to use this command.");
                                         return 0;
                                     }
                                     PlayerSelectorArgumentResolver targetResolver = context.getArgument("target", PlayerSelectorArgumentResolver.class);
@@ -53,7 +53,7 @@ public class BoogeyCommand extends CommandExecutor {
                                     for (Player target : targets) {
                                         Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(target.getUniqueId());
                                         if (participant == null) {
-                                            logError(superSender, "Player " + target.getName() + " is not a participant.");
+                                            logError(context, "Player " + target.getName() + " is not a participant.");
                                             continue;
                                         }
                                         Utils.configs().PARTICIPANT_CONFIG().boogeymen().setBoogey(participant, !participant.boogey);
@@ -66,7 +66,7 @@ public class BoogeyCommand extends CommandExecutor {
                                         .executes(context -> {
                                             CommandSender superSender = context.getSource().getSender();
                                             if (!superSender.hasPermission("lastlife.boogey.set")) {
-                                                logError(superSender, "You do not have permission to use this command.");
+                                                logError(context, "You do not have permission to use this command.");
                                                 return 0;
                                             }
                                             boolean value = Boolean.parseBoolean(StringArgumentType.getString(context, "value"));
@@ -75,7 +75,7 @@ public class BoogeyCommand extends CommandExecutor {
                                             for (Player target : targets) {
                                                 Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(target.getUniqueId());
                                                 if (participant == null) {
-                                                    logError(superSender, "Player " + target.getName() + " is not a participant.");
+                                                    logError(context, "Player " + target.getName() + " is not a participant.");
                                                     continue;
                                                 }
                                                 participant.boogey = value;
@@ -88,7 +88,7 @@ public class BoogeyCommand extends CommandExecutor {
                         .executes(context -> {
                             CommandSender superSender = context.getSource().getSender();
                             if (!superSender.hasPermission("lastlife.boogey.roll")) {
-                                logError(superSender, "You do not have permission to use this command.");
+                                logError(context, "You do not have permission to use this command.");
                                 return 0;
                             }
                             Utils.configs().PARTICIPANT_CONFIG().boogeymen().roll();
@@ -98,7 +98,7 @@ public class BoogeyCommand extends CommandExecutor {
                                 .executes(context -> {
                                     CommandSender superSender = context.getSource().getSender();
                                     if (!superSender.hasPermission("lastlife.boogey.roll")) {
-                                        logError(superSender, "You do not have permission to use this command.");
+                                        logError(context, "You do not have permission to use this command.");
                                         return 0;
                                     }
                                     Utils.configs().PARTICIPANT_CONFIG().boogeymen().roll(context.getArgument("amount", Integer.class));

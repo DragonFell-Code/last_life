@@ -56,6 +56,20 @@ public class MessageUtils {
         register("cmd.session.end", "{\"text\":\"Session ended\",\"color\":\"green\"}");
         register("cmd.session.reward", "{\"text\":\"You have been rewarded with [0]\",\"color\":\"green\"}");
         register("cmd.session.task", "{\"text\":\"You have been assigned the task [0]\",\"color\":\"green\"}");
+
+        register("cmd.party.usage", text("Usage: /party <create|join|leave|remove>"));
+        register("cmd.party.create.usage", text("Usage: /party create <partyName>"));
+        register("cmd.party.join.usage", text("Usage: /party join <partyName> [player(s)]"));
+        register("cmd.party.leave.usage", text("Usage: /party leave"));
+        register("cmd.party.remove.usage", text("Usage: /party remove <partyName>"));
+
+        register("lastlife.party.create", text("Party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\" has been created.", NamedTextColor.YELLOW))));
+        register("lastlife.party.remove", text("Party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\" has been removed.", NamedTextColor.YELLOW))));
+        register("lastlife.party.join", text("You have joined the party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\".", NamedTextColor.YELLOW))));
+        register("lastlife.party.leave", text("You have left the party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\".", NamedTextColor.YELLOW))));
+        register("lastlife.party.join.other", text("[0] has joined the party \"", NamedTextColor.YELLOW).append(text("[1]", NamedTextColor.GREEN).append(text("\".", NamedTextColor.YELLOW))));
+        register("lastlife.party.leave.other", text("[0] has left the party \"", NamedTextColor.YELLOW).append(text("[1]", NamedTextColor.GREEN).append(text("\".", NamedTextColor.YELLOW))));
+
         register("lastlife.death.elimination", text("[0]", NamedTextColor.RED).append(text(" has been eliminated!", NamedTextColor.WHITE)));
         register("cmd.boogey.set", text("[0]", NamedTextColor.GREEN).append(text(" boogeyman state set to ", NamedTextColor.YELLOW).append(text("[1]", NamedTextColor.GOLD))));
         register("lastlife.boogey.roll.multiple", text("[0] boogeymen are about to be selected.", NamedTextColor.RED));
@@ -64,6 +78,7 @@ public class MessageUtils {
         register("lastlife.boogey.set", text("You are now a boogeyman!", NamedTextColor.RED));
         register("lastlife.cmd.life.view", text("[0]'s lives: [1]", NamedTextColor.YELLOW));
         register("lastlife.cmd.life.set", text("Set [0]'s lives to [1].", NamedTextColor.GREEN));
+
     }
 
     public Component deserialize(JSONObject json) {
@@ -112,12 +127,11 @@ public class MessageUtils {
             keys.add(key);
             content = content.replace("${" + key + "}", "");
         }
-        Component result = text.replaceText(builder -> {
+        return text.replaceText(builder -> {
             for (String key : keys) {
                 builder.match("\\$\\{" + key + "\\}").replacement(get(key));
             }
 
         });
-        return result;
     }
 }

@@ -53,4 +53,9 @@ public class PartyConfig extends Config {
         }
         return Optional.empty();
     }
+
+    public void remove(Party party) {
+        parties.remove(party.id);
+        save();
+    }
 }
