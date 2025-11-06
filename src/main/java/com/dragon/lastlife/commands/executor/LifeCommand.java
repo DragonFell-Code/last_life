@@ -36,7 +36,7 @@ public class LifeCommand extends CommandExecutor {
             List<Player> targets = targetResolver.resolve(context.getSource());
             for (Player target : targets) {
                 Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(target.getUniqueId());
-                context.getSource().getSender().sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.cmd.life.view", target.getName(), participant.lives().get()));
+                context.getSource().getSender().sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.life.view", target.getName(), participant.lives().get()));
             }
             return Command.SINGLE_SUCCESS;
         }).then(argument("action", StringArgumentType.word()).suggests((context, builder) -> onlySimilar(new String[]{"add", "remove", "set"}, "action", context, builder)).executes(context -> {
@@ -56,7 +56,7 @@ public class LifeCommand extends CommandExecutor {
                 for (Player target : targets) {
                     Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(target.getUniqueId());
                     participant.lives().add(amount);
-                    context.getSource().getSender().sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.cmd.life.set", target.getName(), participant.lives().get()));
+                    context.getSource().getSender().sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.life.set", target.getName(), participant.lives().get()));
                 }
                 return Command.SINGLE_SUCCESS;
             }
@@ -65,7 +65,7 @@ public class LifeCommand extends CommandExecutor {
                 for (Player target : targets) {
                     Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(target.getUniqueId());
                     participant.lives().set(amount);
-                    context.getSource().getSender().sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.cmd.life.set", target.getName(), participant.lives().get()));
+                    context.getSource().getSender().sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.life.set", target.getName(), participant.lives().get()));
                 }
                 return Command.SINGLE_SUCCESS;
             }
