@@ -11,7 +11,10 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import io.papermc.paper.math.BlockPosition;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -66,12 +69,12 @@ public class PartyCommand extends CommandExecutor {
                                     List<Player> targets = targetResolver.resolve(context.getSource());
                                     for (Player target : targets) {
                                         Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(target.getUniqueId());
-                                        if (participant == null){
+                                        if (participant == null) {
                                             logError(context, target.getName() + " is not linked to a participant.");
                                             continue;
                                         }
                                         Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
-                                        if (party == null){
+                                        if (party == null) {
                                             logError(context, target.getName() + " is not in a party.");
                                             continue;
                                         }
@@ -80,6 +83,53 @@ public class PartyCommand extends CommandExecutor {
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 })))
+                .then(literal("mailbox")
+                        .executes(context -> {
+                            if (!context.getSource().getSender().hasPermission("lastlife.party.mailbox"))
+                                return logError(context, "You do not have permission to use this command.");
+                            if (!(context.getSource().getSender() instanceof Player target))
+                                return logError(context, "Only players can use their mailbox.");
+                            Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(target.getUniqueId());
+                            if (participant == null)
+                                return logError(context, "You are not linked to a participant.");
+                            Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
+                            if (party == null)
+                                return logError(context, "You are not in a party.");
+                            party.mailbox(target.getLocation());
+                            return Command.SINGLE_SUCCESS;
+                        })
+                        .then(argument("blockPos", ArgumentTypes.blockPosition())
+                                .executes(context -> {
+                                    if (!context.getSource().getSender().hasPermission("lastlife.party.mailbox"))
+                                        return logError(context, "You do not have permission to use this command.");
+                                    if (!(context.getSource().getSender() instanceof Player target))
+                                        return logError(context, "Only players can use their mailbox.");
+                                    Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(target.getUniqueId());
+                                    if (participant == null)
+                                        return logError(context, "You are not linked to a participant.");
+                                    Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
+                                    if (party == null)
+                                        return logError(context, "You are not in a party.");
+                                    BlockPositionResolver blockPosResolver = context.getArgument("blockPos", BlockPositionResolver.class);
+                                    BlockPosition blockPos = blockPosResolver.resolve(context.getSource());
+                                    party.mailbox(new Location(target.getWorld(), blockPos.x(), blockPos.y() + 1, blockPos.z()));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                                .then(argument("partyName", new PartyArgumentType())
+                                        .executes(context -> {
+                                            if (!context.getSource().getSender().hasPermission("lastlife.party.mailbox"))
+                                                return logError(context, "You do not have permission to use this command.");
+                                            if (!(context.getSource().getSender() instanceof Player target))
+                                                return logError(context, "Only players can use their mailbox.");
+                                            Party party = context.getArgument("partyName", Party.class);
+                                            if (party == null)
+                                                return logError(context, "Party does not exist.");
+                                            BlockPositionResolver blockPosResolver = context.getArgument("blockPos", BlockPositionResolver.class);
+                                            BlockPosition blockPos = blockPosResolver.resolve(context.getSource());
+
+                                            party.mailbox(new Location(target.getWorld(), blockPos.x(), blockPos.y() + 1, blockPos.z()));
+                                            return Command.SINGLE_SUCCESS;
+                                        }))))
                 .then(literal("join")
                         .executes(context -> showUsage(context, "lastlife.party.join"))
                         .then(argument("partyName", new PartyArgumentType())

@@ -110,7 +110,7 @@ public class CustomFox extends Fox implements NmsEntity {
     @Override
     public void tick() {
         super.tick();
-        if (this.level().isClientSide) return;
+        if (this.level().isClientSide()) return;
 
         if (this.target == null) return;
         switch (this.state) {
