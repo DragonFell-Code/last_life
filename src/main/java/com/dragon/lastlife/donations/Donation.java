@@ -1,6 +1,9 @@
 package com.dragon.lastlife.donations;
 
+import com.dragon.lastlife.config.DonationConfig;
+import com.dragon.lastlife.listeners.LootListener;
 import com.dragon.lastlife.loot.LootManager;
+import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.config.ConfigObject;
@@ -8,7 +11,9 @@ import com.quiptmc.core.data.JsonSerializable;
 import com.quiptmc.core.discord.embed.Embed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.loot.LootTable;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -65,10 +70,11 @@ public class Donation extends ConfigObject {
                 if (incentiveID.equals(participant.incentive_loot)) {
                     Player player = participant.player().getPlayer();
                     if (player != null && player.isOnline()) {
-                        Utils.loot().generate(LootManager.LootType.BUNDLE, participant);
-//                        Utils.lootManager().giveRandomLoot(player, "Donation Incentive");
-                        Utils.initializer().integration().log("Donation", "Gave random loot to " + participant.player().getName() + " for donation incentive.");
-                        return new ProcessResult<>(IncentiveType.LOOT, 1);
+                        DonationConfig config = Utils.configs().DONATION_CONFIG();
+                        LootTier tier = LootTier.of(config.total.doubleValue());
+
+                        LootTable table = Bukkit.getLootTable(tier.key());
+                        return new ProcessResult<>(IncentiveType.LOOT, table);
                     }
                 }
             } else {

@@ -3,6 +3,7 @@ package com.dragon.lastlife.listeners;
 import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
 import com.dragon.lastlife.donations.Donation;
+import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.nms.CustomFox;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.InventorySnapshot;
@@ -22,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Fox;
@@ -30,6 +32,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.loot.LootTable;
 import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
@@ -50,6 +53,7 @@ public class PlayerListener implements Listener {
                 fox.getJumpControl().jump();
                 bukkitFox.getWorld().dropItem(bukkitFox.getLocation(), bukkitFox.getEquipment().getItemInMainHand());
                 bukkitFox.clearActiveItem();
+
                 Bukkit.getScheduler().runTaskLater(Utils.initializer(), () -> {
                     World world = bukkitFox.getWorld();
                     world.spawnParticle(Particle.CLOUD, bukkitFox.getLocation(), 10);
@@ -94,26 +98,36 @@ public class PlayerListener implements Listener {
                     }
 
                     if (label.equalsIgnoreCase("donation")) {
-                        JSONObject json = new JSONObject()
-                                .put("displayName", "Test Donor")
-                                .put("donorId", "270CB800398A911A")
-                                .put("links", new JSONObject()
-                                        .put("recipient", "https://www.extra-life.org/participants/548726")
-                                        .put("donate", "https://www.extra-life.org/participants/548726/donate"))
-                                .put("isRegFee", false)
-                                .put("eventID", 559)
-                                .put("createdDateUTC", "2025-02-01T18:55:51.460+0000")
-                                .put("recipientName", "Test Participant (Elkhorn95)")
-                                .put("recipientImageURL", "https://donordrivecontent.com/extralife/images/$avatars$/constituent_09429FD9-D538-F066-0D0C8F329156DFD1.jpg?v=1756493068380")
-                                .put("participantID", 548726)
-                                .put("amount", "5.00")
-                                .put("avatarImageURL", "https://donordrivecontent.com/extralife/images/$avatars$/constituent_default_100.jpg?v=1756493068380")
-                                .put("teamID", Utils.configs().DONATION_CONFIG().team_id)
-                                .put("donationID", "53DFA757C375170D")
-                                .put("incentiveID", "D0AD363E-BA37-AD5A-15AFC5541F245399")
-                                .put("message", "what if you have to deal with it as a fish fight instead!!!");
-                        Donation donation = new Donation(json);
-                        Utils.configs().DONATION_CONFIG().process(donation);
+                        Party party = Utils.configs().PARTY_CONFIG().get(Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId())).orElse(null);
+                        if (party == null) {
+                            e.getPlayer().sendMessage(text("You are not in a party!", NamedTextColor.RED));
+                            return;
+                        }
+                        DonationConfig config = Utils.configs().DONATION_CONFIG();
+                        LootTier tier = LootTier.of(config.total.doubleValue());
+
+                        LootTable table = Bukkit.getLootTable(tier.key());
+                        party.deliver(table);
+//                        JSONObject json = new JSONObject()
+//                                .put("displayName", "Test Donor")
+//                                .put("donorId", "270CB800398A911A")
+//                                .put("links", new JSONObject()
+//                                        .put("recipient", "https://www.extra-life.org/participants/548726")
+//                                        .put("donate", "https://www.extra-life.org/participants/548726/donate"))
+//                                .put("isRegFee", false)
+//                                .put("eventID", 559)
+//                                .put("createdDateUTC", "2025-02-01T18:55:51.460+0000")
+//                                .put("recipientName", "Test Participant (Elkhorn95)")
+//                                .put("recipientImageURL", "https://donordrivecontent.com/extralife/images/$avatars$/constituent_09429FD9-D538-F066-0D0C8F329156DFD1.jpg?v=1756493068380")
+//                                .put("participantID", 548726)
+//                                .put("amount", "5.00")
+//                                .put("avatarImageURL", "https://donordrivecontent.com/extralife/images/$avatars$/constituent_default_100.jpg?v=1756493068380")
+//                                .put("teamID", Utils.configs().DONATION_CONFIG().team_id)
+//                                .put("donationID", "53DFA757C375170D")
+//                                .put("incentiveID", "D0AD363E-BA37-AD5A-15AFC5541F245399")
+//                                .put("message", "what if you have to deal with it as a fish fight instead!!!");
+//                        Donation donation = new Donation(json);
+//                        Utils.configs().DONATION_CONFIG().process(donation);
 //                        donation.process();
                     }
 

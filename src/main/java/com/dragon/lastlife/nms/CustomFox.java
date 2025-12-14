@@ -2,10 +2,8 @@ package com.dragon.lastlife.nms;
 
 import com.dragon.lastlife.utils.Utils;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.Vec3;
@@ -15,6 +13,8 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * A custom NMS Fox with fully overridden AI. It ignores all default goals and
@@ -31,6 +31,8 @@ public class CustomFox extends Fox implements NmsEntity {
     private Vec3 target;
     State state;
     PersistentDataContainer persistentData;
+    private final long created;
+
 
     /*
       TODO:
@@ -48,10 +50,10 @@ public class CustomFox extends Fox implements NmsEntity {
         this.setInvulnerable(true);
         persistentData = this.getBukkitEntity().getPersistentDataContainer();
         persistentData.set(KEY_CUSTOM_FOX_MARKER, PersistentDataType.BYTE, (byte) 1);
-        ItemStack item = Items.CYAN_BUNDLE.getDefaultInstance();
 
-        this.setItemSlot(EquipmentSlot.MAINHAND, item);
         this.setTarget(this, EntityTargetEvent.TargetReason.CUSTOM); // Prevent fox to eat item if edible
+        created = System.currentTimeMillis();
+
     }
 
     @Override
@@ -131,6 +133,12 @@ public class CustomFox extends Fox implements NmsEntity {
                     this.setSitting(false);
                 }
             }
+        }
+        if(System.currentTimeMillis() - created > TimeUnit.MILLISECONDS.convert(20, TimeUnit.SECONDS) && (!state.equals(State.DROPPING_OFF) && !state.equals(State.WAITING))){
+            teleportTo(target.x, target.y, target.z);
+            setState(State.WAITING);
+            this.setSitting(true);
+
         }
     }
 
