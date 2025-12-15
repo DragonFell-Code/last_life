@@ -1,8 +1,7 @@
-package com.dragon.lastlife.loot;
+package com.dragon.lastlife.loot.delivery;
 
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.utils.Utils;
-import com.quiptmc.core.utils.TaskScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -19,39 +18,25 @@ import org.bukkit.loot.LootTable;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-public class LootDelivery {
+public class BundleDelivery extends DeliverySystem {
 
-    public static final long MAX_DURATION = TimeUnit.MILLISECONDS.convert(2, TimeUnit.MINUTES);
-    public static final int PARTICLE_DELAY = 125;
+
 
     private final Location location;
     private final LootTable table;
-    private long started;
-
-
-    private int ticks = 0;
-    private boolean done = false;
-    private double height = 20;
     private BlockDisplay display; // Spinning chest display
 
-    public LootDelivery(Party party, LootTable table) {
+
+    private double height = 20;
+
+    public BundleDelivery(Party party, LootTable table) {
         this.location = party.mailbox().clone().add(0.5,0,0.5);
         this.table = table;
     }
 
-    public void start() {
-        started = System.currentTimeMillis();
-        Bukkit.getScheduler().runTaskLater(Utils.initializer(), () -> {
-            if (!done) Bukkit.getScheduler().runTaskLater(Utils.initializer(), this::loop, 0);
-        }, 0);
-    }
 
-    private void loop() {
-        tick();
-        if (!done) Bukkit.getScheduler().runTaskLater(Utils.initializer(), this::loop, 2);
-    }
 
-    private void tick() {
+    public void tick() {
         // Lazily spawn the display on first tick
         if (display == null) {
             World world = location.getWorld();
@@ -105,12 +90,10 @@ public class LootDelivery {
         if (System.currentTimeMillis() - started >= MAX_DURATION) stop();
     }
 
-    public boolean done() {
-        return done;
-    }
 
+    @Override
     public void stop() {
-        done = true;
+        super.stop();
         if (display != null) {
             try {
                 display.remove();

@@ -2,7 +2,8 @@ package com.dragon.lastlife.party;
 
 import com.dragon.lastlife.config.PartyConfig;
 import com.dragon.lastlife.config.object.ConfigLocation;
-import com.dragon.lastlife.loot.LootDelivery;
+import com.dragon.lastlife.loot.delivery.BundleDelivery;
+import com.dragon.lastlife.loot.delivery.FoxDelivery;
 import com.dragon.lastlife.nms.CustomFox;
 import com.dragon.lastlife.nms.NmsEntityFactory;
 import com.dragon.lastlife.players.Participant;
@@ -97,8 +98,7 @@ public class Party extends ConfigObject {
                 RandomSource.create(),
                 2
         );
-
-        mailbox = new ConfigLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getYaw(), location.getPitch(), location.getWorld().getName());
+        mailbox = new ConfigLocation(id + "-mailbox", location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getYaw(), location.getPitch(), location.getWorld().getName());
         Utils.configs().PARTY_CONFIG().save();
     }
 
@@ -107,69 +107,7 @@ public class Party extends ConfigObject {
     }
 
     public void deliver(LootTable table) {
-        if(new Random().nextDouble() < 0.25) deliveryFox(table);
-        else delivery(table);
-    }
-
-    private void delivery(LootTable table){
-        System.out.println("Delivery");
-        LootDelivery delivery = new LootDelivery(this, table);
-        delivery.start();
-        deliveryFox(table);
-    }
-
-    private void deliveryFox(LootTable table){
-
-        int radius = 30;
-        // TODO: Randomize it ?
-        Location spawn = mailbox().add(
-                new Random().nextInt(radius) * (new Random().nextBoolean() ? 1 : -1),
-                new Random().nextInt(radius)* (new Random().nextBoolean() ? 1 : -1),
-                new Random().nextInt(radius)* (new Random().nextBoolean() ? 1 : -1));
-        while(!spawn.getBlock().getType().isSolid()){
-            spawn = mailbox().add(
-                    new Random().nextInt(radius) * (new Random().nextBoolean() ? 1 : -1),
-                    new Random().nextInt(radius)* (new Random().nextBoolean() ? 1 : -1),
-                    new Random().nextInt(radius)* (new Random().nextBoolean() ? 1 : -1));
-        }
-        while (spawn.getBlock().getType().isSolid()) {
-            // TODO: Also check for valid spawn ? (eg: not in a wall)
-            // Does MC already has methods to locate a safe-spawn position ?
-            spawn.add(0, 1, 0);
-        }
-
-        // Set a target – here we use the player's current location,
-        // but this can be any arbitrary Location you pass in
-        Location target = mailbox().clone().add(0,1,0);
-
-        try {
-            // Spawn our custom NMS fox with overridden AI that walks to target
-            CustomFox fox = NmsEntityFactory.spawn(spawn, CustomFox.class);
-            Vec3 vecTarget = new Vec3(target.x(), target.y(), target.z());
-            fox.deliverTo(vecTarget);
-            // Build a Bukkit shulker box item with a loot table, then convert to NMS
-            org.bukkit.inventory.ItemStack bukkitShulker = new org.bukkit.inventory.ItemStack(org.bukkit.Material.SHULKER_BOX);
-            if (table != null) {
-                BlockStateMeta meta = (BlockStateMeta) bukkitShulker.getItemMeta();
-                if (meta != null && meta.getBlockState() instanceof ShulkerBox shulkerState) {
-                    // Set the loot table so that when placed, contents are generated like vanilla
-                    if (shulkerState instanceof Lootable lootable) {
-                        lootable.setLootTable(table);
-                        lootable.setSeed(ThreadLocalRandom.current().nextLong());
-                    }
-                    shulkerState.update();
-                    meta.setBlockState(shulkerState);
-                    bukkitShulker.setItemMeta(meta);
-                }
-            }
-            // Convert to NMS for the fox to hold
-            ItemStack nmsItem = CraftItemStack.asNMSCopy(bukkitShulker);
-            fox.setItemSlot(EquipmentSlot.MAINHAND, nmsItem);
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
-                 IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-
+        if(new Random().nextDouble() < 0.25) new FoxDelivery(this, table).start();
+        else new BundleDelivery(this, table).start();
     }
 }
