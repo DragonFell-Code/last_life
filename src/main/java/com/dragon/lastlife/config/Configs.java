@@ -24,6 +24,7 @@ public class Configs {
         ConfigManager.registerConfig(initializer.integration(), ParticipantConfig.class);
         ConfigManager.registerConfig(initializer.integration(), DonationConfig.class);
         ConfigManager.registerConfig(initializer.integration(), PartyConfig.class);
+        ConfigManager.registerConfig(initializer.integration(), PoiConfig.class);
         WebhooksConfig webhooks = ConfigManager.registerConfig(initializer.integration(), WebhooksConfig.class);
         webhooks.initialize();
     }
@@ -46,5 +47,9 @@ public class Configs {
 
     public PartyConfig PARTY_CONFIG() {
         return ConfigManager.getConfig(initializer.integration(), PartyConfig.class);
+    }
+
+    public PoiConfig POI_CONFIG() {
+        return ConfigManager.getConfig(initializer.integration(), PoiConfig.class);
     }
 }
