@@ -1,9 +1,9 @@
 {
   "name": "lastlife:dungeon/exits",
-  "fallback": "minecraft:empty",
+  "fallback": "lastlife:dungeon/dead_ends",
   "elements": [
     {
-      "weight": 1,
+      "weight": 50,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
@@ -12,11 +12,20 @@
       }
     },
     {
-      "weight": 2,
+      "weight": 20,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
         "location": "lastlife:dungeon/exits/empty_1_1",
+        "processors": "lastlife:dungeon_chest_loot"
+      }
+    },
+    {
+      "weight": 30,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "lastlife:dungeon/exits/empty_1_2",
         "processors": "lastlife:dungeon_chest_loot"
       }
     }

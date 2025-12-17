@@ -1,5 +1,5 @@
 {
-  "name": "lastlife:dungeon/start",
+  "name": "lastlife:dungeon/dead_ends",
   "fallback": "minecraft:empty",
   "elements": [
     {
@@ -7,7 +7,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "lastlife:dungeon/entrances/entrance_1_1",
+        "location": "lastlife:dungeon/dead_ends/dead_end_1",
         "processors": "lastlife:dungeon_chest_loot"
       }
     }

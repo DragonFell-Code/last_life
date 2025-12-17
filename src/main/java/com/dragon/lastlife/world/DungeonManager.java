@@ -1,49 +1,18 @@
 package com.dragon.lastlife.world;
 
 import com.dragon.lastlife.Initializer;
-import com.dragon.lastlife.utils.Utils;
-import com.google.common.collect.Lists;
 import com.quiptmc.core.data.registries.Registries;
 import com.quiptmc.core.data.registries.Registry;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtAccounter;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.visitors.CollectToTag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.ItemStackWithSlot;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static com.dragon.lastlife.world.Dungeon.DUNGEON_RESOURCE_KEY;
 import static net.kyori.adventure.text.Component.text;
-import static net.minecraft.world.entity.player.Inventory.*;
-import static org.bukkit.persistence.PersistentDataType.STRING;
 
 public class DungeonManager {
 
