@@ -110,4 +110,14 @@ public class Party extends ConfigObject {
         if(new Random().nextDouble() < 0.25) new FoxDelivery(this, table).start();
         else new BundleDelivery(this, table).start();
     }
+
+    @Deprecated
+    public void deliverFox(LootTable table){
+        new FoxDelivery(this, table).start();
+    }
+
+    @Deprecated
+    public void deliverBundle(LootTable table){
+        new BundleDelivery(this, table).start();
+    }
 }

@@ -41,7 +41,7 @@ public class Utils {
     private static Configs configs;
     private static MessageChannelHandler channelMessageHandler;
     private static LootManager lootManager;
-//    private static
+    private static DonationFlutter flutter;
 
     public static void init(Initializer init) {
         initializer = init;
@@ -72,15 +72,19 @@ public class Utils {
 
     private static void setupHeartbeat() {
         initializer().getComponentLogger().info(text("Setting up heartbeats..."));
-
+        flutter = new DonationFlutter(configs().DONATION_CONFIG());
         try {
             HeartbeatUtils.init(initializer().integration());
 
             HeartbeatUtils.heartbeat(initializer().integration()).flutter(SAVE_FLUTTER);
-            HeartbeatUtils.heartbeat(initializer().integration()).flutter(new DonationFlutter(configs().DONATION_CONFIG()));
+            HeartbeatUtils.heartbeat(initializer().integration()).flutter(flutter);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static DonationFlutter flutter() {
+        return flutter;
     }
 
     public static Initializer initializer() {

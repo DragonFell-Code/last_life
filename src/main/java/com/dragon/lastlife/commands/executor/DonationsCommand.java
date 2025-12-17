@@ -2,21 +2,26 @@ package com.dragon.lastlife.commands.executor;
 
 import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.commands.CommandExecutor;
+import com.dragon.lastlife.loot.LootTier;
+import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.quiptmc.core.utils.net.NetworkUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.loot.LootTable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.net.http.HttpResponse;
+import java.util.Optional;
 
 import static io.papermc.paper.command.brigadier.Commands.argument;
 import static io.papermc.paper.command.brigadier.Commands.literal;
@@ -31,6 +36,54 @@ public class DonationsCommand extends CommandExecutor {
     public LiteralArgumentBuilder<CommandSourceStack> arguments() {
         return literal(name())
                 .executes(context -> showUsage(context, ""))
+                .then(literal("test")
+                        .executes(a -> 1)
+                        .then(literal("fox")
+                                .executes(context -> {
+                                    if (!(context.getSource().getSender() instanceof Player player))
+                                        return logError(context, "Only players can link to participants.");
+                                    if (!player.hasPermission("lastlife.admin"))
+                                        return logError(context, "You do not have permission to use this command.");
+                                    Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(player.getUniqueId());
+                                    if (participant.donorDriveId == 0)
+                                        return logError(context, "You must link your Extra Life account first using /donations link <participantName>");
+                                    Optional<Party> party = Utils.configs().PARTY_CONFIG().get(participant);
+                                    if (party.isEmpty())
+                                        return logError(context, "You are not part of a party.");
+                                    LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
+                                    LootTable table = Bukkit.getLootTable(tier.key());
+                                    party.get().deliverFox(table);
+                                    player.sendMessage(Component.text("Delivered loot to party via fox!"));
+                                    return 1;
+                                }))
+                        .then(literal("bundle")
+                                .executes(context -> {
+                                    if (!(context.getSource().getSender() instanceof Player player))
+                                        return logError(context, "Only players can link to participants.");
+                                    if (!player.hasPermission("lastlife.admin"))
+                                        return logError(context, "You do not have permission to use this command.");
+                                    Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(player.getUniqueId());
+                                    if (participant.donorDriveId == 0)
+                                        return logError(context, "You must link your Extra Life account first using /donations link <participantName>");
+                                    Optional<Party> party = Utils.configs().PARTY_CONFIG().get(participant);
+                                    if (party.isEmpty())
+                                        return logError(context, "You are not part of a party.");
+                                    LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
+                                    LootTable table = Bukkit.getLootTable(tier.key());
+                                    party.get().deliverBundle(table);
+                                    player.sendMessage(Component.text("Delivered loot to party via magic!"));
+                                    return 1;
+                                }))
+                        .then(literal("shulker")
+                                .executes(context -> {
+                                    if (!context.getSource().getSender().hasPermission("lastlife.admin"))
+                                        return logError(context, "You do not have permission to use this command.");
+                                    Utils.flutter().shulkerStepper.consumer().accept(BigDecimal.valueOf(1));
+
+
+                                    context.getSource().getSender().sendMessage(Component.text("Delivered loot to a random location!"));
+                                    return 1;
+                                })))
                 .then(literal("incentives")
                         .executes(context -> {
                             CommandSender sender = context.getSource().getSender();
@@ -95,9 +148,12 @@ public class DonationsCommand extends CommandExecutor {
                                                 JSONObject incentive = raw.getJSONObject(i);
                                                 if (incentive.has("description") && incentive.getString("description").equalsIgnoreCase(StringArgumentType.getString(context, "incentiveName"))) {
                                                     switch (type) {
-                                                        case "life" -> participant.incentive_life = incentive.getString("incentiveID");
-                                                        case "boogey" -> participant.incentive_boogey = incentive.getString("incentiveID");
-                                                        case "loot" -> participant.incentive_loot = incentive.getString("incentiveID");
+                                                        case "life" ->
+                                                                participant.incentive_life = incentive.getString("incentiveID");
+                                                        case "boogey" ->
+                                                                participant.incentive_boogey = incentive.getString("incentiveID");
+                                                        case "loot" ->
+                                                                participant.incentive_loot = incentive.getString("incentiveID");
                                                     }
                                                     Utils.configs().PARTICIPANT_CONFIG().save();
                                                     player.sendMessage(Component.text("Successfully set your " + type + " incentive to " + incentive.getString("description") + " (ID: " + incentive.getString("incentiveID") + ")", NamedTextColor.GREEN));

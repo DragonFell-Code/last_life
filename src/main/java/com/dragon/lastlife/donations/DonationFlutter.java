@@ -1,8 +1,11 @@
 package com.dragon.lastlife.donations;
 
 import com.dragon.lastlife.config.DonationConfig;
+import com.dragon.lastlife.config.object.ConfigLocation;
+import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
+import com.dragon.lastlife.utils.Stepper;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.discord.WebhookManager;
 import com.quiptmc.core.heartbeat.Flutter;
@@ -11,6 +14,10 @@ import com.quiptmc.core.utils.net.HttpHeaders;
 import com.quiptmc.core.utils.net.NetworkUtils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.loot.LootTable;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,6 +33,8 @@ public class DonationFlutter implements Flutter {
 
 
     private final HttpConfig GET;
+    private final Stepper bundleStepper;
+    public final Stepper shulkerStepper;
     private long LAST_HEARTBEAT = 0;
     private int offset = 0;
 
@@ -35,6 +44,27 @@ public class DonationFlutter implements Flutter {
             throw new IllegalArgumentException("DonationConfig cannot be null");
         }
         GET = HttpConfig.defaults(HttpHeaders.ETAG(config.etag));
+        bundleStepper = new Stepper(20, (a) -> {
+            for(Party party : Utils.configs().PARTY_CONFIG().parties.values()){
+                LootTier tier = LootTier.of(config.total.doubleValue());
+                LootTable table = Bukkit.getLootTable(tier.key());
+                party.deliver(table);
+            }
+        });
+        shulkerStepper = new Stepper(50, (a) -> {
+            ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
+            Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
+            LootTier tier = LootTier.of(config.total.doubleValue());
+            LootTable table = Bukkit.getLootTable(tier.key());
+            while(!location.getBlock().getType().isAir())
+                location.add(0, 1, 0);
+            location.getBlock().setType(Material.valueOf(DyeColor.values()[offset++ % DyeColor.values().length] + "_SHULKER_BOX"));
+            ShulkerBox shulkerBoxBlock = (ShulkerBox) location.getBlock().getState();
+            shulkerBoxBlock.setLootTable(table);
+            shulkerBoxBlock.update();
+            Utils.initializer().integration().log("DonationFlutter", "Shulker delivery to [" + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ() + "]");
+
+        });
     }
 
     private DonationConfig config() {
@@ -118,16 +148,15 @@ public class DonationFlutter implements Flutter {
 
         if (!results.isEmpty()) {
             Utils.initializer().integration().log("DonationFlutter", "Processed " + results.size() + " new donations.");
+            shulkerStepper.accept();
+            bundleStepper.accept();
             for (Donation.ProcessResult<?> result : results) {
                 Participant participant = (Participant) result.payload();
                 switch (result.type()) {
                     case LIFE -> {
                         lifeMap.put(participant, lifeMap.getOrDefault(participant, 0) + 1);
                     }
-                    case LOOT -> {
-                        Optional<Party> partyOptional = Utils.configs().PARTY_CONFIG().get(participant);
-                        partyOptional.ifPresentOrElse(party -> party.deliver((LootTable) result.payload()), () -> Bukkit.broadcast(Component.text("Donation from " + participant.player().getName() + " received, but they are not in a party."), "*"));
-                    } case NONE -> {
+                    case NONE -> {
                     }
                     case BOOGEYMAN -> {
                         Utils.configs().PARTICIPANT_CONFIG().boogeymen().queue();
@@ -135,7 +164,8 @@ public class DonationFlutter implements Flutter {
                         Utils.initializer().integration().log("Donation", participant.player().getName() + " received a donation on their boogeyman incentive.");
                     }
                 }
-            } for (Map.Entry<Participant, Integer> entry : lifeMap.entrySet()) {
+            }
+            for (Map.Entry<Participant, Integer> entry : lifeMap.entrySet()) {
                 entry.getKey().lives().add(entry.getValue());
                 Utils.initializer().integration().log("Donation", "Added 1 life to " + entry.getKey().player().getName() + " for donation incentive.");
             }

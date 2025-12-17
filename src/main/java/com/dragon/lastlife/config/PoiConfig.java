@@ -29,4 +29,8 @@ public class PoiConfig extends Config {
     public PoiConfig(File file, String name, ConfigTemplate.Extension extension, QuiptIntegration integration) {
         super(file, name, extension, integration);
     }
+
+    public ConfigLocation random() {
+        return pois.values().stream().skip((int) (Math.random() * pois.size())).findFirst().orElse(null);
+    }
 }

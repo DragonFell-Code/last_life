@@ -34,6 +34,9 @@ public class DonationConfig extends Config {
     @ConfigValue
     public String etag = "null";
 
+    @ConfigValue
+    public long last_bucket = 0;
+
 
     public DonationConfig(File file, String name, ConfigTemplate.Extension extension, QuiptIntegration integration) {
         super(file, name, extension, integration);
