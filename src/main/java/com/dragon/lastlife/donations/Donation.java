@@ -1,18 +1,20 @@
 package com.dragon.lastlife.donations;
 
-import com.dragon.lastlife.config.DonationConfig;
-import com.dragon.lastlife.listeners.LootListener;
-import com.dragon.lastlife.loot.LootManager;
 import com.dragon.lastlife.loot.LootTier;
+import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.config.ConfigObject;
+import com.quiptmc.core.config.objects.ConfigLocation;
 import com.quiptmc.core.data.JsonSerializable;
 import com.quiptmc.core.discord.embed.Embed;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.loot.LootTable;
 import org.json.JSONObject;
 
@@ -67,15 +69,26 @@ public class Donation extends ConfigObject {
                 if (incentiveID.equals(participant.incentive_boogey)) {
                     return new ProcessResult<>(IncentiveType.BOOGEYMAN, participant);
                 }
-                if (incentiveID.equals(participant.incentive_loot)) {
-                    Player player = participant.player().getPlayer();
-                    if (player != null && player.isOnline()) {
-                        DonationConfig config = Utils.configs().DONATION_CONFIG();
-                        LootTier tier = LootTier.of(config.total.doubleValue());
-
+                if (incentiveID.equals(participant.incentive_bundle_loot)) {
+                    for(Party party : Utils.configs().PARTY_CONFIG().parties.values()){
+                        LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
                         LootTable table = Bukkit.getLootTable(tier.key());
-                        return new ProcessResult<>(IncentiveType.LOOT, table);
+                        party.deliver(table);
                     }
+                }
+                if(incentiveID.equals(participant.incentive_shulker_loot)){
+                    ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
+                    Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
+                    LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
+                    LootTable table = Bukkit.getLootTable(tier.key());
+                    while(!location.getBlock().getType().isAir())
+                        location.add(0, 1, 0);
+                    location.getBlock().setType(Material.valueOf(DyeColor.values()[tier.value()+1 % DyeColor.values().length] + "_SHULKER_BOX"));
+                    ShulkerBox shulkerBoxBlock = (ShulkerBox) location.getBlock().getState();
+                    shulkerBoxBlock.setLootTable(table);
+                    shulkerBoxBlock.update();
+                    Utils.initializer().integration().log("DonationFlutter", "Shulker delivery to [" + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ() + "]");
+
                 }
             } else {
                 Utils.initializer().integration().log("Donation", "Participant with ID " + participantID + " not found for donation incentive.");

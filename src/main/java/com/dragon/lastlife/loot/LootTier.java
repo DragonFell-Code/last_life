@@ -3,14 +3,16 @@ package com.dragon.lastlife.loot;
 import org.bukkit.NamespacedKey;
 
 public enum LootTier {
-    LOW(new NamespacedKey("lastlife", "chests/dungeon_tier_low")),
-    MID(new NamespacedKey("lastlife", "chests/dungeon_tier_mid")),
-    HIGH(new NamespacedKey("lastlife", "chests/dungeon_tier_high"));
+    LOW(0,  new NamespacedKey("lastlife", "chests/dungeon_tier_low")),
+    MID(1,  new NamespacedKey("lastlife", "chests/dungeon_tier_mid")),
+    HIGH(2, new NamespacedKey("lastlife", "chests/dungeon_tier_high"));
 
     final NamespacedKey key;
+    final int value;
 
-    LootTier(NamespacedKey key) {
+    LootTier(int value, NamespacedKey key) {
         this.key = key;
+        this.value = value;
     }
 
     public static LootTier of(double amount) {
@@ -28,5 +30,9 @@ public enum LootTier {
 
     public NamespacedKey key() {
         return key;
+    }
+
+    public int value(){
+        return value;
     }
 }

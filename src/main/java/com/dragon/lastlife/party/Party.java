@@ -1,41 +1,31 @@
 package com.dragon.lastlife.party;
 
 import com.dragon.lastlife.config.PartyConfig;
-import com.dragon.lastlife.config.object.ConfigLocation;
 import com.dragon.lastlife.loot.delivery.BundleDelivery;
 import com.dragon.lastlife.loot.delivery.FoxDelivery;
-import com.dragon.lastlife.nms.CustomFox;
-import com.dragon.lastlife.nms.NmsEntityFactory;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigObject;
+import com.quiptmc.core.config.objects.ConfigLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraft.world.phys.Vec3;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-// Use Bukkit meta API to set loot table on a shulker box and then convert to NMS
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
-import org.bukkit.block.ShulkerBox;
-import org.bukkit.loot.Lootable;
 
 public class Party extends ConfigObject {
 
@@ -60,7 +50,7 @@ public class Party extends ConfigObject {
         members.put(participant);
         Utils.configs().PARTY_CONFIG().save();
         Player player = participant.player().getPlayer();
-        if(player != null)
+        if (player != null)
             player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.party.join", this.id));
     }
 
@@ -68,15 +58,15 @@ public class Party extends ConfigObject {
         members.remove(participant);
         Utils.configs().PARTY_CONFIG().save();
         Player player = participant.player().getPlayer();
-        if(player != null)
+        if (player != null)
             player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.party.leave", this.id));
 
     }
 
     public void mailbox(@NotNull Location location) {
         World world = location.getWorld();
-        Optional<StructureTemplate> templateOptional = ((CraftWorld)world).getHandle().getStructureManager().get(ResourceLocation.parse("lastlife:features/mailbox"));
-        if(templateOptional.isEmpty())
+        Optional<StructureTemplate> templateOptional = ((CraftWorld) world).getHandle().getStructureManager().get(ResourceLocation.parse("lastlife:features/mailbox"));
+        if (templateOptional.isEmpty())
             return;
         StructureTemplate template = templateOptional.get();
         Mirror mirror = Mirror.NONE;
@@ -87,7 +77,7 @@ public class Party extends ConfigObject {
                 .setRotation(rot)
                 .setIgnoreEntities(false);
 
-        BlockPos pos = new BlockPos(location.getBlockX()-2, location.getBlockY(), location.getBlockZ()-2);
+        BlockPos pos = new BlockPos(location.getBlockX() - 2, location.getBlockY(), location.getBlockZ() - 2);
 
         CraftWorld cw = (CraftWorld) world;
         boolean placed = template.placeInWorld(
@@ -98,26 +88,26 @@ public class Party extends ConfigObject {
                 RandomSource.create(),
                 2
         );
-        mailbox = new ConfigLocation(id + "-mailbox", location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getYaw(), location.getPitch(), location.getWorld().getName());
+        mailbox = new ConfigLocation(id + "-mailbox", location.x(), location.y(), location.z(), location.getYaw(), location.getPitch(), world.getName());
         Utils.configs().PARTY_CONFIG().save();
     }
 
-    public Location mailbox(){
+    public Location mailbox() {
         return new Location(Bukkit.getWorld(mailbox.world), mailbox.x, mailbox.y, mailbox.z, mailbox.yaw, mailbox.pitch);
     }
 
     public void deliver(LootTable table) {
-        if(new Random().nextDouble() < 0.25) new FoxDelivery(this, table).start();
+        if (new Random().nextDouble() < 0.10) new FoxDelivery(this, table).start();
         else new BundleDelivery(this, table).start();
     }
 
     @Deprecated
-    public void deliverFox(LootTable table){
+    public void deliverFox(LootTable table) {
         new FoxDelivery(this, table).start();
     }
 
     @Deprecated
-    public void deliverBundle(LootTable table){
+    public void deliverBundle(LootTable table) {
         new BundleDelivery(this, table).start();
     }
 }

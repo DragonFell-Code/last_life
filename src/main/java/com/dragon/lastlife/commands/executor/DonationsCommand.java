@@ -2,17 +2,23 @@ package com.dragon.lastlife.commands.executor;
 
 import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.commands.CommandExecutor;
+import com.dragon.lastlife.donations.IncentiveType;
 import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.quiptmc.core.config.objects.ConfigLocation;
 import com.quiptmc.core.utils.net.NetworkUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.loot.LootTable;
@@ -78,7 +84,16 @@ public class DonationsCommand extends CommandExecutor {
                                 .executes(context -> {
                                     if (!context.getSource().getSender().hasPermission("lastlife.admin"))
                                         return logError(context, "You do not have permission to use this command.");
-                                    Utils.flutter().shulkerStepper.consumer().accept(BigDecimal.valueOf(1));
+                                    ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
+                                    Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
+                                    LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
+                                    LootTable table = Bukkit.getLootTable(tier.key());
+                                    while(!location.getBlock().getType().isAir())
+                                        location.add(0, 1, 0);
+                                    location.getBlock().setType(Material.valueOf(DyeColor.values()[tier.value()+1 % DyeColor.values().length] + "_SHULKER_BOX"));
+                                    ShulkerBox shulkerBoxBlock = (ShulkerBox) location.getBlock().getState();
+                                    shulkerBoxBlock.setLootTable(table);
+                                    shulkerBoxBlock.update();
 
 
                                     context.getSource().getSender().sendMessage(Component.text("Delivered loot to a random location!"));
@@ -103,7 +118,10 @@ public class DonationsCommand extends CommandExecutor {
                                     return logError(context, "Usage: /donations incentives life <incentiveName>");
                                 })
                                 .suggests(((context, builder) -> {
-                                    String[] types = new String[]{"life", "boogey", "loot"};
+                                    String[] types = new String[IncentiveType.values().length];
+                                    for (int i = 0; i < types.length; i++) {
+                                        types[i] = IncentiveType.values()[i].name().toLowerCase();
+                                    }
                                     return onlySimilar(types, "type", context, builder);
                                 }))
                                 .then(argument("incentiveName", StringArgumentType.greedyString())
@@ -129,8 +147,11 @@ public class DonationsCommand extends CommandExecutor {
                                             return onlySimilar(values, "incentiveName", context, builder);
                                         })
                                         .executes(context -> {
-                                            String type = StringArgumentType.getString(context, "type").toLowerCase();
-                                            if (!type.equals("life") && !type.equals("boogey") && !type.equals("loot")) {
+                                            String typeArg = StringArgumentType.getString(context, "type").toUpperCase();
+                                            IncentiveType type;
+                                            try{
+                                                type = IncentiveType.valueOf(typeArg);
+                                            } catch (IllegalArgumentException e) {
                                                 return logError(context, "Type must be one of life, boogey, or loot.");
                                             }
                                             CommandSender sender = context.getSource().getSender();
@@ -148,15 +169,17 @@ public class DonationsCommand extends CommandExecutor {
                                                 JSONObject incentive = raw.getJSONObject(i);
                                                 if (incentive.has("description") && incentive.getString("description").equalsIgnoreCase(StringArgumentType.getString(context, "incentiveName"))) {
                                                     switch (type) {
-                                                        case "life" ->
+                                                        case LIFE ->
                                                                 participant.incentive_life = incentive.getString("incentiveID");
-                                                        case "boogey" ->
+                                                        case BOOGEYMAN ->
                                                                 participant.incentive_boogey = incentive.getString("incentiveID");
-                                                        case "loot" ->
-                                                                participant.incentive_loot = incentive.getString("incentiveID");
+                                                        case SHULKER_LOOT ->
+                                                                participant.incentive_shulker_loot = incentive.getString("incentiveID");
+                                                        case BUNDLE_LOOT ->
+                                                                participant.incentive_bundle_loot = incentive.getString("incentiveID");
                                                     }
                                                     Utils.configs().PARTICIPANT_CONFIG().save();
-                                                    player.sendMessage(Component.text("Successfully set your " + type + " incentive to " + incentive.getString("description") + " (ID: " + incentive.getString("incentiveID") + ")", NamedTextColor.GREEN));
+                                                    player.sendMessage(Component.text("Successfully set your " + typeArg + " incentive to " + incentive.getString("description") + " (ID: " + incentive.getString("incentiveID") + ")", NamedTextColor.GREEN));
                                                     return 1;
                                                 }
                                             }

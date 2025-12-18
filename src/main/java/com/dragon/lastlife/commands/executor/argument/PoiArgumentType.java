@@ -1,15 +1,12 @@
 package com.dragon.lastlife.commands.executor.argument;
 
-import com.dragon.lastlife.config.object.ConfigLocation;
-import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
+import com.quiptmc.core.config.objects.ConfigLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
