@@ -31,7 +31,7 @@ public class DungeonManager {
             return null;
         }
         // These coordinates are always the same, because of how the dungeon is generated in the custom dimension
-        Location tp_location = new Location(dungeon_world, -96, 100, -32);
+        Location tp_location = new Location(dungeon_world, -96, 272, -32);
         Collection<Entity> entities = dungeon_world.getNearbyEntities(tp_location, 7, 1, 7);
         Optional<Entity> spawn_marker = entities.stream().filter(entity -> "lastlife:dungeon/spawn".equals(entity.getName())).findFirst();
 
