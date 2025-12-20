@@ -1,21 +1,28 @@
 package com.dragon.lastlife.donations;
 
 import com.dragon.lastlife.config.DonationConfig;
+import com.dragon.lastlife.loot.LootTier;
+import com.dragon.lastlife.loot.delivery.ShulkerDelivery;
+import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
-import com.dragon.lastlife.utils.Stepper;
 import com.dragon.lastlife.utils.Utils;
+import com.quiptmc.core.config.objects.ConfigLocation;
 import com.quiptmc.core.discord.WebhookManager;
 import com.quiptmc.core.heartbeat.Flutter;
 import com.quiptmc.core.utils.net.HttpConfig;
 import com.quiptmc.core.utils.net.HttpHeaders;
 import com.quiptmc.core.utils.net.NetworkUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.awt.*;
 import java.net.http.HttpResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DonationFlutter implements Flutter {
 
@@ -117,11 +124,22 @@ public class DonationFlutter implements Flutter {
             Utils.initializer().integration().log("DonationFlutter", "Processed " + results.size() + " new donations.");
             for (Donation.ProcessResult<?> result : results) {
                 Participant participant = (Participant) result.payload();
+                LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
                 switch (result.type()) {
                     case LIFE -> {
                         lifeMap.put(participant, lifeMap.getOrDefault(participant, 0) + 1);
                     }
-                    case NONE -> {
+                    case BUNDLE_LOOT -> {
+                        for (Party party : Utils.configs().PARTY_CONFIG().parties.values()) {
+                            party.deliver(Bukkit.getLootTable(tier.key()));
+                        }
+                    }
+                    case SHULKER_LOOT -> {
+                        ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
+                        Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
+                        while (!location.getBlock().getType().isAir())
+                            location.add(0, 1, 0);
+                        new ShulkerDelivery(location, tier);
                     }
                     case BOOGEYMAN -> {
                         Utils.configs().PARTICIPANT_CONFIG().boogeymen().queue();

@@ -4,6 +4,7 @@ import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.donations.IncentiveType;
 import com.dragon.lastlife.loot.LootTier;
+import com.dragon.lastlife.loot.delivery.ShulkerDelivery;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
@@ -80,22 +81,34 @@ public class DonationsCommand extends CommandExecutor {
                                     player.sendMessage(Component.text("Delivered loot to party via magic!"));
                                     return 1;
                                 }))
+                        .then(literal("delivery")
+                                .executes(context->{
+                                    if (!(context.getSource().getSender() instanceof Player player))
+                                        return logError(context, "Only players can link to participants.");
+                                    if (!player.hasPermission("lastlife.admin"))
+                                        return logError(context, "You do not have permission to use this command.");
+                                    Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(player.getUniqueId());
+                                    if (participant.donorDriveId == 0)
+                                        return logError(context, "You must link your Extra Life account first using /donations link <participantName>");
+                                    Optional<Party> party = Utils.configs().PARTY_CONFIG().get(participant);
+                                    if (party.isEmpty())
+                                        return logError(context, "You are not part of a party.");
+                                    LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
+                                    LootTable table = Bukkit.getLootTable(tier.key());
+                                    party.get().deliver(table);
+                                    player.sendMessage(Component.text("Delivered loot to party via chance!"));
+                                    return 1;
+                                }))
                         .then(literal("shulker")
                                 .executes(context -> {
                                     if (!context.getSource().getSender().hasPermission("lastlife.admin"))
                                         return logError(context, "You do not have permission to use this command.");
                                     ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
                                     Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
-                                    LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
-                                    LootTable table = Bukkit.getLootTable(tier.key());
                                     while(!location.getBlock().getType().isAir())
                                         location.add(0, 1, 0);
-                                    location.getBlock().setType(Material.valueOf(DyeColor.values()[tier.value()+1 % DyeColor.values().length] + "_SHULKER_BOX"));
-                                    ShulkerBox shulkerBoxBlock = (ShulkerBox) location.getBlock().getState();
-                                    shulkerBoxBlock.setLootTable(table);
-                                    shulkerBoxBlock.update();
-
-
+                                    LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
+                                    new ShulkerDelivery(location, tier).start();
                                     context.getSource().getSender().sendMessage(Component.text("Delivered loot to a random location!"));
                                     return 1;
                                 })))
