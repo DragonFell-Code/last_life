@@ -62,6 +62,10 @@ public class CustomFox extends Fox implements NmsEntity {
 
     }
 
+    // Damage handling in this Minecraft version marks Entity#hurt as final.
+    // We rely on the invulnerable flag set in the constructor and additionally
+    // enforce full health every tick to guarantee no lasting damage is applied.
+
     @Override
     public void load(@NotNull ValueInput input) {
         super.load(input);
@@ -120,6 +124,18 @@ public class CustomFox extends Fox implements NmsEntity {
     public void tick() {
         super.tick();
         if (this.level().isClientSide()) return;
+
+        // Hard guarantee: keep fox fully healthy and unaffected by environmental damage.
+        // setInvulnerable(true) already blocks most damage, this is a safety net.
+        if (this.getHealth() < this.getMaxHealth()) {
+            this.setHealth(this.getMaxHealth());
+        }
+        if (this.isOnFire()) {
+            this.clearFire();
+        }
+        // Prevent drowning and reset fall accumulation
+        this.setAirSupply(this.getMaxAirSupply());
+        this.fallDistance = 0.0F;
 
         if (this.target == null) return;
         switch (this.state) {
