@@ -1,6 +1,7 @@
 package com.dragon.lastlife.party;
 
 import com.dragon.lastlife.config.PartyConfig;
+import com.dragon.lastlife.config.object.ConfigLocation;
 import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.loot.delivery.BundleDelivery;
 import com.dragon.lastlife.loot.delivery.FoxDelivery;
@@ -8,7 +9,6 @@ import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigObject;
-import com.quiptmc.core.config.objects.ConfigLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -94,7 +94,7 @@ public class Party extends ConfigObject {
     }
 
     public Location mailbox() {
-        return new Location(Bukkit.getWorld(mailbox.world), mailbox.x, mailbox.y, mailbox.z, mailbox.yaw, mailbox.pitch);
+        return new Location(Bukkit.getWorld(mailbox.world), mailbox.x, mailbox.y, mailbox.z, mailbox.yaw.floatValue(), mailbox.pitch.floatValue());
     }
 
     public void deliver(LootTier tier) {

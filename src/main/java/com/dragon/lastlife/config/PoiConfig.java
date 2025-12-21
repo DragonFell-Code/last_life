@@ -1,11 +1,11 @@
 package com.dragon.lastlife.config;
 
+import com.dragon.lastlife.config.object.ConfigLocation;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.Config;
 import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigTemplate;
 import com.quiptmc.core.config.ConfigValue;
-import com.quiptmc.core.config.objects.ConfigLocation;
 
 import java.io.File;
 

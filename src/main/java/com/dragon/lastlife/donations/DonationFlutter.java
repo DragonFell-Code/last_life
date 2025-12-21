@@ -1,12 +1,12 @@
 package com.dragon.lastlife.donations;
 
 import com.dragon.lastlife.config.DonationConfig;
+import com.dragon.lastlife.config.object.ConfigLocation;
 import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.loot.delivery.ShulkerDelivery;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
-import com.quiptmc.core.config.objects.ConfigLocation;
 import com.quiptmc.core.discord.WebhookManager;
 import com.quiptmc.core.heartbeat.Flutter;
 import com.quiptmc.core.utils.net.HttpConfig;
