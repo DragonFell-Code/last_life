@@ -131,7 +131,7 @@ public class DonationFlutter implements Flutter {
                     }
                     case BUNDLE_LOOT -> {
                         for (Party party : Utils.configs().PARTY_CONFIG().parties.values()) {
-                            party.deliver(Bukkit.getLootTable(tier.key()));
+                            party.deliver(tier);
                         }
                     }
                     case SHULKER_LOOT -> {

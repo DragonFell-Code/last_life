@@ -58,8 +58,7 @@ public class DonationsCommand extends CommandExecutor {
                                     if (party.isEmpty())
                                         return logError(context, "You are not part of a party.");
                                     LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
-                                    LootTable table = Bukkit.getLootTable(tier.key());
-                                    party.get().deliverFox(table);
+                                    party.get().deliverFox(tier);
                                     player.sendMessage(Component.text("Delivered loot to party via fox!"));
                                     return 1;
                                 }))
@@ -76,8 +75,7 @@ public class DonationsCommand extends CommandExecutor {
                                     if (party.isEmpty())
                                         return logError(context, "You are not part of a party.");
                                     LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
-                                    LootTable table = Bukkit.getLootTable(tier.key());
-                                    party.get().deliverBundle(table);
+                                    party.get().deliverBundle(tier);
                                     player.sendMessage(Component.text("Delivered loot to party via magic!"));
                                     return 1;
                                 }))
@@ -94,8 +92,7 @@ public class DonationsCommand extends CommandExecutor {
                                     if (party.isEmpty())
                                         return logError(context, "You are not part of a party.");
                                     LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
-                                    LootTable table = Bukkit.getLootTable(tier.key());
-                                    party.get().deliver(table);
+                                    party.get().deliver(tier);
                                     player.sendMessage(Component.text("Delivered loot to party via chance!"));
                                     return 1;
                                 }))

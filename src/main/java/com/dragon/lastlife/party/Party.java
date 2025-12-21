@@ -1,6 +1,7 @@
 package com.dragon.lastlife.party;
 
 import com.dragon.lastlife.config.PartyConfig;
+import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.loot.delivery.BundleDelivery;
 import com.dragon.lastlife.loot.delivery.FoxDelivery;
 import com.dragon.lastlife.players.Participant;
@@ -96,18 +97,18 @@ public class Party extends ConfigObject {
         return new Location(Bukkit.getWorld(mailbox.world), mailbox.x, mailbox.y, mailbox.z, mailbox.yaw, mailbox.pitch);
     }
 
-    public void deliver(LootTable table) {
-        if (new Random().nextDouble() < 0.10) new FoxDelivery(this, table).start();
-        else new BundleDelivery(this, table).start();
+    public void deliver(LootTier tier) {
+        if (new Random().nextDouble() < 0.10) new FoxDelivery(this, tier).start();
+        else new BundleDelivery(this, tier).start();
     }
 
     @Deprecated
-    public void deliverFox(LootTable table) {
-        new FoxDelivery(this, table).start();
+    public void deliverFox(LootTier tier) {
+        new FoxDelivery(this, tier).start();
     }
 
     @Deprecated
-    public void deliverBundle(LootTable table) {
-        new BundleDelivery(this, table).start();
+    public void deliverBundle(LootTier tier) {
+        new BundleDelivery(this, tier).start();
     }
 }

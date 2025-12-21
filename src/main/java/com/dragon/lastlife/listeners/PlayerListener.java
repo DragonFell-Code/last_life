@@ -43,6 +43,23 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEntityEvent event) {
         if (((CraftEntity) event.getRightClicked()).getHandle() instanceof CustomFox fox) {
+            if(fox.getParty() == null) return;
+            Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(event.getPlayer().getUniqueId());
+
+            if(participant == null){
+                event.getPlayer().sendMessage(text("You are not a participant!", NamedTextColor.RED));
+                return;
+            }
+            Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
+            if(party == null){
+                event.getPlayer().sendMessage(text("You are not in a party!", NamedTextColor.RED));
+                return;
+            }
+            if(!fox.getParty().equals(party.id())){
+                event.getPlayer().sendMessage(text("Your party does not own this fox!", NamedTextColor.RED));
+                return;
+            }
+
             if (fox.getState().equals(CustomFox.State.WAITING)) {
                 fox.setState(CustomFox.State.DROPPING_OFF);
                 Fox bukkitFox = (Fox) fox.getBukkitEntity();
@@ -106,8 +123,7 @@ public class PlayerListener implements Listener {
                         DonationConfig config = Utils.configs().DONATION_CONFIG();
                         LootTier tier = LootTier.of(config.total.doubleValue());
 
-                        LootTable table = Bukkit.getLootTable(tier.key());
-                        party.deliver(table);
+                        party.deliver(tier);
 //                        JSONObject json = new JSONObject()
 //                                .put("displayName", "Test Donor")
 //                                .put("donorId", "270CB800398A911A")

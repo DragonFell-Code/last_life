@@ -1,6 +1,7 @@
 package com.dragon.lastlife.listeners;
 
 import com.dragon.lastlife.config.DonationConfig;
+import com.dragon.lastlife.loot.LootManager;
 import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.utils.Utils;
 import org.bukkit.Bukkit;
@@ -25,7 +26,7 @@ public class LootListener implements Listener {
         DonationConfig config = Utils.configs().DONATION_CONFIG();
         LootTier tier = LootTier.of(config.total.doubleValue());
 
-        LootTable table = Bukkit.getLootTable(tier.key());
+        LootTable table = LootManager.table(tier);
         if (table != null) {
             // Generate items from the tier table into this event
             Collection<ItemStack> generated = table.populateLoot(new Random(), event.getLootContext());

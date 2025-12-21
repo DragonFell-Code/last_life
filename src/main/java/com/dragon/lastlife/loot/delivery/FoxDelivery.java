@@ -1,5 +1,7 @@
 package com.dragon.lastlife.loot.delivery;
 
+import com.dragon.lastlife.loot.LootManager;
+import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.nms.CustomFox;
 import com.dragon.lastlife.nms.NmsEntityFactory;
 import com.dragon.lastlife.party.Party;
@@ -7,11 +9,9 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
-import org.bukkit.block.ShulkerBox;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
-import org.bukkit.loot.LootTable;
-import org.bukkit.loot.Lootable;
+import org.bukkit.inventory.meta.BundleMeta;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
@@ -19,12 +19,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FoxDelivery extends DeliverySystem{
 
-    private final LootTable table;
+    private final LootTier tier;
     private final Location mailbox;
+    private final Party party;
 
-    public FoxDelivery(Party party, LootTable table) {
+    public FoxDelivery(Party party, LootTier tier) {
+        this.party = party;
         mailbox = party.mailbox().clone().add(0,1,0);
-        this.table = table;
+        this.tier = tier;
     }
 
     @Override
@@ -32,9 +34,9 @@ public class FoxDelivery extends DeliverySystem{
         int radius = 30;
         // TODO: Randomize it ?
         Location spawn = mailbox.clone().add(
-                new Random().nextInt(radius) * (new Random().nextBoolean() ? 1 : -1),
-                new Random().nextInt(radius)* (new Random().nextBoolean() ? 1 : -1),
-                new Random().nextInt(radius)* (new Random().nextBoolean() ? 1 : -1));
+                ThreadLocalRandom.current().nextInt(radius) * (ThreadLocalRandom.current().nextBoolean() ? 1 : -1),
+                ThreadLocalRandom.current().nextInt(radius)* (ThreadLocalRandom.current().nextBoolean() ? 1 : -1),
+                ThreadLocalRandom.current().nextInt(radius)* (ThreadLocalRandom.current().nextBoolean() ? 1 : -1));
         while(!spawn.getBlock().getType().isSolid()){
             spawn = mailbox.clone().add(
                     new Random().nextInt(radius) * (new Random().nextBoolean() ? 1 : -1),
@@ -54,25 +56,25 @@ public class FoxDelivery extends DeliverySystem{
         try {
             // Spawn our custom NMS fox with overridden AI that walks to target
             CustomFox fox = NmsEntityFactory.spawn(spawn, CustomFox.class);
+            fox.setParty(party);
             Vec3 vecTarget = new Vec3(target.x(), target.y(), target.z());
             fox.deliverTo(vecTarget);
-            // Build a Bukkit shulker box item with a loot table, then convert to NMS
-            org.bukkit.inventory.ItemStack bukkitShulker = new org.bukkit.inventory.ItemStack(org.bukkit.Material.SHULKER_BOX);
-            if (table != null) {
-                BlockStateMeta meta = (BlockStateMeta) bukkitShulker.getItemMeta();
-                if (meta != null && meta.getBlockState() instanceof ShulkerBox shulkerState) {
-                    // Set the loot table so that when placed, contents are generated like vanilla
-                    if (shulkerState instanceof Lootable lootable) {
-                        lootable.setLootTable(table);
-                        lootable.setSeed(ThreadLocalRandom.current().nextLong());
+            // Build a Bukkit bundle item pre-filled with generated loot, then convert to NMS
+            org.bukkit.inventory.ItemStack bundle = new org.bukkit.inventory.ItemStack(
+                    Material.valueOf(LootManager.color(tier) + "_BUNDLE")
+            );
+            BundleMeta meta = (BundleMeta) bundle.getItemMeta();
+            if (meta != null) {
+                var loot = LootManager.generate(tier, mailbox);
+                if (loot != null) {
+                    for (org.bukkit.inventory.ItemStack lootItem : loot) {
+                        meta.addItem(lootItem);
                     }
-                    shulkerState.update();
-                    meta.setBlockState(shulkerState);
-                    bukkitShulker.setItemMeta(meta);
                 }
+                bundle.setItemMeta(meta);
             }
             // Convert to NMS for the fox to hold
-            ItemStack nmsItem = CraftItemStack.asNMSCopy(bukkitShulker);
+            ItemStack nmsItem = CraftItemStack.asNMSCopy(bundle);
             fox.setItemSlot(EquipmentSlot.MAINHAND, nmsItem);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                  IllegalAccessException e) {

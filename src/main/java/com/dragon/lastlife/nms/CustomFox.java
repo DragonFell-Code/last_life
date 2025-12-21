@@ -1,6 +1,10 @@
 package com.dragon.lastlife.nms;
 
+import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.item.ItemStack;
@@ -27,11 +31,13 @@ public class CustomFox extends Fox implements NmsEntity {
     public static final NamespacedKey KEY_TARGET_X = new NamespacedKey(Utils.initializer(), "fox_target_x");
     public static final NamespacedKey KEY_TARGET_Y = new NamespacedKey(Utils.initializer(), "fox_target_y");
     public static final NamespacedKey KEY_TARGET_Z = new NamespacedKey(Utils.initializer(), "fox_target_z");
+    public static final NamespacedKey PARTY_OWNERS = new NamespacedKey(Utils.initializer(), "fox_party_owners");
 
     private Vec3 target;
     State state;
     PersistentDataContainer persistentData;
     private final long created;
+    private String party;
 
 
     /*
@@ -65,7 +71,8 @@ public class CustomFox extends Fox implements NmsEntity {
         Double ty = persistentData.get(KEY_TARGET_Y, PersistentDataType.DOUBLE);
         Double tz = persistentData.get(KEY_TARGET_Z, PersistentDataType.DOUBLE);
         String state = persistentData.get(KEY_STATE, PersistentDataType.STRING);
-
+        String party = persistentData.get(PARTY_OWNERS, PersistentDataType.STRING);
+        if(party != null) this.party = party;
         if (tx != null && ty != null && tz != null) {
             this.target = new Vec3(tx, ty, tz);
         }
@@ -163,6 +170,17 @@ public class CustomFox extends Fox implements NmsEntity {
             persistentData.set(KEY_TARGET_Z, PersistentDataType.DOUBLE, target.z);
             persistentData.set(KEY_TARGET_X, PersistentDataType.DOUBLE, target.x);
         }
+    }
+
+    public String getParty() {
+        return party;
+    }
+
+    public void setParty(Party party) {
+        this.party = party.id();
+        persistentData.set(PARTY_OWNERS, PersistentDataType.STRING, party.id());
+        getBukkitEntity().customName(Component.text("Click me!").color(NamedTextColor.AQUA).decorate(TextDecoration.BOLD));
+        getBukkitEntity().setCustomNameVisible(true);
     }
 
     public State getState() {
