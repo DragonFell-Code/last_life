@@ -24,7 +24,7 @@ public class Participant extends ConfigObject {
     public int lives;
     public long donorDriveId;
     public boolean modded = false;
-    public ConfigMap<ConfigString> settings = new ConfigMap<>();
+    public ConfigMap<ConfigString> settings = new ConfigMap<ConfigString>();
     public String incentive_life;
     public String incentive_boogey;
     public String incentive_bundle_loot;
@@ -152,7 +152,5 @@ public class Participant extends ConfigObject {
         }
     }
 
-    public class Settings extends ConfigMap<ConfigString> {
 
-    }
 }

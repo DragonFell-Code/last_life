@@ -7,6 +7,7 @@ import com.quiptmc.core.config.Config;
 import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigTemplate;
 import com.quiptmc.core.config.ConfigValue;
+import com.quiptmc.core.config.objects.ConfigString;
 import com.quiptmc.core.discord.WebhookManager;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -57,6 +58,10 @@ public class ParticipantConfig extends Config {
             return cache.get(uuid.toString());
         }
         Participant participant = new Participant(uuid.toString(), "none", 3, 0);
+        participant.settings.put(new ConfigString("boogey_particles", "true"));
+        participant.settings.put(new ConfigString("boogey_boss_bar", "true"));
+        participant.settings.put(new ConfigString("boogey_sound", "true"));
+        participant.settings.put(new ConfigString("boogey_message", "true"));
         cache.put(participant);
         save();
         return participant;
@@ -153,7 +158,10 @@ public class ParticipantConfig extends Config {
                             setBoogey(participant, true);
                             Player player = participant.player().getPlayer();
                             if (player != null && player.isOnline()) {
-                                player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.set", player.getName(), participant.boogey));
+                                if(participant.settings.get("boogey_sound").value().equalsIgnoreCase("true"))
+                                    player.playSound(player.getLocation(), "minecraft:entity.endermen.teleport", 1, 1);
+                                if (participant.settings.get("boogey_message").value().equalsIgnoreCase("true"))
+                                    player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.set", player.getName(), participant.boogey));
                             }
                         }
                         save();

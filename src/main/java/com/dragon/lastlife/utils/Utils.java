@@ -1,6 +1,7 @@
 package com.dragon.lastlife.utils;
 
 import com.dragon.lastlife.Initializer;
+import com.dragon.lastlife.boogey.BoogeyFlutter;
 import com.dragon.lastlife.config.Configs;
 import com.dragon.lastlife.donations.DonationFlutter;
 import com.dragon.lastlife.loot.LootManager;
@@ -14,6 +15,7 @@ import com.quiptmc.core.discord.WebhookManager;
 import com.quiptmc.core.discord.embed.Embed;
 import com.quiptmc.core.heartbeat.Flutter;
 import com.quiptmc.core.heartbeat.HeartbeatUtils;
+import com.quiptmc.core.heartbeat.runnable.Heartbeat;
 
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +43,6 @@ public class Utils {
     private static Configs configs;
     private static MessageChannelHandler channelMessageHandler;
     private static LootManager lootManager;
-    private static DonationFlutter flutter;
 
     public static void init(Initializer init) {
         initializer = init;
@@ -72,19 +73,15 @@ public class Utils {
 
     private static void setupHeartbeat() {
         initializer().getComponentLogger().info(text("Setting up heartbeats..."));
-        flutter = new DonationFlutter(configs().DONATION_CONFIG());
         try {
-            HeartbeatUtils.init(initializer().integration());
+            Heartbeat heartbeat = HeartbeatUtils.init(initializer().integration());
 
-            HeartbeatUtils.heartbeat(initializer().integration()).flutter(SAVE_FLUTTER);
-            HeartbeatUtils.heartbeat(initializer().integration()).flutter(flutter);
+            heartbeat.flutter(SAVE_FLUTTER);
+            heartbeat.flutter(new DonationFlutter(configs().DONATION_CONFIG()));
+            heartbeat.flutter(new BoogeyFlutter());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static DonationFlutter flutter() {
-        return flutter;
     }
 
     public static Initializer initializer() {

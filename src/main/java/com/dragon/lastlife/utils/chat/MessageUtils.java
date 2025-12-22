@@ -63,6 +63,12 @@ public class MessageUtils {
         register("cmd.party.leave.usage", text("Usage: /party leave"));
         register("cmd.party.remove.usage", text("Usage: /party remove <partyName>"));
 
+        register("cmd.donations.usage", text("Usage: /donations <incentives|link>"));
+        register("cmd.donations.incentives.usage", text("Usage: /donations incentives <life|boogey|shulker_loot|bundle_loot> <incentiveName>"));
+        register("cmd.donations.link.usage", text("Usage: /donations link <participantName>"));
+
+        register("cmd.boogey.set.usage", text("Usage: /boogey set <player> [true|false]"));
+
         register("lastlife.party.create", text("Party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\" has been created.", NamedTextColor.YELLOW))));
         register("lastlife.party.remove", text("Party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\" has been removed.", NamedTextColor.YELLOW))));
         register("lastlife.party.join", text("You have joined the party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\".", NamedTextColor.YELLOW))));

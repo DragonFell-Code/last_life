@@ -35,7 +35,7 @@ public class PoiCommand extends CommandExecutor {
                                     if (!player.hasPermission("lastlife.poi.add"))
                                         return logError(context, "You do not have permission to use this command.");
                                     String id = StringArgumentType.getString(context, "id");
-                                    ConfigLocation location = new ConfigLocation(id, player.getLocation().x(), player.getLocation().y(), player.getLocation().z(), player.getLocation().getYaw(), player.getLocation().getPitch(), player.getLocation().getWorld().getName());
+                                    ConfigLocation location = new ConfigLocation(id, player.getLocation().blockX(), player.getLocation().blockY(), player.getLocation().blockZ(), player.getLocation().getYaw(), player.getLocation().getPitch(), player.getLocation().getWorld().getName());
                                     Utils.configs().POI_CONFIG().pois.put(location);
                                     Utils.configs().POI_CONFIG().save();
                                     player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("cmd.poi.add", id));

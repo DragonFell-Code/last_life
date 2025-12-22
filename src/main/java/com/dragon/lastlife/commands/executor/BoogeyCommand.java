@@ -38,7 +38,7 @@ public class BoogeyCommand extends CommandExecutor {
                                 logError(context, "You do not have permission to use this command.");
                                 return 0;
                             }
-                            logError(context, "Usage: /boogey set <player> [true|false]");
+                            showUsage(context, "lastlife.boogey.set");
                             return 1;
                         })
                         .then(argument("target", ArgumentTypes.players())
