@@ -6,7 +6,6 @@ import com.quiptmc.core.config.files.MessagesConfig;
 import com.quiptmc.core.data.registries.Registries;
 import com.quiptmc.core.data.registries.Registry;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -82,9 +81,12 @@ public class MessageUtils {
         register("lastlife.boogey.roll", text("[0] boogeyman is about to be selected.", NamedTextColor.RED));
         register("lastlife.boogey.cured", text("You've been cured! You are no longer a boogeyman.", NamedTextColor.GREEN));
         register("lastlife.boogey.set", text("You are now a boogeyman!", NamedTextColor.RED));
+
         register("lastlife.cmd.life.view", text("[0]'s lives: [1]", NamedTextColor.YELLOW));
         register("lastlife.cmd.life.set", text("Set [0]'s lives to [1].", NamedTextColor.GREEN));
 
+        register("lastlife.cmd.dungeon.open", text("The dungeon is now OPEN", NamedTextColor.GREEN));
+        register("lastlife.cmd.dungeon.open_fail", text("The dungeon failed to generate", NamedTextColor.RED));
     }
 
     public Component deserialize(JSONObject json) {

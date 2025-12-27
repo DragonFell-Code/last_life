@@ -19,6 +19,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
@@ -29,6 +30,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -45,14 +47,30 @@ public class Dungeon {
     public DungeonManager manager;
     public BlockPos origin = null;
 
-    public void generate(ResourceKey<Structure> structurekey, ChunkPos pos) {
-        Holder.Reference<Structure> structure = MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(structurekey);
+    public void generate(ResourceKey<Structure> structureKey, ChunkPos pos) {
+        Holder.Reference<Structure> structureRef = MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(structureKey);
         ServerLevel level = ((CraftWorld) world).getHandle();
 
-        Structure structure1 = structure.value();
+        JigsawStructure structure = (JigsawStructure)structureRef.value();
         ChunkGenerator generator = level.getChunkSource().getGenerator();
-        StructureStart structureStart = structure1.generate(
-                structure,
+
+        // MC doesn't expose a method to change the depth, relying on Reflection
+        try {
+            Field maxDepthField = JigsawStructure.class.getDeclaredField("maxDepth");
+            Field maxDistanceFromCenterField = JigsawStructure.class.getDeclaredField("maxDistanceFromCenter");
+
+            maxDistanceFromCenterField.setAccessible(true);
+            maxDepthField.setAccessible(true);
+            maxDepthField.set(structure, 10); // TODO: Replace with the size we want.
+
+            // Remove max horizontal distance
+            maxDistanceFromCenterField.set(structure, new JigsawStructure.MaxDistance(10000, 10000));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        StructureStart structureStart = structure.generate(
+                structureRef,
                 level.dimension(),
                 level.registryAccess(),
                 generator,

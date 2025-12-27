@@ -5,7 +5,7 @@
     "settings": {
       "biome": "lastlife:void",
       "layers": [],
-      "structure_overrides": ["lastlife:lastlife_dungeons"]
+      "structure_overrides": []
     }
   }
 }

@@ -34,6 +34,4 @@ public class LootListener implements Listener {
             event.getLoot().addAll(generated);
         }
     }
-
-
 }
