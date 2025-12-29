@@ -37,11 +37,9 @@ public class DonationConfig extends Config {
     @ConfigValue
     public long last_bucket = 0;
 
-
     public DonationConfig(File file, String name, ConfigTemplate.Extension extension, QuiptIntegration integration) {
         super(file, name, extension, integration);
     }
-
 
     public Donation.ProcessResult<?> process(Donation donation) {
         Donation.ProcessResult<?> result = donation.process();

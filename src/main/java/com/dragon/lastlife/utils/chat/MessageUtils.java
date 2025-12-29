@@ -85,8 +85,9 @@ public class MessageUtils {
         register("lastlife.cmd.life.view", text("[0]'s lives: [1]", NamedTextColor.YELLOW));
         register("lastlife.cmd.life.set", text("Set [0]'s lives to [1].", NamedTextColor.GREEN));
 
+        register("lastlife.cmd.dungeon.generating", text("The dungeon is generating. This might take a while depending on the size of the dungeon", NamedTextColor.GRAY));
         register("lastlife.cmd.dungeon.open", text("The dungeon is now OPEN", NamedTextColor.GREEN));
-        register("lastlife.cmd.dungeon.open_fail", text("The dungeon failed to generate", NamedTextColor.RED));
+        register("lastlife.cmd.dungeon.open_fail", text("The dungeon failed to generate. Check the server logs for details", NamedTextColor.RED));
     }
 
     public Component deserialize(JSONObject json) {
