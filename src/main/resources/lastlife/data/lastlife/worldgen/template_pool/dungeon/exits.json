@@ -7,7 +7,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "lastlife:dungeon/exits/portal_1_1",
+        "location": "lastlife:dungeon/exits/portal",
         "processors": "lastlife:dungeon_chest_loot"
       }
     },
@@ -16,7 +16,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "lastlife:dungeon/exits/empty_1_1",
+        "location": "lastlife:dungeon/exits/empty_1",
         "processors": "lastlife:dungeon_chest_loot"
       }
     },
@@ -25,7 +25,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "lastlife:dungeon/exits/empty_1_2",
+        "location": "lastlife:dungeon/exits/empty_2",
         "processors": "lastlife:dungeon_chest_loot"
       }
     }

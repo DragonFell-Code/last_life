@@ -85,9 +85,12 @@ public class MessageUtils {
         register("lastlife.cmd.life.view", text("[0]'s lives: [1]", NamedTextColor.YELLOW));
         register("lastlife.cmd.life.set", text("Set [0]'s lives to [1].", NamedTextColor.GREEN));
 
-        register("lastlife.cmd.dungeon.generating", text("The dungeon is generating. This might take a while depending on the size of the dungeon", NamedTextColor.GRAY));
-        register("lastlife.cmd.dungeon.open", text("The dungeon is now OPEN", NamedTextColor.GREEN));
-        register("lastlife.cmd.dungeon.open_fail", text("The dungeon failed to generate. Check the server logs for details", NamedTextColor.RED));
+        register("lastlife.cmd.dungeon.generating", text("The Labyrinth is generating. This might take a while depending on the size of the Labyrinth", NamedTextColor.GRAY));
+        register("lastlife.cmd.dungeon.auto_size", text("Labyrinth size: [0]", NamedTextColor.GRAY));
+        register("lastlife.cmd.dungeon.generated", text("The Labyrinth was generated successfully. Check it out with /dungeon tp. If it looks good, open it for players with /dungeon open", NamedTextColor.GREEN));
+        register("lastlife.cmd.dungeon.generate_fail", text("The Labyrinth failed to generate. Check the server logs for details", NamedTextColor.RED));
+        register("lastlife.cmd.dungeon.open", text("The Labyrinth is now OPEN", NamedTextColor.GREEN));
+        register("lastlife.cmd.dungeon.closed", text("The Labyrinth is now CLOSED", NamedTextColor.RED));
     }
 
     public Component deserialize(JSONObject json) {

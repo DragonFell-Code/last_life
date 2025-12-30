@@ -7,7 +7,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "lastlife:dungeon/entrances/entrance_1_1",
+        "location": "lastlife:dungeon/entrances/entrance",
         "processors": "lastlife:dungeon_chest_loot"
       }
     }

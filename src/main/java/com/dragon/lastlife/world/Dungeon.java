@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.dragon.lastlife.world.DungeonManager.SPAWN_MARKER_NAME;
+
 public class Dungeon {
     static ResourceKey<Structure> DUNGEON_RESOURCE_KEY = ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse("lastlife:lastlife_dungeon"));
 
@@ -101,7 +103,7 @@ public class Dungeon {
                 // Start generation
                 this.generateNext(structureStart, chunks, callback);
             } catch (Exception e) {
-                manager.initializer.getLogger().warning("Failed to generate dungeon: " + e.getMessage());
+                manager.initializer.getLogger().severe("Failed to generate dungeon: " + e.getMessage());
                 callback.accept(null);
             }
         });
@@ -109,9 +111,13 @@ public class Dungeon {
 
     private void generateNext(StructureStart structure, List<ChunkPos> remainingChunks, Consumer<Dungeon> callback) {
         if (remainingChunks.isEmpty()) {
-            // TODO: Make sure we have a spawn marker available
-            manager.initializer.getLogger().info("Structure has been Generated !");
-            callback.accept(this);
+            if (manager.getDungeonEntranceLocation(SPAWN_MARKER_NAME) != null) {
+                manager.initializer.getLogger().info("Structure has been Generated !");
+                callback.accept(this);
+            } else {
+                manager.initializer.getLogger().severe("Failed to generate the dungeon spawn");
+                callback.accept(null);
+            }
             return;
         }
 
@@ -133,7 +139,7 @@ public class Dungeon {
                 // Generate next chunk of the structure
                 this.generateNext(structure, remainingChunks, callback);
             } catch (Exception e) {
-                manager.initializer.getLogger().warning("Failed to generate dungeon: " + e.getMessage());
+                manager.initializer.getLogger().severe("Failed to generate dungeon: " + e.getMessage());
                 callback.accept(null);
             }
         }, 1);
