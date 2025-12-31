@@ -97,7 +97,12 @@ public class Dungeon {
                 ChunkPos start = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.minX()), SectionPos.blockToSectionCoord(boundingBox.minZ()));
                 ChunkPos end = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.maxX()), SectionPos.blockToSectionCoord(boundingBox.maxZ()));
 
+                ChunkPos origin = new ChunkPos(0, 0);
                 List<ChunkPos> chunks = ChunkPos.rangeClosed(start, end).collect(Collectors.toCollection(LinkedList::new));
+
+                // Ensure we generate chunk 0,0 first so Marker is spawned instantly
+                chunks.remove(origin);
+                chunks.addFirst(origin);
 
                 manager.initializer.getLogger().info("Total chunks to generate : " + chunks.size());
                 // Start generation

@@ -4,10 +4,7 @@ import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.utils.Utils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.ChunkPos;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Entity;
@@ -32,7 +29,12 @@ public class DungeonManager {
 
     public DungeonManager(Initializer initializer) {
         this.initializer = initializer;
-        dungeon_world = Bukkit.getWorld("world_lastlife_dungeon_dim");
+        String level_name = ((CraftServer)Bukkit.getServer()).getServer().getLevelIdName();
+        dungeon_world = Bukkit.getWorld(level_name + "_lastlife_dungeon_dim");
+
+        if (dungeon_world == null) {
+            initializer.getLogger().severe("FAILED TO LOAD DUNGEON DIMENSION");
+        }
     }
 
     public Location getDungeonEntranceLocation() {
@@ -78,6 +80,9 @@ public class DungeonManager {
         size = Math.clamp(size, 1, MAX_DUNGEON_SIZE);
         ChunkPos pos = new ChunkPos(dungeonSpawn.getBlockX() >> 4, dungeonSpawn.getBlockZ() >> 4);
         Dungeon dungeon = new Dungeon(dungeon_world, this, pos);
+
+        dungeon_world.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);
+        dungeon_world.setGameRule(GameRule.KEEP_INVENTORY, true);
 
         try {
             dungeon.generate(callback, size);

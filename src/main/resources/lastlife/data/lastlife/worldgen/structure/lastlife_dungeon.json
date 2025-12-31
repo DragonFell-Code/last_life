@@ -4,6 +4,7 @@
   "spawn_overrides": {},
   "step": "surface_structures",
   "terrain_adaptation": "none",
+  "liquid_settings": "ignore_waterlogging",
   "start_pool": "lastlife:dungeon/start",
   "start_jigsaw_name": "lastlife:center",
   "size": 10,
