@@ -10,6 +10,7 @@ import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.ConfigManager;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.entity.Fox;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
@@ -44,7 +45,10 @@ public final class Initializer extends JavaPlugin {
         PluginManager pluginManager = this.getServer().getPluginManager();
         listeners.forEach(listener -> pluginManager.registerEvents(listener, this));
 
-        Bukkit.getWorlds().forEach(world -> world.getEntitiesByClass(Fox.class).forEach(fox -> FOX_PERSISTENCE_LISTENER.handleFoxEntity(fox)));
+        Bukkit.getWorlds().forEach(world -> {
+            world.getEntitiesByClass(Fox.class).forEach(fox -> FOX_PERSISTENCE_LISTENER.handleFoxEntity(fox));
+            world.setGameRule(GameRule.KEEP_INVENTORY, true);
+        });
 
         new CommandExecutor.Builder(new ConfigCommand(this)).setDescription("Manage Last Life configuration files").register();
         new CommandExecutor.Builder(new BoogeyCommand(this)).setDescription("Manage Last Life boogeys").register();

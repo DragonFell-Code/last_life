@@ -1,28 +1,34 @@
 package com.dragon.lastlife.world;
 
 import com.dragon.lastlife.Initializer;
+import com.dragon.lastlife.utils.Utils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.ChunkPos;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Entity;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.dragon.lastlife.world.Dungeon.DUNGEON_RESOURCE_KEY;
 import static net.kyori.adventure.text.Component.text;
 
 public class DungeonManager {
-
-    public World dungeon_world;
-
-    Initializer initializer;
-
+    public static int MAX_DUNGEON_SIZE = 30;
+    public static String PLAYER_SPAWN_MARKER_NAME = "lastlife:dungeon/player_spawn";
+    public static String SPAWN_MARKER_NAME = "lastlife:dungeon/spawn";
     // These coordinates are always the same, because of how the dungeon is generated in the custom dimension
     static Location dungeonSpawn = new Location(null, 0, 271, 0);
+
+    public World dungeon_world;
+    Initializer initializer;
 
     public DungeonManager(Initializer initializer) {
         this.initializer = initializer;
@@ -30,44 +36,75 @@ public class DungeonManager {
     }
 
     public Location getDungeonEntranceLocation() {
-        if (dungeon_world == null) {
-            return null;
-        }
-        Location tp_location = dungeonSpawn.toLocation(dungeon_world);
-        Collection<Entity> entities = dungeon_world.getNearbyEntities(tp_location, 7, 1, 7);
-        Optional<Entity> spawn_marker = entities.stream().filter(entity -> "lastlife:dungeon/spawn".equals(entity.getName())).findFirst();
+        return this.getDungeonEntranceLocation(PLAYER_SPAWN_MARKER_NAME);
+    }
 
-        return spawn_marker.map(Entity::getLocation).orElse(null);
+    public Location getDungeonEntranceLocation(String name) {
+        return this.getMarkerLocation(name);
     }
 
     public Location getDungeonExitLocation() {
-        World overworld = Bukkit.getWorlds().getFirst(); // TODO: Does this always work ?
+        World overworld = ((CraftServer)Bukkit.getServer()).getServer().overworld().getWorld();
 
-        // TODO: Do we want custom coordinates instead ?
-        return overworld.getSpawnLocation();
+        return overworld.getSpawnLocation().add(0.5, 0, 0.5);
     }
 
-    public void create(Consumer<Dungeon> callback) {
-        // TODO: detect dungeon based on Marker's presence
-        if (false) {
+    public int currentDungeonLevel() {
+        // TODO: Get lobby ID
+        BigDecimal increments = BigDecimal.valueOf(false ? 1000 : 500);
+        int level =  Utils.configs().DONATION_CONFIG().total.divide(increments, RoundingMode.DOWN).intValue();
+
+        initializer.getLogger().info("Current Dungeon level: " + level + " (Size: " + dungeonLevelToSize(level) + ")");
+        return level;
+    }
+
+    public int dungeonLevelToSize(int level) {
+        return level * 2 + 6;
+    }
+
+    public void create(Consumer<Dungeon> callback, Integer size) {
+        create(callback, size != null ? size : this.dungeonLevelToSize(this.currentDungeonLevel()));
+    }
+
+    public void create(Consumer<Dungeon> callback, int size) {
+        if (this.getDungeonEntranceLocation() != null) {
             initializer.getComponentLogger().warn(text("Dungeon already exists!"), NamedTextColor.RED);
             callback.accept(null);
             return;
         }
 
+        // TODO: Clear out dimension ?
+
+        size = Math.clamp(size, 1, MAX_DUNGEON_SIZE);
         ChunkPos pos = new ChunkPos(dungeonSpawn.getBlockX() >> 4, dungeonSpawn.getBlockZ() >> 4);
+        Dungeon dungeon = new Dungeon(dungeon_world, this, pos);
 
-        Bukkit.getScheduler().runTask(initializer, () -> {
-            Dungeon dungeon = new Dungeon(dungeon_world, this);
+        try {
+            dungeon.generate(callback, size);
+        } catch (Exception e) {
+            initializer.getLogger().severe("Failed to generate dungeon structure: " + e.getMessage());
+            callback.accept(null);
+        }
+    }
 
-            try {
-                dungeon.generate(DUNGEON_RESOURCE_KEY, pos);
+    public Optional<Entity> getMarker(String marker_name) {
+        if (dungeon_world == null) {
+            return Optional.empty();
+        }
+        Location tp_location = dungeonSpawn.toLocation(dungeon_world);
+        Chunk chunk = tp_location.getChunk();
+        ChunkPos chunkPos = new ChunkPos(chunk.getX(), chunk.getZ());
 
-                callback.accept(dungeon);
-            } catch (Exception e) {
-                initializer.getLogger().warning("Failed to generate dungeon structure: " + e.getMessage());
-                callback.accept(null);
-            }
-        });
+        if (!((CraftWorld) dungeon_world).getHandle().isLoaded(chunkPos.getWorldPosition())) {
+            dungeon_world.getChunkAt(chunkPos.x, chunkPos.z); // force load
+        }
+
+        Collection<Entity> entities = dungeon_world.getNearbyEntities(tp_location, 5, 5, 5);
+
+        return entities.stream().filter(entity -> marker_name.equals(entity.getName())).findFirst();
+    }
+
+    public Location getMarkerLocation(String marker_name) {
+        return getMarker(marker_name).map(Entity::getLocation).orElse(null);
     }
 }

@@ -28,7 +28,6 @@ public class DonationFlutter implements Flutter {
 
     public static final int MAX_LIMIT = 100;
 
-
     private final HttpConfig GET;
     private long LAST_HEARTBEAT = 0;
     private int offset = 0;
