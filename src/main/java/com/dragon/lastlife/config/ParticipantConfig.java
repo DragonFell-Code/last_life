@@ -15,6 +15,8 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
@@ -156,13 +158,7 @@ public class ParticipantConfig extends Config {
                     } else {
                         for (Participant participant : selected) {
                             setBoogey(participant, true);
-                            Player player = participant.player().getPlayer();
-                            if (player != null && player.isOnline()) {
-                                if(participant.settings.get("boogey_sound").value().equalsIgnoreCase("true"))
-                                    player.playSound(player.getLocation(), "minecraft:entity.endermen.teleport", 1, 1);
-                                if (participant.settings.get("boogey_message").value().equalsIgnoreCase("true"))
-                                    player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.set", player.getName(), participant.boogey));
-                            }
+
                         }
                         save();
                     }
@@ -174,10 +170,24 @@ public class ParticipantConfig extends Config {
         public void setBoogey(Participant participant, boolean boogey) {
             participant.boogey = boogey;
             participant.sync();
+            Player player = participant.player().getPlayer();
             if (boogey) {
+                if (player != null) {
+                    player.playSound(player, Sound.ITEM_GOAT_HORN_SOUND_5, SoundCategory.MASTER, 10, 1);
+                    player.playSound(player.getLocation(), "minecraft:entity.endermen.teleport", 100, 1);
+                    if (participant.settings.get("boogey_message").value().equalsIgnoreCase("true"))
+                        player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.set", player.getName(), participant.boogey));
+
+                }
                 if (WebhookManager.get("boogeymen") != null)
                     Utils.genericWebhook("boogeymen", new Color(0xD27330), "Boogeyman Selected!", "https://mc-heads.net/head/" + participant.id + "/left.png", participant.player().getName() + " has been selected as a boogeyman!");
 
+            } else {
+
+                if (player != null) {
+                    player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.cured"));
+                    player.playSound(player.getLocation(), "minecraft:entity.endermen.teleport", 100, 1);
+                }
             }
         }
 

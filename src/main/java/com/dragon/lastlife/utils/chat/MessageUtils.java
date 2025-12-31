@@ -68,12 +68,18 @@ public class MessageUtils {
 
         register("cmd.boogey.set.usage", text("Usage: /boogey set <player> [true|false]"));
 
+        register("cmd.settings.usage", text("Usage: /settings <view|set> <setting> <value>"));
+
         register("lastlife.party.create", text("Party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\" has been created.", NamedTextColor.YELLOW))));
         register("lastlife.party.remove", text("Party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\" has been removed.", NamedTextColor.YELLOW))));
         register("lastlife.party.join", text("You have joined the party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\".", NamedTextColor.YELLOW))));
         register("lastlife.party.leave", text("You have left the party \"", NamedTextColor.YELLOW).append(text("[0]", NamedTextColor.GREEN).append(text("\".", NamedTextColor.YELLOW))));
         register("lastlife.party.join.other", text("[0] has joined the party \"", NamedTextColor.YELLOW).append(text("[1]", NamedTextColor.GREEN).append(text("\".", NamedTextColor.YELLOW))));
         register("lastlife.party.leave.other", text("[0] has left the party \"", NamedTextColor.YELLOW).append(text("[1]", NamedTextColor.GREEN).append(text("\".", NamedTextColor.YELLOW))));
+
+        register("lastlife.settings.set", text("[0] has been set to [1]", NamedTextColor.YELLOW));
+        register("lastlife.settings.view", text("[0]: [1]", NamedTextColor.YELLOW));
+
 
         register("lastlife.death.elimination", text("[0]", NamedTextColor.RED).append(text(" has been eliminated!", NamedTextColor.WHITE)));
         register("cmd.boogey.set", text("[0]", NamedTextColor.GREEN).append(text(" boogeyman state set to ", NamedTextColor.YELLOW).append(text("[1]", NamedTextColor.GOLD))));

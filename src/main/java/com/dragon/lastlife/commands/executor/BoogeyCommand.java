@@ -78,8 +78,7 @@ public class BoogeyCommand extends CommandExecutor {
                                                     logError(context, "Player " + target.getName() + " is not a participant.");
                                                     continue;
                                                 }
-                                                participant.boogey = value;
-                                                participant.sync();
+                                                Utils.configs().PARTICIPANT_CONFIG().boogeymen().setBoogey(participant, !participant.boogey);
                                                 superSender.sendMessage(Utils.configs().MESSAGE_CONFIG.get("cmd.boogey.set", target.getName(), participant.boogey));
                                             }
                                             return 1;

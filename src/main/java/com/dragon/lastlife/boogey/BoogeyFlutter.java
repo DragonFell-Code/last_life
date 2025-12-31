@@ -27,7 +27,7 @@ public class BoogeyFlutter implements Flutter {
             for (Participant participant : Utils.configs().PARTICIPANT_CONFIG().cache.values()) {
                 Player player = participant.player().getPlayer();
                 if (player == null) continue;
-                if (!participant.boogey) {
+                if (!participant.boogey || participant.settings.get("boogey_boss_bar").value().equalsIgnoreCase("false")) {
                     //No need for complicated checks, make sure they can't see the bassbar and move on.
                     player.hideBossBar(boogeyBossBar);
                     continue;
@@ -36,7 +36,8 @@ public class BoogeyFlutter implements Flutter {
                     // Show small red redstone particles that disappear quickly around the player's upper body
                     // REDSTONE particles require DustOptions for color and size
                     Particle.DustOptions redDust = new Particle.DustOptions(Color.RED, 0.6f);
-                    player.getWorld().spawnParticle(
+
+                    player.spawnParticle(
                             Particle.DUST,
                             player.getLocation().add(0, 1.0, 0), // around chest/head height
                             1,      // small count for subtle effect

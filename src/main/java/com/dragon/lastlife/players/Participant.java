@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
@@ -68,6 +69,12 @@ public class Participant extends ConfigObject {
         if (player != null && player.isOnline()) {
             player.setGameMode(GameMode.SPECTATOR);
             player.setHealth(player.getHealthScale());
+            for (ItemStack item : player.getInventory().getContents()) {
+                if(item != null) {
+                    player.dropItem(item);
+                }
+            }
+            player.getInventory().clear();
         }
     }
 

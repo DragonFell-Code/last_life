@@ -57,6 +57,7 @@ public final class Initializer extends JavaPlugin {
         new CommandExecutor.Builder(new DungeonCommand(this)).register();
         new CommandExecutor.Builder(new PartyCommand(this)).register();
         new CommandExecutor.Builder(new PoiCommand(this)).register();
+        new CommandExecutor.Builder(new SettingsCommand(this)).setDescription("Manage personal Last Life settings").register();
         getLogger().info("LastLife plugin has been enabled successfully.");
     }
 

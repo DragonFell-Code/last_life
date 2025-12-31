@@ -2,6 +2,7 @@ package com.dragon.lastlife.listeners;
 
 import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
+import com.dragon.lastlife.donations.Donation;
 import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.nms.CustomFox;
 import com.dragon.lastlife.party.Party;
@@ -22,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.data.type.Bed;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Fox;
@@ -30,30 +32,32 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
 import static net.kyori.adventure.text.Component.text;
 import static org.bukkit.GameMode.CREATIVE;
+import static org.bukkit.GameMode.CREATIVE;
 
 public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEntityEvent event) {
         if (((CraftEntity) event.getRightClicked()).getHandle() instanceof CustomFox fox) {
-            if(fox.getParty() == null) return;
+            if (fox.getParty() == null) return;
             Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(event.getPlayer().getUniqueId());
 
-            if(participant == null){
+            if (participant == null) {
                 event.getPlayer().sendMessage(text("You are not a participant!", NamedTextColor.RED));
                 return;
             }
             Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
-            if(party == null){
+            if (party == null) {
                 event.getPlayer().sendMessage(text("You are not in a party!", NamedTextColor.RED));
                 return;
             }
-            if(!fox.getParty().equals(party.id())){
+            if (!fox.getParty().equals(party.id())) {
                 event.getPlayer().sendMessage(text("Your party does not own this fox!", NamedTextColor.RED));
                 return;
             }
@@ -196,15 +200,18 @@ public class PlayerListener implements Listener {
 
         // Boogey curing
         if (e.getDamageSource().getCausingEntity() != null && e.getDamageSource().getCausingEntity() instanceof Player killer) {
-            Participant killerParticipant = config.get(killer.getUniqueId());
-            if (killerParticipant != null) {
-                if (killerParticipant.boogey) {
-                    killer.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.cured"));
-                    killerParticipant.boogey = false;
-                }
+            if (!killer.equals(player)) {
+                Participant killerParticipant = config.get(killer.getUniqueId());
+                if (killerParticipant != null) {
+                    if (killerParticipant.boogey) {
+                        config.boogeymen().setBoogey(killerParticipant, false);
+
+
+                    }
 //                killerParticipant.stats.deaths++;
 //                killerParticipant.stats.kills++;
-                killerParticipant.sync();
+                    killerParticipant.sync();
+                }
             }
         }
 
@@ -212,15 +219,11 @@ public class PlayerListener implements Listener {
         if (participant.lives().remove() <= 0) {
             e.setCancelled(true);
             player.getWorld().strikeLightningEffect(e.getPlayer().getLocation());
+            Component deathMessage = e.deathMessage();
+            if (deathMessage != null)
+                Bukkit.broadcast(deathMessage);
             Bukkit.broadcast(Utils.configs().MESSAGE_CONFIG.get("lastlife.death.elimination", e.getPlayer().name()));
 
-//            // TODO: Drop player loot ?
-//            // Could also push the items in e.getDrops() - I think its mutable ?
-//            for (ItemStack item : serverPlayer.getInventory().getContents()) {
-//                if (!item.isEmpty() && !EnchantmentHelper.has(item, net.minecraft.world.item.enchantment.EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP)) {
-//                    serverPlayer.drop(item, true, false, false, null);
-//                }
-//            }
         } else { // Player is still alive
             DungeonManager manager = Utils.configs().DUNGEON_MANAGER;
 
