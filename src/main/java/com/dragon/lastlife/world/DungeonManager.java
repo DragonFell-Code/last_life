@@ -46,8 +46,7 @@ public class DungeonManager {
     public Location getDungeonExitLocation() {
         World overworld = ((CraftServer)Bukkit.getServer()).getServer().overworld().getWorld();
 
-        // TODO: Do we want custom coordinates instead ?
-        return overworld.getSpawnLocation();
+        return overworld.getSpawnLocation().add(0.5, 0, 0.5);
     }
 
     public int currentDungeonLevel() {

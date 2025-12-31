@@ -2,7 +2,6 @@ package com.dragon.lastlife.listeners;
 
 import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
-import com.dragon.lastlife.donations.Donation;
 import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.nms.CustomFox;
 import com.dragon.lastlife.party.Party;
@@ -23,7 +22,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.block.data.type.Bed;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Fox;
@@ -32,12 +30,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.loot.LootTable;
 import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
 import static net.kyori.adventure.text.Component.text;
+import static org.bukkit.GameMode.CREATIVE;
 
 public class PlayerListener implements Listener {
     @EventHandler
@@ -189,6 +187,10 @@ public class PlayerListener implements Listener {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         ParticipantConfig config = Utils.configs().PARTICIPANT_CONFIG();
         Participant participant = config.get(player.getUniqueId());
+
+        if (participant == null || player.getGameMode() == CREATIVE) {
+            return;
+        }
 
         Utils.initializer().getComponentLogger().info("{} lost a life !", player.getName());
 

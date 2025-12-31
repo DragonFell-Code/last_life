@@ -3,6 +3,7 @@ package com.dragon.lastlife.commands.executor;
 import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.config.Configs;
+import com.dragon.lastlife.players.InventorySnapshot;
 import com.dragon.lastlife.utils.Utils;
 import com.dragon.lastlife.world.DungeonManager;
 import com.mojang.brigadier.Command;
@@ -36,6 +37,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Marker;
 
@@ -157,8 +159,10 @@ public class DungeonCommand extends CommandExecutor {
         Location exit = dungeonManager.getDungeonExitLocation();
         World dungeonWorld = dungeonManager.dungeon_world;
 
-        // TODO: Clear inventory from dungeon loot
-        dungeonWorld.getPlayers().forEach(player -> player.teleport(exit));
+        dungeonWorld.getPlayers().forEach(player -> {
+            player.teleport(exit);
+            InventorySnapshot.forceApplyInventorySnapshot(((CraftPlayer)player).getHandle());
+        });
     }
 
     private int resetDungeon(CommandContext<CommandSourceStack> context, Integer size) {

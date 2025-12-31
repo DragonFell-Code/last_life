@@ -1,6 +1,7 @@
 package com.dragon.lastlife.players;
 
 import com.dragon.lastlife.utils.Utils;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.damage.CraftDamageSource;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -80,6 +82,107 @@ public class InventorySnapshot {
                 Utils.initializer().getComponentLogger().error("Failed to write CompundTag: ", e);
             }
         }
+    }
+
+
+    public static void applyPlayerInventorySnapshot(ServerPlayer player, PlayerDeathEvent event) {
+        SimpleContainer snapshot = getInventorySnapshot(player);
+
+        if (snapshot == null) {
+            Utils.initializer().getComponentLogger().error("Failed to get InventorySnapshot - leaving player inventory untouched");
+            return;
+        }
+
+        Inventory inventory = player.getInventory();
+        List<ItemStack> items = inventory.getContents();
+        List<ItemStack> snapshotItems = snapshot.getContents();
+        @NotNull List<org.bukkit.inventory.ItemStack> drops = event.getDrops();
+        HashMap<Item, Integer> transformativeItems = getTransformativeItemsCountMap(items);
+        HashMap<Item, Integer> snapshotTransformativeItems = getTransformativeItemsCountMap(snapshotItems);
+
+        // Allocate each transformative item in the snapshot to un-transformed items in inventory.
+        // snapshotTransformativeItems will contain the remainder after all exact matches have been accounted for.
+        snapshotTransformativeItems.replaceAll((item, count) -> {
+            int newCount = transformativeItems.getOrDefault(item, 0);
+
+            if (newCount > count) {
+                return 0;
+            } else {
+                return count - newCount;
+            }
+        });
+
+        for (int i = 0; i < items.size(); i++) {
+            ItemStack item = items.get(i);
+            if (item.isEmpty()) {
+                continue;
+            }
+
+            int currentCount = item.getCount();
+
+            // In case player merged 2 item stacks, we will loop until we find all the quantities in the snapshot, or run out of matching items
+            while (true) {
+                int snapshotItemIndex = findMatchingItem(item, snapshotItems, snapshotTransformativeItems);
+
+                // Item not found in snapshot : dropping
+                if (snapshotItemIndex == -1) {
+                    int countFound = item.getCount() - currentCount;
+
+                    if (countFound == 0) {
+                        // Item was completely not found in snapshot - removing from inventory
+                        drops.add(item.asBukkitCopy());
+                        inventory.setItem(i, ItemStack.EMPTY);
+                    } else {
+                        // Item was partially found in snapshot - keeping that amount and dropping the excess
+                        org.bukkit.inventory.ItemStack drop = item.asBukkitCopy();
+
+                        item.setCount(countFound);
+                        drop.subtract(countFound);
+                        drops.add(drop);
+                    }
+                    break;
+                }
+
+                ItemStack snapshotItem = snapshotItems.get(snapshotItemIndex);
+
+                int countBefore = snapshotItem.getCount();
+                int countDifference = currentCount - countBefore;
+
+                // player has less quantity than in snapshot
+                if (countDifference < 0) {
+                    // In case the player split the stack, we keep track of how many where used
+                    snapshotItem.shrink(currentCount);
+                    break;
+                }
+
+                // SnapshotItem quantity has been fully "used", removing it from snapshot so it's not used by subsequent item searches
+                snapshotItems.set(snapshotItemIndex, ItemStack.EMPTY);
+
+                // Got exact count match, continue to next item
+                if (countDifference == 0) {
+                    break;
+                }
+
+                // If item count higher -> Count we found some, and keep looking
+                currentCount -= countBefore;
+            }
+        }
+
+        event.setKeepInventory(false);
+    }
+
+    public static void forceApplyInventorySnapshot(ServerPlayer player) {
+        CraftDamageSource bukkitDamageSource = new CraftDamageSource(player.damageSources().generic());
+
+        // Creating a fake PlayerDeathEvent since that is how the original InventorySnapshot code works
+        @SuppressWarnings("UnstableApiUsage")
+        PlayerDeathEvent event = new PlayerDeathEvent(
+                player.getBukkitEntity(), bukkitDamageSource, new java.util.ArrayList<>(player.getInventory().getContainerSize()),
+                0, 0, Component.empty(), false
+        );
+
+        // Apply the snapshot to the fake event
+        applyPlayerInventorySnapshot(player, event);
     }
 
     private static SimpleContainer getInventorySnapshot(ServerPlayer player) {
@@ -182,89 +285,5 @@ public class InventorySnapshot {
         }
 
         return -1;
-    }
-
-    public static void applyPlayerInventorySnapshot(ServerPlayer player, PlayerDeathEvent event) {
-        SimpleContainer snapshot = getInventorySnapshot(player);
-
-        if (snapshot == null) {
-            Utils.initializer().getComponentLogger().error("Failed to get InventorySnapshot - leaving player inventory untouched");
-            return;
-        }
-
-        Inventory inventory = player.getInventory();
-        List<ItemStack> items = inventory.getContents();
-        List<ItemStack> snapshotItems = snapshot.getContents();
-        @NotNull List<org.bukkit.inventory.ItemStack> drops = event.getDrops();
-        HashMap<Item, Integer> transformativeItems = getTransformativeItemsCountMap(items);
-        HashMap<Item, Integer> snapshotTransformativeItems = getTransformativeItemsCountMap(snapshotItems);
-
-        // Allocate each transformative item in the snapshot to un-transformed items in inventory.
-        // snapshotTransformativeItems will contain the remainder after all exact matches have been accounted for.
-        snapshotTransformativeItems.replaceAll((item, count) -> {
-            int newCount = transformativeItems.getOrDefault(item, 0);
-
-            if (newCount > count) {
-                return 0;
-            } else {
-                return count - newCount;
-            }
-        });
-
-        for (int i = 0; i < items.size(); i++) {
-            ItemStack item = items.get(i);
-            if (item.isEmpty()) {
-                continue;
-            }
-
-            int currentCount = item.getCount();
-
-            // In case player merged 2 item stacks, we will loop until we find all the quantities in the snapshot, or run out of matching items
-            while (true) {
-                int snapshotItemIndex = findMatchingItem(item, snapshotItems, snapshotTransformativeItems);
-
-                // Item not found in snapshot : dropping
-                if (snapshotItemIndex == -1) {
-                    int countFound = item.getCount() - currentCount;
-
-                    if (countFound == 0) {
-                        // Item was completely not found in snapshot - removing from inventory
-                        drops.add(item.asBukkitCopy());
-                        inventory.setItem(i, ItemStack.EMPTY);
-                    } else {
-                        // Item was partially found in snapshot - keeping that amount and dropping the excess
-                        org.bukkit.inventory.ItemStack drop = item.asBukkitCopy();
-
-                        item.setCount(countFound);
-                        drop.subtract(countFound);
-                        drops.add(drop);
-                    }
-                    break;
-                }
-
-                ItemStack snapshotItem = snapshotItems.get(snapshotItemIndex);
-
-                int countBefore = snapshotItem.getCount();
-                int countDifference = currentCount - countBefore;
-
-                // player has less quantity than in snapshot
-                if (countDifference < 0) {
-                    // In case the player split the stack, we keep track of how many where used
-                    snapshotItem.shrink(currentCount);
-                    break;
-                }
-
-                // SnapshotItem quantity has been fully "used", removing it from snapshot so it's not used by subsequent item searches
-                snapshotItems.set(snapshotItemIndex, ItemStack.EMPTY);
-
-                // Got exact count match, continue to next item
-                if (countDifference == 0) {
-                    break;
-                }
-
-                // If item count higher -> Count we found some, and keep looking
-                currentCount -= countBefore;
-            }
-        }
     }
 }
