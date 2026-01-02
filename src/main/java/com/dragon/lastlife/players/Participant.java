@@ -5,6 +5,7 @@ import com.dragon.lastlife.utils.net.MessageChannelHandler;
 import com.quiptmc.core.config.ConfigMap;
 import com.quiptmc.core.config.ConfigObject;
 import com.quiptmc.core.config.objects.ConfigString;
+import com.quiptmc.core.utils.net.NetworkUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -12,7 +13,9 @@ import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.json.JSONArray;
 
+import java.net.http.HttpResponse;
 import java.util.UUID;
 
 import static net.kyori.adventure.text.Component.text;
@@ -31,6 +34,9 @@ public class Participant extends ConfigObject {
     public String incentive_bundle_loot;
     public String incentive_shulker_loot;
 
+    private JSONArray incentives_cache = null;
+    private long last_incentives_fetch = 0;
+
     public Participant() {
     }
 
@@ -40,6 +46,23 @@ public class Participant extends ConfigObject {
         this.lives = lives;
         this.boogey = false;
         this.donorDriveId = donorDriveId;
+    }
+
+    public JSONArray getIncentives() {
+        return getIncentives(false);
+    }
+
+    public JSONArray getIncentives(boolean force) {
+        long now = System.currentTimeMillis();
+
+        if (force || now - last_incentives_fetch >= 60 * 1000L) {
+            HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "participants/" + this.donorDriveId + "/incentives");
+            incentives_cache = new JSONArray(response.body());
+            last_incentives_fetch = now;
+
+        }
+
+        return incentives_cache;
     }
 
     public LifeManager lives() {

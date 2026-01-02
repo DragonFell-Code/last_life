@@ -1,0 +1,116 @@
+{
+  "function": "sequence",
+  "functions": [
+    {
+      "function": "enchant_randomly",
+      "only_compatible": true,
+      "options": [
+        "fire_aspect",
+        "smite",
+        "bane_of_arthropods",
+        "looting",
+        "knockback",
+        "sweeping_edge",
+        "flame",
+        "punch",
+        "power",
+        "multishot",
+        "piercing",
+        "quick_charge",
+        "wind_burst",
+        "impaling",
+        "channeling",
+        "loyalty",
+        "riptide",
+        "thorns",
+        "density",
+        "breach"
+      ]
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "fire_aspect"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "fire_aspect": 2 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "smite"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "smite": 5 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "bane_of_arthropods"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "bane_of_arthropods": 5 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "looting"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "looting": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "knockback"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "knockback": 2 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "sweeping_edge"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "sweeping_edge": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "punch"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "punch": 2 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "power"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "power": 5 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "piercing"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "piercing": 4 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "quick_charge"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "quick_charge": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "wind_burst"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "wind_burst": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "impaling"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "impaling": 5 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "loyalty"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "loyalty": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "riptide"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "riptide": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "thorns"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "thorns": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "density"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "density": 5 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "breach"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "breach": 4 } }
+    }
+  ]
+}

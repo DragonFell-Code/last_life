@@ -1,0 +1,44 @@
+{
+  "type": "chest",
+  "pools": [
+    {
+      "rolls": { "min": 3, "max": 5 },
+      "entries": [
+        { "weight": 20, "type": "item", "name": "minecraft:copper_ingot", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] },
+        { "weight": 40, "type": "item", "name": "minecraft:emerald", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 16 } } ] },
+        { "weight": 10, "type": "item", "name": "minecraft:copper_block", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] },
+        { "weight": 30, "type": "empty" }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "weight": 10, "type": "item", "name": "minecraft:copper_pickaxe", "functions": [ { "function": "set_enchantments", "enchantments": { "efficiency": 5, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 20, "type": "item", "name": "minecraft:copper_axe", "functions": [ { "function": "set_enchantments", "enchantments": { "efficiency": 5, "sharpness": 2, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 30, "type": "item", "name": "minecraft:copper_sword", "functions": [ { "function": "set_enchantments", "enchantments": { "sharpness": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 10, "type": "item", "name": "minecraft:copper_shovel", "functions": [ { "function": "set_enchantments", "enchantments": { "silk_touch": 1, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 40, "type": "empty" }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "weight": 15, "type": "item", "name": "minecraft:copper_helmet", "functions": [ { "function": "set_enchantments", "enchantments": { "protection": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 15, "type": "item", "name": "minecraft:copper_chestplate", "functions": [ { "function": "set_enchantments", "enchantments": { "protection": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 15, "type": "item", "name": "minecraft:copper_leggings", "functions": [ { "function": "set_enchantments", "enchantments": { "protection": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 15, "type": "item", "name": "minecraft:copper_boots", "functions": [ { "function": "set_enchantments", "enchantments": { "protection": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 40, "type": "empty" }
+      ]
+    },
+    {
+      "rolls": 2,
+      "entries": [
+        { "weight": 30, "type": "item", "name": "minecraft:name_tag", "functions": [ { "function": "set_count", "count": 3 } ] },
+        { "weight": 10, "type": "item", "name": "minecraft:dune_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 10, "type": "item", "name": "minecraft:raiser_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 20, "type": "item", "name": "minecraft:copper_torch", "functions": [ { "function": "set_count", "count": { "min": 4, "max": 6 } } ] },
+        { "weight": 30, "type": "empty" }
+      ]
+    }
+  ]
+}

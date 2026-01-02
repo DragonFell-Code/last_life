@@ -5,14 +5,24 @@
       "rules": [
         {
           "input_predicate": {
-            "predicate_type": "minecraft:block_match",
-            "block": "minecraft:chest"
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "north",
+                "type": "single"
+              }
+            }
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
-            "Name": "minecraft:chest"
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "north",
+                "type": "single"
+            }
           },
           "block_entity_modifier": {
             "type": "minecraft:append_loot",
@@ -21,14 +31,24 @@
         },
         {
           "input_predicate": {
-            "predicate_type": "minecraft:block_match",
-            "block": "minecraft:trapped_chest"
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "south",
+                "type": "single"
+              }
+            }
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
-            "Name": "minecraft:trapped_chest"
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "south",
+                "type": "single"
+            }
           },
           "block_entity_modifier": {
             "type": "minecraft:append_loot",
@@ -37,14 +57,24 @@
         },
         {
           "input_predicate": {
-            "predicate_type": "minecraft:block_match",
-            "block": "minecraft:barrel"
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "east",
+                "type": "single"
+              }
+            }
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
-            "Name": "minecraft:barrel"
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "east",
+                "type": "single"
+            }
           },
           "block_entity_modifier": {
             "type": "minecraft:append_loot",
@@ -53,14 +83,24 @@
         },
         {
           "input_predicate": {
-            "predicate_type": "minecraft:block_match",
-            "block": "minecraft:waxed_exposed_copper_chest"
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "west",
+                "type": "single"
+              }
+            }
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
-            "Name": "minecraft:waxed_exposed_copper_chest"
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "west",
+                "type": "single"
+            }
           },
           "block_entity_modifier": {
             "type": "minecraft:append_loot",
@@ -69,14 +109,24 @@
         },
         {
           "input_predicate": {
-            "predicate_type": "minecraft:block_match",
-            "block": "minecraft:waxed_copper_chest"
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "north",
+                "type": "right"
+              }
+            }
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
-            "Name": "minecraft:waxed_copper_chest"
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "north",
+                "type": "right"
+            }
           },
           "block_entity_modifier": {
             "type": "minecraft:append_loot",
@@ -85,14 +135,24 @@
         },
         {
           "input_predicate": {
-            "predicate_type": "minecraft:block_match",
-            "block": "minecraft:waxed_exposed_copper_chest"
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "south",
+                "type": "right"
+              }
+            }
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
-            "Name": "minecraft:waxed_exposed_copper_chest"
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "south",
+                "type": "right"
+            }
           },
           "block_entity_modifier": {
             "type": "minecraft:append_loot",
@@ -101,14 +161,24 @@
         },
         {
           "input_predicate": {
-            "predicate_type": "minecraft:block_match",
-            "block": "minecraft:waxed_weathered_copper_chest"
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "east",
+                "type": "right"
+              }
+            }
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
-            "Name": "minecraft:waxed_weathered_copper_chest"
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "east",
+                "type": "right"
+            }
           },
           "block_entity_modifier": {
             "type": "minecraft:append_loot",
@@ -117,14 +187,758 @@
         },
         {
           "input_predicate": {
-            "predicate_type": "minecraft:block_match",
-            "block": "minecraft:waxed_oxidized_copper_chest"
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "west",
+                "type": "right"
+              }
+            }
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
-            "Name": "minecraft:waxed_oxidized_copper_chest"
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "west",
+                "type": "right"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "north",
+                "type": "left"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "north",
+                "type": "left"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "south",
+                "type": "left"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "south",
+                "type": "left"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "east",
+                "type": "left"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "east",
+                "type": "left"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:chest",
+              "Properties": {
+                "facing": "west",
+                "type": "left"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:chest",
+            "Properties": {
+              "facing": "west",
+                "type": "left"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:trapped_chest",
+              "Properties": {
+                "facing": "north"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:trapped_chest",
+            "Properties": {
+              "facing": "north"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:trapped_chest",
+              "Properties": {
+                "facing": "south"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:trapped_chest",
+            "Properties": {
+              "facing": "south"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:trapped_chest",
+              "Properties": {
+                "facing": "east"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:trapped_chest",
+            "Properties": {
+              "facing": "east"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:trapped_chest",
+              "Properties": {
+                "facing": "west"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:trapped_chest",
+            "Properties": {
+              "facing": "west"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:barrel",
+              "Properties": {
+                "facing": "north"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:barrel",
+            "Properties": {
+              "facing": "north"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:barrel",
+              "Properties": {
+                "facing": "south"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:barrel",
+            "Properties": {
+              "facing": "south"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:barrel",
+              "Properties": {
+                "facing": "east"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:barrel",
+            "Properties": {
+              "facing": "east"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:barrel",
+              "Properties": {
+                "facing": "west"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:barrel",
+            "Properties": {
+              "facing": "west"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:barrel",
+              "Properties": {
+                "facing": "up"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:barrel",
+            "Properties": {
+              "facing": "up"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:barrel",
+              "Properties": {
+                "facing": "down"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:barrel",
+            "Properties": {
+              "facing": "down"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_copper_chest",
+              "Properties": {
+                "facing": "north"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_copper_chest",
+            "Properties": {
+              "facing": "north"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_copper_chest",
+              "Properties": {
+                "facing": "south"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_copper_chest",
+            "Properties": {
+              "facing": "south"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_copper_chest",
+              "Properties": {
+                "facing": "east"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_copper_chest",
+            "Properties": {
+              "facing": "east"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_copper_chest",
+              "Properties": {
+                "facing": "west"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_copper_chest",
+            "Properties": {
+              "facing": "west"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_exposed_copper_chest",
+              "Properties": {
+                "facing": "north"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_exposed_copper_chest",
+            "Properties": {
+              "facing": "north"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_exposed_copper_chest",
+              "Properties": {
+                "facing": "south"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_exposed_copper_chest",
+            "Properties": {
+              "facing": "south"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_exposed_copper_chest",
+              "Properties": {
+                "facing": "east"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_exposed_copper_chest",
+            "Properties": {
+              "facing": "east"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_exposed_copper_chest",
+              "Properties": {
+                "facing": "west"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_exposed_copper_chest",
+            "Properties": {
+              "facing": "west"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_weathered_copper_chest",
+              "Properties": {
+                "facing": "north"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_weathered_copper_chest",
+            "Properties": {
+              "facing": "north"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_weathered_copper_chest",
+              "Properties": {
+                "facing": "south"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_weathered_copper_chest",
+            "Properties": {
+              "facing": "south"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_weathered_copper_chest",
+              "Properties": {
+                "facing": "east"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_weathered_copper_chest",
+            "Properties": {
+              "facing": "east"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_weathered_copper_chest",
+              "Properties": {
+                "facing": "west"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_weathered_copper_chest",
+            "Properties": {
+              "facing": "west"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_oxidized_copper_chest",
+              "Properties": {
+                "facing": "north"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_oxidized_copper_chest",
+            "Properties": {
+              "facing": "north"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_oxidized_copper_chest",
+              "Properties": {
+                "facing": "south"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_oxidized_copper_chest",
+            "Properties": {
+              "facing": "south"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_oxidized_copper_chest",
+              "Properties": {
+                "facing": "east"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_oxidized_copper_chest",
+            "Properties": {
+              "facing": "east"
+            }
+          },
+          "block_entity_modifier": {
+            "type": "minecraft:append_loot",
+            "loot_table": "lastlife:chests/dungeon_scaled"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:blockstate_match",
+            "block_state": {
+              "Name": "minecraft:waxed_oxidized_copper_chest",
+              "Properties": {
+                "facing": "west"
+              }
+            }
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:waxed_oxidized_copper_chest",
+            "Properties": {
+              "facing": "west"
+            }
           },
           "block_entity_modifier": {
             "type": "minecraft:append_loot",

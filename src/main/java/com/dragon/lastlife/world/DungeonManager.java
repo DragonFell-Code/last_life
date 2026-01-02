@@ -1,19 +1,14 @@
 package com.dragon.lastlife.world;
 
 import com.dragon.lastlife.Initializer;
-import com.dragon.lastlife.utils.Utils;
+import com.dragon.lastlife.loot.LootManager;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.world.level.ChunkPos;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Entity;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -21,7 +16,7 @@ import java.util.function.Consumer;
 import static net.kyori.adventure.text.Component.text;
 
 public class DungeonManager {
-    public static int MAX_DUNGEON_SIZE = 30;
+    public static int MAX_DUNGEON_SIZE = 35;
     public static String PLAYER_SPAWN_MARKER_NAME = "lastlife:dungeon/player_spawn";
     public static String SPAWN_MARKER_NAME = "lastlife:dungeon/spawn";
     // These coordinates are always the same, because of how the dungeon is generated in the custom dimension
@@ -32,7 +27,12 @@ public class DungeonManager {
 
     public DungeonManager(Initializer initializer) {
         this.initializer = initializer;
-        dungeon_world = Bukkit.getWorld("world_lastlife_dungeon_dim");
+        String level_name = ((CraftServer)Bukkit.getServer()).getServer().getLevelIdName();
+        dungeon_world = Bukkit.getWorld(level_name + "_lastlife_dungeon_dim");
+
+        if (dungeon_world == null) {
+            initializer.getLogger().severe("FAILED TO LOAD DUNGEON DIMENSION");
+        }
     }
 
     public Location getDungeonEntranceLocation() {
@@ -49,13 +49,8 @@ public class DungeonManager {
         return overworld.getSpawnLocation().add(0.5, 0, 0.5);
     }
 
-    public int currentDungeonLevel() {
-        // TODO: Get lobby ID
-        BigDecimal increments = BigDecimal.valueOf(false ? 1000 : 500);
-        int level =  Utils.configs().DONATION_CONFIG().total.divide(increments, RoundingMode.DOWN).intValue();
-
-        initializer.getLogger().info("Current Dungeon level: " + level + " (Size: " + dungeonLevelToSize(level) + ")");
-        return level;
+    public int currentDungeonSize() {
+        return dungeonLevelToSize(LootManager.getDonationLevel());
     }
 
     public int dungeonLevelToSize(int level) {
@@ -63,7 +58,7 @@ public class DungeonManager {
     }
 
     public void create(Consumer<Dungeon> callback, Integer size) {
-        create(callback, size != null ? size : this.dungeonLevelToSize(this.currentDungeonLevel()));
+        create(callback, size != null ? size : this.currentDungeonSize());
     }
 
     public void create(Consumer<Dungeon> callback, int size) {
@@ -78,6 +73,9 @@ public class DungeonManager {
         size = Math.clamp(size, 1, MAX_DUNGEON_SIZE);
         ChunkPos pos = new ChunkPos(dungeonSpawn.getBlockX() >> 4, dungeonSpawn.getBlockZ() >> 4);
         Dungeon dungeon = new Dungeon(dungeon_world, this, pos);
+
+        dungeon_world.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);
+        dungeon_world.setGameRule(GameRule.KEEP_INVENTORY, true);
 
         try {
             dungeon.generate(callback, size);

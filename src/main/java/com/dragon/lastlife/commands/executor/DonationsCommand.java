@@ -11,7 +11,6 @@ import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.quiptmc.core.utils.net.NetworkUtils;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.http.HttpResponse;
 import java.util.Optional;
 
 import static io.papermc.paper.command.brigadier.Commands.argument;
@@ -135,8 +133,7 @@ public class DonationsCommand extends CommandExecutor {
                                                 return builder.buildFuture();
                                             }
 
-                                            HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "participants/" + participant.donorDriveId + "/incentives");
-                                            JSONArray raw = new JSONArray(response.body());
+                                            JSONArray raw = participant.getIncentives();
                                             String[] values = new String[raw.length()];
                                             for (int i = 0; i < raw.length(); i++) {
                                                 JSONObject participantJson = raw.getJSONObject(i);
@@ -161,8 +158,7 @@ public class DonationsCommand extends CommandExecutor {
                                                 return logError(context, "You must link your Extra Life account first using /donations link <participantName>");
                                             }
 
-                                            HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "participants/" + participant.donorDriveId + "/incentives");
-                                            JSONArray raw = new JSONArray(response.body());
+                                            JSONArray raw = participant.getIncentives(true);
                                             for (int i = 0; i < raw.length(); i++) {
                                                 JSONObject incentive = raw.getJSONObject(i);
                                                 if (incentive.has("description") && incentive.getString("description").equalsIgnoreCase(StringArgumentType.getString(context, "incentiveName"))) {
@@ -188,8 +184,7 @@ public class DonationsCommand extends CommandExecutor {
                         .executes(context -> showUsage(context, ""))
                         .then(argument("participantName", StringArgumentType.greedyString())
                                 .suggests((context, builder) -> {
-                                    HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "teams/" + Utils.configs().DONATION_CONFIG().team_id + "/participants");
-                                    JSONArray raw = new JSONArray(response.body());
+                                    JSONArray raw = Utils.configs().PARTICIPANT_CONFIG().fetchParticipants();
                                     String[] values = new String[raw.length()];
                                     for (int i = 0; i < raw.length(); i++) {
                                         JSONObject participant = raw.getJSONObject(i);
@@ -201,8 +196,7 @@ public class DonationsCommand extends CommandExecutor {
                                     CommandSender sender = context.getSource().getSender();
                                     if (!(sender instanceof Player player))
                                         return logError(context, "Only players can link to participants.");
-                                    HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "teams/" + Utils.configs().DONATION_CONFIG().team_id + "/participants");
-                                    JSONArray raw = new JSONArray(response.body());
+                                    JSONArray raw = Utils.configs().PARTICIPANT_CONFIG().fetchParticipants(true);
                                     String participantName = StringArgumentType.getString(context, "participantName");
                                     for (int i = 0; i < raw.length(); i++) {
                                         JSONObject participant = raw.getJSONObject(i);

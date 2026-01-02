@@ -31,7 +31,6 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.level.validation.ContentValidationException;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -137,11 +136,9 @@ public class DungeonCommand extends CommandExecutor {
         CommandSender sender = context.getSource().getSender();
 
         sender.sendMessage(configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.generating"));
-        dungeonManager.dungeon_world.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);
-        dungeonManager.dungeon_world.setGameRule(GameRule.KEEP_INVENTORY, true);
 
         if (size == null) {
-            size = dungeonManager.dungeonLevelToSize(dungeonManager.currentDungeonLevel());
+            size = dungeonManager.currentDungeonSize();
             sender.sendMessage(configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.auto_size", size));
         }
 

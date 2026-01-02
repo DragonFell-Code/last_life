@@ -17,7 +17,7 @@ public class DonationConfig extends Config {
     public String api_endpoint = "https://www.extra-life.org/api/";
 
     @ConfigValue
-    public int seconds_per_check = 15;
+    public int seconds_per_check = 20;
 
     @ConfigValue
     public int team_id = 69005;

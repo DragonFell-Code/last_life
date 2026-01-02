@@ -32,7 +32,6 @@ public class DonationFlutter implements Flutter {
     private long LAST_HEARTBEAT = 0;
     private int offset = 0;
 
-
     public DonationFlutter(DonationConfig config) {
         if (config == null) {
             throw new IllegalArgumentException("DonationConfig cannot be null");
