@@ -54,6 +54,7 @@ public final class Initializer extends JavaPlugin {
         new CommandExecutor.Builder(new BoogeyCommand(this)).setDescription("Manage Last Life boogeys").register();
         new CommandExecutor.Builder(new DonationsCommand(this)).setDescription("Base command for participants to link their ExtraLife accounts").register();
         new CommandExecutor.Builder(new LifeCommand(this)).setDescription("Manage player lives").register();
+        new CommandExecutor.Builder(new LootLevelCommand(this)).register();
         new CommandExecutor.Builder(new DungeonCommand(this)).register();
         new CommandExecutor.Builder(new PartyCommand(this)).register();
         new CommandExecutor.Builder(new PoiCommand(this)).register();

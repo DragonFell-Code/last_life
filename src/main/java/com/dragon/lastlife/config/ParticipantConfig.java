@@ -9,6 +9,7 @@ import com.quiptmc.core.config.ConfigTemplate;
 import com.quiptmc.core.config.ConfigValue;
 import com.quiptmc.core.config.objects.ConfigString;
 import com.quiptmc.core.discord.WebhookManager;
+import com.quiptmc.core.utils.net.NetworkUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
@@ -18,9 +19,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
+import org.json.JSONArray;
 
 import java.awt.*;
 import java.io.File;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,15 +32,32 @@ import static net.kyori.adventure.text.Component.text;
 
 @ConfigTemplate(name = "participants", ext = ConfigTemplate.Extension.JSON)
 public class ParticipantConfig extends Config {
-
     private final BoogeymenManager boogeymen = new BoogeymenManager();
     @ConfigValue
     public ConfigMap<Participant> cache = new ConfigMap<>();
     @ConfigValue
     public int queued_boogeymen = 0;
 
+    private JSONArray participants_cache = null;
+    private long last_participants_fetch = 0;
+
     public ParticipantConfig(File file, String name, ConfigTemplate.Extension extension, QuiptIntegration integration) {
         super(file, name, extension, integration);
+    }
+
+    public JSONArray fetchParticipants() {
+        return fetchParticipants(false);
+    }
+
+    public JSONArray fetchParticipants(boolean force) {
+        long now = System.currentTimeMillis();
+
+        if (force || now - last_participants_fetch >= 60 * 1000L) {
+            HttpResponse<String> response = NetworkUtils.get(NetworkUtils.DEFAULT, Utils.configs().DONATION_CONFIG().api_endpoint + "teams/" + Utils.configs().DONATION_CONFIG().team_id + "/participants");
+            participants_cache = new JSONArray(response.body());
+            last_participants_fetch = now;
+        }
+        return participants_cache;
     }
 
     /**

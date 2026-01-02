@@ -1,0 +1,92 @@
+{
+  "type": "chest",
+  "pools": [
+    {
+      "rolls": 2,
+      "entries": [
+        { "weight": 5, "type": "item", "name": "minecraft:copper_block", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:iron_block", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] },
+        { "weight": 10, "type": "item", "name": "minecraft:emerald_block", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] },
+        { "weight": 10, "type": "item", "name": "minecraft:lapis_block", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] },
+        { "weight": 10, "type": "item", "name": "minecraft:redstone_block", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] },
+        { "weight": 10, "type": "item", "name": "minecraft:diamond_block", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] }
+      ]
+    },
+    {
+      "rolls": 2,
+      "entries": [
+        { "weight": 5, "type": "item", "name": "minecraft:diamond_pickaxe", "functions": [ { "function": "set_enchantments", "enchantments": { "efficiency": 5, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:diamond_axe", "functions": [ { "function": "set_enchantments", "enchantments": { "sharpness": 2, "efficiency": 5, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 15, "type": "item", "name": "minecraft:diamond_sword", "functions": [ { "function": "set_enchantments", "enchantments": { "sharpness": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:diamond_shovel", "functions": [ { "function": "set_enchantments", "enchantments": { "silk_touch": 1, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:diamond_helmet", "functions": [ { "function": "set_enchantments", "enchantments": { "protection": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:diamond_chestplate", "functions": [ { "function": "set_enchantments", "enchantments": { "protection": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:diamond_leggings", "functions": [ { "function": "set_enchantments", "enchantments": { "protection": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:diamond_boots", "functions": [ { "function": "set_enchantments", "enchantments": { "protection": 4, "unbreaking": 3 } }, { "function": "set_count", "count": 1 } ] },
+        { "weight": 50, "type": "empty" }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "weight": 5, "type": "item", "name": "minecraft:dune_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:raiser_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:snout_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:flow_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:eye_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 5, "type": "item", "name": "minecraft:spire_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 15, "type": "item", "name": "minecraft:sentry_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 15, "type": "item", "name": "minecraft:wild_armor_trim_smithing_template", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 25, "type": "empty" }
+      ]
+    },
+    {
+      "rolls": 2,
+      "entries": [
+        { "weight": 30, "type": "item", "name": "minecraft:tnt", "functions": [ { "function": "set_count", "count": { "min": 2, "max": 6 } } ] },
+        {
+          "weight": 30, "type": "loot_table", "value": {
+            "type": "chest",
+            "pools": [
+              {
+                "rolls": 1,
+                "entries": [
+                  { "weight": 1, "type": "item", "name": "minecraft:end_crystal", "functions": [ { "function": "set_count", "count": { "min": 2, "max": 4 } } ] },
+                  { "weight": 1, "type": "item", "name": "minecraft:obsidian", "functions": [ { "function": "set_count", "count": { "min": 2, "max": 4 } } ] }
+                ]
+              }
+            ]
+          }
+        },
+        { "weight": 40, "type": "empty" }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "weight": 30, "type": "item", "name": "minecraft:diamond_horse_armor", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 20, "type": "item", "name": "minecraft:saddle", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 10, "type": "item", "name": "minecraft:name_tag", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 20, "type": "item", "name": "minecraft:totem_of_undying", "functions": [ { "function": "set_count", "count": 1 } ] },
+        { "weight": 10, "type": "empty" }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        { "weight": 1, "type": "item", "name": "minecraft:book", "functions": [ { "function": "reference", "name": "lastlife:random_enchant_list_1" } ] },
+        { "weight": 3, "type": "item", "name": "minecraft:book", "functions": [ { "function": "reference", "name": "lastlife:random_enchant_list_2" } ] },
+        { "weight": 28, "type": "empty" }
+      ]
+    },
+    {
+      "rolls": 2,
+      "entries": [
+        { "weight": 35, "type": "item", "name": "minecraft:diamond", "functions": [ { "function": "set_count", "count": { "min": 16, "max": 32 } } ] },
+        { "weight": 25, "type": "item", "name": "minecraft:diamond_block", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] },
+        { "weight": 15, "type": "item", "name": "minecraft:emerald", "functions": [ { "function": "set_count", "count": { "min": 16, "max": 32 } } ] },
+        { "weight": 25, "type": "item", "name": "minecraft:emerald_block", "functions": [ { "function": "set_count", "count": { "min": 5, "max": 12 } } ] }
+      ]
+    }
+  ]
+}

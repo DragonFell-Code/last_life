@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:loot_table",
-          "value": "lastlife:chests/dungeon_scaled"
+          "value": {}
         }
       ]
     }

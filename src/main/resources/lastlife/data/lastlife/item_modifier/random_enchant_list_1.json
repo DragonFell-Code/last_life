@@ -1,0 +1,93 @@
+{
+  "function": "sequence",
+  "functions": [
+    {
+      "function": "enchant_randomly",
+      "only_compatible": true,
+      "options": [
+        "mending",
+        "unbreaking",
+        "protection",
+        "blast_protection",
+        "fire_protection",
+        "projectile_protection",
+        "feather_falling",
+        "respiration",
+        "depth_strider",
+        "frost_walker",
+        "soul_speed",
+        "efficiency",
+        "fortune",
+        "sharpness",
+        "aqua_affinity",
+        "infinity",
+        "silk_touch"
+      ]
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "unbreaking"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "unbreaking": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "protection"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "protection": 4 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "blast_protection"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "blast_protection": 4 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments": ["fire_protection"]}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "fire_protection": 4 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "projectile_protection"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "projectile_protection": 4 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "feather_falling"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "feather_falling": 4 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "respiration"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "respiration": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "depth_strider"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "depth_strider": 1 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "frost_walker"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "frost_walker": 1 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "soul_speed"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "soul_speed": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "efficiency"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "efficiency": 5 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "fortune"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "fortune": 3 } }
+    },
+    {
+      "function": "filtered",
+      "item_filter": { "predicates": { "minecraft:stored_enchantments": [{"enchantments":  "sharpness"}] } },
+      "modifier": { "function": "set_enchantments", "enchantments": { "sharpness": 5 } }
+    }
+  ]
+}

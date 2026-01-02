@@ -91,6 +91,10 @@ public class MessageUtils {
         register("lastlife.cmd.life.view", text("[0]'s lives: [1]", NamedTextColor.YELLOW));
         register("lastlife.cmd.life.set", text("Set [0]'s lives to [1].", NamedTextColor.GREEN));
 
+        register("lastlife.cmd.loot_level.get", text("Current loot level is [0][1]", NamedTextColor.WHITE));
+        register("lastlife.cmd.loot_level.set", text("Loot level has been overridden successfully. (Current Level: [0])", NamedTextColor.GREEN));
+        register("lastlife.cmd.loot_level.reset", text("Loot level has been reset and is now dependent on donations. (Current Level: [0])", NamedTextColor.WHITE));
+
         register("lastlife.cmd.dungeon.generating", text("The Labyrinth is generating. This might take a while depending on the size of the Labyrinth", NamedTextColor.GRAY));
         register("lastlife.cmd.dungeon.auto_size", text("Labyrinth size: [0]", NamedTextColor.GRAY));
         register("lastlife.cmd.dungeon.generated", text("The Labyrinth was generated successfully. Check it out with /dungeon tp. If it looks good, open it for players with /dungeon open", NamedTextColor.GREEN));

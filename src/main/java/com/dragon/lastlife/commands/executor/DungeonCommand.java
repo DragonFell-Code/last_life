@@ -138,7 +138,7 @@ public class DungeonCommand extends CommandExecutor {
         sender.sendMessage(configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.generating"));
 
         if (size == null) {
-            size = dungeonManager.dungeonLevelToSize(dungeonManager.currentDungeonLevel());
+            size = dungeonManager.currentDungeonSize();
             sender.sendMessage(configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.auto_size", size));
         }
 
