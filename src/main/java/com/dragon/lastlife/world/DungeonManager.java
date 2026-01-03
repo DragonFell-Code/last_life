@@ -26,6 +26,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -240,6 +241,10 @@ public class DungeonManager {
     }
 
     public void handleNewDonationTotal() {
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(initializer, this::handleNewDonationTotal);
+            return;
+        }
         double total = Utils.configs().DONATION_CONFIG().total.doubleValue();
         double currentTotal = getLastDonationTotalFromMarker();
 
