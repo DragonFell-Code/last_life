@@ -115,6 +115,37 @@ public class DonationFlutter implements Flutter {
             offset = Math.max(offset - diff, 0);
         }
 
+        Bukkit.getScheduler().runTask(Utils.initializer(), () -> handleResults(results));
+        Utils.configs().DUNGEON_MANAGER.handleNewDonationTotal();
+
+        if (WebhookManager.get("donations") != null) {
+            int batchSize = 10;
+            int totalEmbeds = embedArray.length();
+            int batches = (int) Math.ceil(totalEmbeds / (double) batchSize);
+
+            for (int batchIndex = 0; batchIndex < batches; batchIndex++) {
+                int startIndex = batchIndex * batchSize;
+                int endIndex = Math.min(startIndex + batchSize, totalEmbeds);
+
+                JSONArray batchArray = new JSONArray();
+                for (int i = startIndex; i < endIndex; i++) {
+                    batchArray.put(embedArray.getJSONObject(i));
+                }
+
+                if (!batchArray.isEmpty()) {
+                    JSONObject send = new JSONObject();
+                    send.put("embeds", batchArray);
+                    WebhookManager.send("donations", send);
+                }
+            }
+        }
+
+        config().donations = config().donations + diff;
+        Utils.initializer().integration().log("DonationFlutter", "Total donations: " + config().donations);
+        config().save();
+    }
+
+    private void handleResults(List<Donation.ProcessResult<?>> results) {
         Map<Participant, Integer> lifeMap = new HashMap<>();
 
         if (!results.isEmpty()) {
@@ -157,33 +188,5 @@ public class DonationFlutter implements Flutter {
             }
             Utils.configs().PARTICIPANT_CONFIG().save();
         }
-
-        Utils.configs().DUNGEON_MANAGER.handleNewDonationTotal();
-
-        if (WebhookManager.get("donations") != null) {
-            int batchSize = 10;
-            int totalEmbeds = embedArray.length();
-            int batches = (int) Math.ceil(totalEmbeds / (double) batchSize);
-
-            for (int batchIndex = 0; batchIndex < batches; batchIndex++) {
-                int startIndex = batchIndex * batchSize;
-                int endIndex = Math.min(startIndex + batchSize, totalEmbeds);
-
-                JSONArray batchArray = new JSONArray();
-                for (int i = startIndex; i < endIndex; i++) {
-                    batchArray.put(embedArray.getJSONObject(i));
-                }
-
-                if (!batchArray.isEmpty()) {
-                    JSONObject send = new JSONObject();
-                    send.put("embeds", batchArray);
-                    WebhookManager.send("donations", send);
-                }
-            }
-        }
-
-        config().donations = config().donations + diff;
-        Utils.initializer().integration().log("DonationFlutter", "Total donations: " + config().donations);
-        config().save();
     }
 }
