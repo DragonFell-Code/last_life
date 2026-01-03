@@ -199,8 +199,8 @@ public class ParticipantConfig extends Config {
                         player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.set", player.getName(), participant.boogey));
 
                 }
-                if (WebhookManager.get("boogeymen") != null)
-                    Utils.genericWebhook("boogeymen", new Color(0xD27330), "Boogeyman Selected!", "https://mc-heads.net/head/" + participant.id + "/left.png", participant.player().getName() + " has been selected as a boogeyman!");
+                if (WebhookManager.get("boogey") != null)
+                    Utils.genericWebhook("boogey", new Color(0xD27330), "Boogeyman Selected!", "https://mc-heads.net/head/" + participant.id + "/left.png", participant.player().getName() + " has been selected as a boogeyman!");
 
             } else {
 

@@ -160,6 +160,7 @@ public class DonationFlutter implements Flutter {
                         }
                     }
                     case BUNDLE_LOOT -> {
+                        Utils.genericWebhook("donations", new Color(0x85FF00), "Bundle Delivery", null, "A donation to " + participant.player().getName() + " has delivered a bundle of loot!");
                         for (Party party : Utils.configs().PARTY_CONFIG().parties.values()) {
                             party.deliver(participant);
                         }

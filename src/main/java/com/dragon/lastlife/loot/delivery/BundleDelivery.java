@@ -27,13 +27,11 @@ public class BundleDelivery extends DeliverySystem {
     public BundleDelivery(Party party, Participant participant) {
         this.location = party.mailbox().clone().add(0.5, 1, 0.5);
         this.participant = participant;
-        Bukkit.getScheduler().runTask(Utils.initializer(), ()->{
             display = location.getWorld().spawn(location, ArmorStand.class);
             display.setGravity(false);
             display.setMarker(true);
             display.setInvisible(true);
             display.setInvulnerable(true);
-        });
 
     }
 

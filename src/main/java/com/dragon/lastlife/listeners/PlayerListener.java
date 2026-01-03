@@ -83,8 +83,11 @@ public class PlayerListener implements Listener {
             return;
         }
 
+        int lives = participant.lives().remove();
+
         Utils.initializer().getComponentLogger().info("{} lost a life !", player.getName());
-        Utils.genericWebhook("death", new Color(0xFC486C), "Death", "https://mc-heads.net/combo/" + player.getUniqueId(), Utils.configs().MESSAGE_CONFIG.plainText(e.deathMessage()) + (participant.lives().remove() <= 0 ? " (Elimination)" : ""));
+
+        Utils.genericWebhook("death", new Color(0xFC486C), "Death", "https://mc-heads.net/combo/" + player.getUniqueId(), Utils.configs().MESSAGE_CONFIG.plainText(e.deathMessage()) + (lives <= 0 ? " (Elimination)" : ""));
 
         // Boogey curing
         if (e.getDamageSource().getCausingEntity() != null && e.getDamageSource().getCausingEntity() instanceof Player killer) {
@@ -101,7 +104,7 @@ public class PlayerListener implements Listener {
         }
 
         // Last life
-        if (participant.lives().remove() <= 0) {
+        if (lives <= 0) {
             e.setCancelled(true);
             player.getWorld().strikeLightningEffect(e.getPlayer().getLocation());
             Component deathMessage = e.deathMessage();
