@@ -3,6 +3,8 @@ package com.dragon.lastlife.loot.delivery;
 import com.dragon.lastlife.loot.LootManager;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
+import com.dragon.lastlife.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -25,11 +27,14 @@ public class BundleDelivery extends DeliverySystem {
     public BundleDelivery(Party party, Participant participant) {
         this.location = party.mailbox().clone().add(0.5, 1, 0.5);
         this.participant = participant;
-        display = location.getWorld().spawn(location, ArmorStand.class);
-        display.setGravity(false);
-        display.setMarker(true);
-        display.setInvisible(true);
-        display.setInvulnerable(true);
+        Bukkit.getScheduler().runTask(Utils.initializer(), ()->{
+            display = location.getWorld().spawn(location, ArmorStand.class);
+            display.setGravity(false);
+            display.setMarker(true);
+            display.setInvisible(true);
+            display.setInvulnerable(true);
+        });
+
     }
 
     @Override
