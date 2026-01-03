@@ -26,7 +26,7 @@ public class PoiArgumentType extends CustomArgumentConverter<@NotNull ConfigLoca
     public <S> @NotNull CompletableFuture<Suggestions> listSuggestions(@NotNull CommandContext<S> context, @NotNull SuggestionsBuilder builder) {
 
         String input = builder.getInput().substring(builder.getStart());
-        String[] values = new String[Utils.configs().PARTY_CONFIG().parties.size()];
+        String[] values = new String[Utils.configs().POI_CONFIG().pois.size()];
         int i = 0;
         for (ConfigLocation loc : Utils.configs().POI_CONFIG().pois.values()) {
             values[i] = loc.id();
