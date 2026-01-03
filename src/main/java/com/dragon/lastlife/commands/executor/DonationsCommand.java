@@ -4,7 +4,6 @@ import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.config.object.ConfigLocation;
 import com.dragon.lastlife.donations.IncentiveType;
-import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.loot.delivery.ShulkerDelivery;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
@@ -49,8 +48,7 @@ public class DonationsCommand extends CommandExecutor {
                                         return logError(context, "You must link your Extra Life account first using /donations link <participantName>");
                                     Optional<Party> party = Utils.configs().PARTY_CONFIG().get(participant);
                                     if (party.isEmpty()) return logError(context, "You are not part of a party.");
-                                    LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
-                                    party.get().deliverFox(tier);
+                                    party.get().deliverFox(participant);
                                     player.sendMessage(Component.text("Delivered loot to party via fox!"));
                                     return 1;
                                 }))
@@ -65,8 +63,7 @@ public class DonationsCommand extends CommandExecutor {
                                         return logError(context, "You must link your Extra Life account first using /donations link <participantName>");
                                     Optional<Party> party = Utils.configs().PARTY_CONFIG().get(participant);
                                     if (party.isEmpty()) return logError(context, "You are not part of a party.");
-                                    LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
-                                    party.get().deliverBundle(tier);
+                                    party.get().deliverBundle(participant);
                                     player.sendMessage(Component.text("Delivered loot to party via magic!"));
                                     return 1;
                                 }))
@@ -80,8 +77,7 @@ public class DonationsCommand extends CommandExecutor {
                                 return logError(context, "You must link your Extra Life account first using /donations link <participantName>");
                             Optional<Party> party = Utils.configs().PARTY_CONFIG().get(participant);
                             if (party.isEmpty()) return logError(context, "You are not part of a party.");
-                            LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
-                            party.get().deliver(tier);
+                            party.get().deliver(participant);
                             player.sendMessage(Component.text("Delivered loot to party via chance!"));
                             return 1;
                         }))
@@ -91,8 +87,7 @@ public class DonationsCommand extends CommandExecutor {
                             ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
                             Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
                             while (!location.getBlock().getType().isAir()) location.add(0, 1, 0);
-                            LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
-                            new ShulkerDelivery(location, tier).start();
+                            new ShulkerDelivery(location).start();
                             context.getSource().getSender().sendMessage(Component.text("Delivered loot to a random location!"));
                             return 1;
                         })))

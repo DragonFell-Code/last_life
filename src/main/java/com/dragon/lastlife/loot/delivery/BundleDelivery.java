@@ -1,39 +1,35 @@
 package com.dragon.lastlife.loot.delivery;
 
 import com.dragon.lastlife.loot.LootManager;
-import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.party.Party;
+import com.dragon.lastlife.players.Participant;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BundleMeta;
 import org.bukkit.util.EulerAngle;
 
-import java.util.Collection;
 import java.util.Random;
 
 public class BundleDelivery extends DeliverySystem {
 
-
     private final Location location;
-    private final LootTier tier;
+    private final Participant participant;
     private ArmorStand display; // Spinning chest display
 
 
     private double height = 20;
 
-    public BundleDelivery(Party party, LootTier tier) {
+    public BundleDelivery(Party party, Participant participant) {
         this.location = party.mailbox().clone().add(0.5, 1, 0.5);
-        this.tier = tier;
+        this.participant = participant;
         display = location.getWorld().spawn(location, ArmorStand.class);
         display.setGravity(false);
         display.setMarker(true);
         display.setInvisible(true);
         display.setInvulnerable(true);
-
     }
 
     @Override
@@ -51,7 +47,6 @@ public class BundleDelivery extends DeliverySystem {
                 location.getWorld().spawnParticle(Particle.END_ROD, location.x(), location.y() + Math.min(i * new Random().nextDouble(), height), location.z(), 1, 0, 0, 0, 0);
         }
         location.getWorld().spawnParticle(Particle.WITCH, location.x(), location.y() + height, location.z(), 10);
-
 
         //Remove magic numbers:
         double angle = ticks / 3d;
@@ -74,25 +69,18 @@ public class BundleDelivery extends DeliverySystem {
         if (System.currentTimeMillis() - started >= MAX_DURATION) stop();
     }
 
-
     @Override
     public void stop() {
         super.stop();
         if (location.getBlock().getType() != Material.CHEST) {
             if (location.getBlock().getType() != Material.AIR)
-                location.getWorld().dropItem(location, new ItemStack(location.getBlock().getType()));
+                location.getWorld().dropItem(location, new ItemStack(location.getBlock().getType())).setUnlimitedLifetime(true);
             location.getBlock().setType(Material.CHEST);
         }
         Chest chest = (Chest) location.getBlock().getState();
-        Collection<ItemStack> loot = LootManager.generate(tier, location);
-        ItemStack currentBundle = new ItemStack(Material.valueOf(LootManager.color(tier) + "_BUNDLE"));
-        BundleMeta bundleMeta = (BundleMeta) currentBundle.getItemMeta();
+        ItemStack bundle = LootManager.generateBundle(participant);
 
-        if (loot != null) for (ItemStack lootItem : loot) {
-            bundleMeta.addItem(lootItem);
-        }
-        currentBundle.setItemMeta(bundleMeta);
-        chest.getBlockInventory().addItem(currentBundle);
+        chest.getBlockInventory().addItem(bundle);
         if (display != null) {
             try {
                 display.remove();
@@ -101,6 +89,4 @@ public class BundleDelivery extends DeliverySystem {
             display = null;
         }
     }
-
-
 }

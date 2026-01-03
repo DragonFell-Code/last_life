@@ -1,29 +1,30 @@
 package com.dragon.lastlife.loot.delivery;
 
-import com.dragon.lastlife.loot.LootTier;
+import com.dragon.lastlife.loot.LootManager;
 import com.dragon.lastlife.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.ShulkerBox;
+
+import java.time.Duration;
+
+import static com.dragon.lastlife.utils.Utils.configs;
 
 public class ShulkerDelivery extends DeliverySystem {
 
     Location location;
-    LootTier tier;
 
-    public ShulkerDelivery(Location location, LootTier tier) {
+    public ShulkerDelivery(Location location) {
         this.location = location;
-        this.tier = tier;
     }
 
     @Override
     void tick() {
-        location.getBlock().setType(Material.valueOf(DyeColor.values()[tier.value()+1 % DyeColor.values().length] + "_SHULKER_BOX"));
-        ShulkerBox shulkerBoxBlock = (ShulkerBox) location.getBlock().getState();
-        shulkerBoxBlock.setLootTable(Bukkit.getLootTable(tier.key()));
-        shulkerBoxBlock.update();
+        LootManager.generateShulker(location);
+
+        // TODO: Add announcement
         Utils.initializer().integration().log("DonationFlutter", "Shulker delivery to [" + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ() + "]");
         stop();
     }

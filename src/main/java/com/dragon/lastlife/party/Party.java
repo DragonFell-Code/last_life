@@ -2,7 +2,7 @@ package com.dragon.lastlife.party;
 
 import com.dragon.lastlife.config.PartyConfig;
 import com.dragon.lastlife.config.object.ConfigLocation;
-import com.dragon.lastlife.loot.LootTier;
+import com.dragon.lastlife.loot.LootManager;
 import com.dragon.lastlife.loot.delivery.BundleDelivery;
 import com.dragon.lastlife.loot.delivery.FoxDelivery;
 import com.dragon.lastlife.players.Participant;
@@ -21,7 +21,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
-import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -97,18 +96,21 @@ public class Party extends ConfigObject {
         return new Location(Bukkit.getWorld(mailbox.world), mailbox.x, mailbox.y, mailbox.z, mailbox.yaw.floatValue(), mailbox.pitch.floatValue());
     }
 
-    public void deliver(LootTier tier) {
-        if (new Random().nextDouble() < 0.10) new FoxDelivery(this, tier).start();
-        else new BundleDelivery(this, tier).start();
+    public void deliver(Participant participant) {
+        if (LootManager.random.nextDouble() < 0.10) {
+            new FoxDelivery(this, participant).start();
+        } else {
+            new BundleDelivery(this, participant).start();
+        }
     }
 
     @Deprecated
-    public void deliverFox(LootTier tier) {
-        new FoxDelivery(this, tier).start();
+    public void deliverFox(Participant participant) {
+        new FoxDelivery(this, participant).start();
     }
 
     @Deprecated
-    public void deliverBundle(LootTier tier) {
-        new BundleDelivery(this, tier).start();
+    public void deliverBundle(Participant participant) {
+        new BundleDelivery(this, participant).start();
     }
 }

@@ -1,17 +1,15 @@
 package com.dragon.lastlife.loot.delivery;
 
 import com.dragon.lastlife.loot.LootManager;
-import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.nms.CustomFox;
 import com.dragon.lastlife.nms.NmsEntityFactory;
 import com.dragon.lastlife.party.Party;
+import com.dragon.lastlife.players.Participant;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.bukkit.inventory.meta.BundleMeta;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
@@ -19,14 +17,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FoxDelivery extends DeliverySystem{
 
-    private final LootTier tier;
     private final Location mailbox;
     private final Party party;
+    private final Participant participant;
 
-    public FoxDelivery(Party party, LootTier tier) {
+    public FoxDelivery(Party party, Participant participant) {
         this.party = party;
         mailbox = party.mailbox().clone().add(0,1,0);
-        this.tier = tier;
+        this.participant = participant;
     }
 
     @Override
@@ -59,20 +57,8 @@ public class FoxDelivery extends DeliverySystem{
             fox.setParty(party);
             Vec3 vecTarget = new Vec3(target.x(), target.y(), target.z());
             fox.deliverTo(vecTarget);
-            // Build a Bukkit bundle item pre-filled with generated loot, then convert to NMS
-            org.bukkit.inventory.ItemStack bundle = new org.bukkit.inventory.ItemStack(
-                    Material.valueOf(LootManager.color(tier) + "_BUNDLE")
-            );
-            BundleMeta meta = (BundleMeta) bundle.getItemMeta();
-            if (meta != null) {
-                var loot = LootManager.generate(tier, mailbox);
-                if (loot != null) {
-                    for (org.bukkit.inventory.ItemStack lootItem : loot) {
-                        meta.addItem(lootItem);
-                    }
-                }
-                bundle.setItemMeta(meta);
-            }
+
+            org.bukkit.inventory.ItemStack bundle = LootManager.generateBundle(participant);
             // Convert to NMS for the fox to hold
             ItemStack nmsItem = CraftItemStack.asNMSCopy(bundle);
             fox.setItemSlot(EquipmentSlot.MAINHAND, nmsItem);

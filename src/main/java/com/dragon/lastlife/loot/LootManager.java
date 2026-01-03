@@ -1,9 +1,13 @@
 package com.dragon.lastlife.loot;
 
+import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootContext;
 import org.bukkit.loot.LootTable;
@@ -11,23 +15,32 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Random;
+import java.util.*;
+
+import static com.dragon.lastlife.loot.BundleLoot.BUNDLE_LIST;
 
 public class LootManager {
-    private static final Random random = new Random();
+    public static final Random random = new Random();
     private static final int LOBBY_1_TEAM_ID = 73169;
     private static final int LOBBY_2_TEAM_ID = 73168;
 
-    public static Collection<ItemStack> generate(LootTier tier, Location location){
-        LootTable table = table(tier);
-        if(table == null) return null;
-        return table.populateLoot(random, new LootContext.Builder(location).build());
+    public static void generateShulker(Location location) {
+        DyeColor[] colors = DyeColor.values();
+        DyeColor color = colors[random.nextInt(colors.length)];
+
+        location.getBlock().setType(Material.valueOf( color + "_SHULKER_BOX"));
+        ShulkerBox shulkerBoxBlock = (ShulkerBox) location.getBlock().getState();
+        ItemStack[] originalContent = ShulkerLoot.SHULKER_CONTENTS_LIST.get(random.nextInt(ShulkerLoot.SHULKER_CONTENTS_LIST.size()));
+        ItemStack[] contents = Arrays.stream(originalContent).map(ItemStack::clone).toArray(ItemStack[]::new);
+
+        shulkerBoxBlock.getInventory().setContents(contents);
     }
 
-    public static String color(LootTier tier){
-        return DyeColor.values()[tier.value()+1 % DyeColor.values().length].name();
+    public static ItemStack generateBundle(Participant participant) {
+        ItemStack bundle = BUNDLE_LIST.get(random.nextInt(BUNDLE_LIST.size())).clone();
 
+        bundle.lore(List.of(Component.text("Donation from " + participant.player().getName() + "'s page")));
+        return bundle;
     }
 
     public static int getLobbyID() {
@@ -45,9 +58,5 @@ public class LootManager {
         BigDecimal increments = BigDecimal.valueOf(getLobbyID() == 1 ? 1000 : 500);
 
         return Utils.configs().DONATION_CONFIG().total.divide(increments, RoundingMode.DOWN).intValue();
-    }
-
-    public static @Nullable LootTable table(LootTier tier) {
-        return Bukkit.getLootTable(tier.key());
     }
 }

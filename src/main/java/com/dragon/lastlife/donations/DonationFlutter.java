@@ -2,7 +2,6 @@ package com.dragon.lastlife.donations;
 
 import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.object.ConfigLocation;
-import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.loot.delivery.ShulkerDelivery;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
@@ -74,8 +73,6 @@ public class DonationFlutter implements Flutter {
                         }
 
                         sync(diff);
-
-
                     }
                 }
             } catch (Exception e) {
@@ -108,7 +105,6 @@ public class DonationFlutter implements Flutter {
                 embedArray.put(donation.embed().json());
                 results.add(result);
             }
-
         }
         if (offset != preOffset) {
             Utils.configs().DONATION_CONFIG().save();
@@ -122,22 +118,25 @@ public class DonationFlutter implements Flutter {
             Utils.initializer().integration().log("DonationFlutter", "Processed " + results.size() + " new donations.");
             for (Donation.ProcessResult<?> result : results) {
                 Participant participant = (Participant) result.payload();
-                LootTier tier = LootTier.of(Utils.configs().DONATION_CONFIG().total.doubleValue());
                 switch (result.type()) {
                     case LIFE -> {
-                        lifeMap.put(participant, lifeMap.getOrDefault(participant, 0) + 1);
+                        // Don't give a life if player is already Dead
+                        if (participant.lives().lives() > 0) {
+                            lifeMap.put(participant, lifeMap.getOrDefault(participant, 0) + 1);
+                        }
                     }
                     case BUNDLE_LOOT -> {
                         for (Party party : Utils.configs().PARTY_CONFIG().parties.values()) {
-                            party.deliver(tier);
+                            party.deliver(participant);
                         }
                     }
                     case SHULKER_LOOT -> {
                         ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
                         Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
+
                         while (!location.getBlock().getType().isAir())
                             location.add(0, 1, 0);
-                        new ShulkerDelivery(location, tier);
+                        new ShulkerDelivery(location);
                     }
                     case BOOGEYMAN -> {
                         Utils.configs().PARTICIPANT_CONFIG().boogeymen().queue();
@@ -151,12 +150,11 @@ public class DonationFlutter implements Flutter {
                 Utils.initializer().integration().log("Donation", "Added 1 life to " + entry.getKey().player().getName() + " for donation incentive.");
             }
             Utils.configs().PARTICIPANT_CONFIG().save();
-
         }
 
+        Utils.configs().DUNGEON_MANAGER.handleNewDonationTotal();
 
         if (WebhookManager.get("donations") != null) {
-
             int batchSize = 10;
             int totalEmbeds = embedArray.length();
             int batches = (int) Math.ceil(totalEmbeds / (double) batchSize);
@@ -176,13 +174,10 @@ public class DonationFlutter implements Flutter {
                     WebhookManager.send("donations", send);
                 }
             }
-
-
         }
 
         config().donations = config().donations + diff;
         Utils.initializer().integration().log("DonationFlutter", "Total donations: " + config().donations);
         config().save();
     }
-
 }

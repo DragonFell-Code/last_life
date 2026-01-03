@@ -17,13 +17,17 @@ import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.entity.Entity;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.dragon.lastlife.world.DungeonManager.GENERATION_COMPLETE_TAG;
 import static com.dragon.lastlife.world.DungeonManager.SPAWN_MARKER_NAME;
 
 public class Dungeon {
@@ -44,7 +48,7 @@ public class Dungeon {
     public BlockPos origin;
     public ChunkPos chunkPos;
 
-    public void generate(Consumer<Dungeon> callback, int size) {
+    public void generate(BiConsumer<Dungeon, String> callback, int size) {
         Holder.Reference<Structure> structureRef = MinecraftServer.getServer().registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(DUNGEON_RESOURCE_KEY);
 
         JigsawStructure structure = (JigsawStructure) structureRef.value();
@@ -84,8 +88,9 @@ public class Dungeon {
                 );
 
                 if (!structureStart.isValid()) {
-                    manager.initializer.getLogger().severe("StructureStart is not Valid");
-                    callback.accept(null);
+                    String error = "StructureStart is not Valid";
+                    manager.initializer.getLogger().severe(error);
+                    callback.accept(null, error);
                     return;
                 }
 
@@ -108,20 +113,24 @@ public class Dungeon {
                 // Start generation
                 this.generateNext(structureStart, chunks, callback);
             } catch (Exception e) {
-                manager.initializer.getLogger().severe("Failed to generate dungeon: " + e.getMessage());
-                callback.accept(null);
+                String error = "Failed to generate labyrinth";
+                manager.initializer.getLogger().severe(error + ": " + e.getMessage());
+                callback.accept(null, error);
             }
         });
     }
 
-    private void generateNext(StructureStart structure, List<ChunkPos> remainingChunks, Consumer<Dungeon> callback) {
+    private void generateNext(StructureStart structure, List<ChunkPos> remainingChunks, BiConsumer<Dungeon, String> callback) {
         if (remainingChunks.isEmpty()) {
-            if (manager.getDungeonEntranceLocation(SPAWN_MARKER_NAME) != null) {
+            Entity marker = manager.getMarker(SPAWN_MARKER_NAME).orElse(null);
+            if (marker != null) {
+                marker.addScoreboardTag(GENERATION_COMPLETE_TAG);
                 manager.initializer.getLogger().info("Structure has been Generated !");
-                callback.accept(this);
+                callback.accept(this, null);
             } else {
-                manager.initializer.getLogger().severe("Failed to generate the dungeon spawn");
-                callback.accept(null);
+                String error = "Failed to generate the labyrinth spawn";
+                manager.initializer.getLogger().severe(error);
+                callback.accept(null, error);
             }
             return;
         }
@@ -144,8 +153,9 @@ public class Dungeon {
                 // Generate next chunk of the structure
                 this.generateNext(structure, remainingChunks, callback);
             } catch (Exception e) {
-                manager.initializer.getLogger().severe("Failed to generate dungeon: " + e.getMessage());
-                callback.accept(null);
+                String error = "Failed to generate labyrinth";
+                manager.initializer.getLogger().severe(error + ": " + e.getMessage());
+                callback.accept(null, error);
             }
         }, 1);
     }

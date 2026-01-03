@@ -2,8 +2,6 @@ package com.dragon.lastlife.listeners;
 
 import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
-import com.dragon.lastlife.donations.Donation;
-import com.dragon.lastlife.loot.LootTier;
 import com.dragon.lastlife.nms.CustomFox;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.InventorySnapshot;
@@ -23,7 +21,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.block.data.type.Bed;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Fox;
@@ -32,13 +29,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.inventory.ItemStack;
 import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
 import static net.kyori.adventure.text.Component.text;
-import static org.bukkit.GameMode.CREATIVE;
 import static org.bukkit.GameMode.CREATIVE;
 
 public class PlayerListener implements Listener {
@@ -87,6 +82,9 @@ public class PlayerListener implements Listener {
     public void onPlayerChat(AsyncChatEvent e) {
         if (e.getPlayer().isOp()) {
             String raw = Utils.configs().MESSAGE_CONFIG.plainText(e.message());
+            Player player = e.getPlayer();
+            Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(player.getUniqueId());
+
             if (raw.startsWith("!")) {
                 e.setCancelled(true);
 
@@ -95,13 +93,13 @@ public class PlayerListener implements Listener {
                     String label = raw.substring(1, indexOfSpace);
                     String argsRaw = raw.length() == indexOfSpace ? "" : raw.substring(indexOfSpace + 1);
                     String[] args = argsRaw.contains(" ") ? argsRaw.split(" ") : new String[]{argsRaw};
+
                     if (label.equals("packet")) {
-                        Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId()).sync();
-                        e.getPlayer().sendMessage(text("Sent packet!", NamedTextColor.GREEN));
+                        participant.sync();
+                        player.sendMessage(text("Sent packet!", NamedTextColor.GREEN));
                     }
 
                     if (label.equalsIgnoreCase("dungeon")) {
-                        Player player = e.getPlayer();
                         Location tp_location = Utils.configs().DUNGEON_MANAGER.getDungeonEntranceLocation();
 
                         if (tp_location == null) {
@@ -117,15 +115,14 @@ public class PlayerListener implements Listener {
                     }
 
                     if (label.equalsIgnoreCase("donation")) {
-                        Party party = Utils.configs().PARTY_CONFIG().get(Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId())).orElse(null);
+                        Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
                         if (party == null) {
-                            e.getPlayer().sendMessage(text("You are not in a party!", NamedTextColor.RED));
+                            player.sendMessage(text("You are not in a party!", NamedTextColor.RED));
                             return;
                         }
                         DonationConfig config = Utils.configs().DONATION_CONFIG();
-                        LootTier tier = LootTier.of(config.total.doubleValue());
 
-                        party.deliver(tier);
+                        party.deliver(participant);
 //                        JSONObject json = new JSONObject()
 //                                .put("displayName", "Test Donor")
 //                                .put("donorId", "270CB800398A911A")
@@ -151,7 +148,7 @@ public class PlayerListener implements Listener {
 
                     if (label.equals("lives")) {
                         if (args.length != 2) {
-                            e.getPlayer().sendMessage(text("Usage: !lives <player> <amount>", NamedTextColor.RED));
+                            player.sendMessage(text("Usage: !lives <player> <amount>", NamedTextColor.RED));
                             return;
                         }
                         String playerName = args[0];
@@ -159,23 +156,21 @@ public class PlayerListener implements Listener {
                         try {
                             amount = Integer.parseInt(args[1]);
                         } catch (NumberFormatException ex) {
-                            e.getPlayer().sendMessage((text("Invalid number: " + args[1], NamedTextColor.RED)));
+                            player.sendMessage((text("Invalid number: " + args[1], NamedTextColor.RED)));
                             return;
                         }
-                        Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId());
                         int lives = participant.lives().edit(amount);
                         MessageUtils messages = Utils.configs().MESSAGE_CONFIG;
-                        e.getPlayer().sendMessage(PlaceholderUtils.replace(e.getPlayer(), "Lives: ${lives}"));
+                        player.sendMessage(PlaceholderUtils.replace(player, "Lives: ${lives}"));
                         Utils.configs().PARTICIPANT_CONFIG().save();
                     } else {
-                        e.getPlayer().performCommand(label);
+                        player.performCommand(label);
                     }
                 }, 0);
                 return;
             }
             //this code will be removed later. This is for debugging purposes only
             e.setCancelled(true);
-            Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId());
             Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
             Component prefix = text((party== null || participant == null) ? "" : "[" + party.id() + "] ", NamedTextColor.GREEN);
             Component name = text(e.getPlayer().getName(), NamedTextColor.YELLOW);
