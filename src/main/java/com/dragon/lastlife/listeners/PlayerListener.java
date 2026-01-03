@@ -1,19 +1,13 @@
 package com.dragon.lastlife.listeners;
 
-import com.dragon.lastlife.config.DonationConfig;
 import com.dragon.lastlife.config.ParticipantConfig;
 import com.dragon.lastlife.nms.CustomFox;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.InventorySnapshot;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
-import com.dragon.lastlife.utils.chat.MessageUtils;
-import com.dragon.lastlife.utils.chat.placeholder.PlaceholderUtils;
 import com.dragon.lastlife.world.DungeonManager;
-import com.quiptmc.core.config.ConfigManager;
-import com.quiptmc.core.config.objects.ConfigString;
 import com.quiptmc.core.utils.TaskScheduler;
-import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,8 +23,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.json.JSONObject;
 
+import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
 import static net.kyori.adventure.text.Component.text;
@@ -79,108 +73,6 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerChat(AsyncChatEvent e) {
-        if (e.getPlayer().isOp()) {
-            String raw = Utils.configs().MESSAGE_CONFIG.plainText(e.message());
-            Player player = e.getPlayer();
-            Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(player.getUniqueId());
-
-            if (raw.startsWith("!")) {
-                e.setCancelled(true);
-
-                Bukkit.getScheduler().runTaskLater(Utils.initializer(), () -> {
-                    int indexOfSpace = raw.contains(" ") ? raw.indexOf(" ") : raw.length();
-                    String label = raw.substring(1, indexOfSpace);
-                    String argsRaw = raw.length() == indexOfSpace ? "" : raw.substring(indexOfSpace + 1);
-                    String[] args = argsRaw.contains(" ") ? argsRaw.split(" ") : new String[]{argsRaw};
-
-                    if (label.equals("packet")) {
-                        participant.sync();
-                        player.sendMessage(text("Sent packet!", NamedTextColor.GREEN));
-                    }
-
-                    if (label.equalsIgnoreCase("dungeon")) {
-                        Location tp_location = Utils.configs().DUNGEON_MANAGER.getDungeonEntranceLocation();
-
-                        if (tp_location == null) {
-                            player.sendMessage(text("Failed to detect dungeon world", NamedTextColor.RED));
-                            return;
-                        }
-
-                        player.teleport(tp_location);
-                    }
-
-                    if (label.equalsIgnoreCase("config")) {
-                        ConfigManager.reloadConfig(Utils.initializer().integration(), DonationConfig.class);
-                    }
-
-                    if (label.equalsIgnoreCase("donation")) {
-                        Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
-                        if (party == null) {
-                            player.sendMessage(text("You are not in a party!", NamedTextColor.RED));
-                            return;
-                        }
-                        DonationConfig config = Utils.configs().DONATION_CONFIG();
-
-                        party.deliver(participant);
-//                        JSONObject json = new JSONObject()
-//                                .put("displayName", "Test Donor")
-//                                .put("donorId", "270CB800398A911A")
-//                                .put("links", new JSONObject()
-//                                        .put("recipient", "https://www.extra-life.org/participants/548726")
-//                                        .put("donate", "https://www.extra-life.org/participants/548726/donate"))
-//                                .put("isRegFee", false)
-//                                .put("eventID", 559)
-//                                .put("createdDateUTC", "2025-02-01T18:55:51.460+0000")
-//                                .put("recipientName", "Test Participant (Elkhorn95)")
-//                                .put("recipientImageURL", "https://donordrivecontent.com/extralife/images/$avatars$/constituent_09429FD9-D538-F066-0D0C8F329156DFD1.jpg?v=1756493068380")
-//                                .put("participantID", 548726)
-//                                .put("amount", "5.00")
-//                                .put("avatarImageURL", "https://donordrivecontent.com/extralife/images/$avatars$/constituent_default_100.jpg?v=1756493068380")
-//                                .put("teamID", Utils.configs().DONATION_CONFIG().team_id)
-//                                .put("donationID", "53DFA757C375170D")
-//                                .put("incentiveID", "D0AD363E-BA37-AD5A-15AFC5541F245399")
-//                                .put("message", "what if you have to deal with it as a fish fight instead!!!");
-//                        Donation donation = new Donation(json);
-//                        Utils.configs().DONATION_CONFIG().process(donation);
-//                        donation.process();
-                    }
-
-                    if (label.equals("lives")) {
-                        if (args.length != 2) {
-                            player.sendMessage(text("Usage: !lives <player> <amount>", NamedTextColor.RED));
-                            return;
-                        }
-                        String playerName = args[0];
-                        int amount;
-                        try {
-                            amount = Integer.parseInt(args[1]);
-                        } catch (NumberFormatException ex) {
-                            player.sendMessage((text("Invalid number: " + args[1], NamedTextColor.RED)));
-                            return;
-                        }
-                        int lives = participant.lives().edit(amount);
-                        MessageUtils messages = Utils.configs().MESSAGE_CONFIG;
-                        player.sendMessage(PlaceholderUtils.replace(player, "Lives: ${lives}"));
-                        Utils.configs().PARTICIPANT_CONFIG().save();
-                    } else {
-                        player.performCommand(label);
-                    }
-                }, 0);
-                return;
-            }
-            //this code will be removed later. This is for debugging purposes only
-            e.setCancelled(true);
-            Party party = Utils.configs().PARTY_CONFIG().get(participant).orElse(null);
-            Component prefix = text((party== null || participant == null) ? "" : "[" + party.id() + "] ", NamedTextColor.GREEN);
-            Component name = text(e.getPlayer().getName(), NamedTextColor.YELLOW);
-            Component message = text(raw, NamedTextColor.GRAY);
-            e.getPlayer().sendMessage(prefix.append(name).append(text(": ", NamedTextColor.GRAY)).append(message));
-
-        }
-    }
-
-    @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         Player player = e.getPlayer();
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
@@ -192,6 +84,7 @@ public class PlayerListener implements Listener {
         }
 
         Utils.initializer().getComponentLogger().info("{} lost a life !", player.getName());
+        Utils.genericWebhook("death", new Color(0xFC486C), "Death", "https://mc-heads.net/combo/" + player.getUniqueId(), Utils.configs().MESSAGE_CONFIG.plainText(e.deathMessage()) + (participant.lives().remove() <= 0 ? " (Elimination)" : ""));
 
         // Boogey curing
         if (e.getDamageSource().getCausingEntity() != null && e.getDamageSource().getCausingEntity() instanceof Player killer) {
@@ -200,11 +93,8 @@ public class PlayerListener implements Listener {
                 if (killerParticipant != null) {
                     if (killerParticipant.boogey) {
                         config.boogeymen().setBoogey(killerParticipant, false);
-
-
+                        Utils.genericWebhook("boogey", new Color(0x81FC01), "Boogey Cured", "https://mc-heads.net/combo/" + killer.getUniqueId(), killer.getName() + " has been cured!");
                     }
-//                killerParticipant.stats.deaths++;
-//                killerParticipant.stats.kills++;
                     killerParticipant.sync();
                 }
             }
@@ -233,17 +123,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent e) {
-        TaskScheduler.scheduleAsyncTask(() -> {
-            Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId()).sync();
-        }, 500, TimeUnit.MILLISECONDS);
-        e.getPlayer().sendMessage(Utils.configs().MESSAGE_CONFIG.parse(text("Welcome to Last Life! ${cmd.session.start}", NamedTextColor.GOLD)));
-        Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId());
-        if (participant.settings.get("boogey_particles") == null) {
-            ConfigString string = new ConfigString("boogey_particles", "flame");
-            participant.settings.put(string);
-        }
-        JSONObject json = participant.settings.json();
-        e.getPlayer().sendMessage(participant.settings.get("boogey_particles").toString());
-        Utils.configs().PARTICIPANT_CONFIG().save();
+        TaskScheduler.scheduleAsyncTask(() -> Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId()).sync(), 500, TimeUnit.MILLISECONDS);
+        e.getPlayer().sendMessage(Utils.configs().MESSAGE_CONFIG.parse(text("Welcome to Last Life!", NamedTextColor.GOLD)));
     }
 }

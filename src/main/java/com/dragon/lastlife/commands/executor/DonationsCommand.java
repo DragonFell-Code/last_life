@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.util.Optional;
 
 import static io.papermc.paper.command.brigadier.Commands.argument;
@@ -88,6 +89,9 @@ public class DonationsCommand extends CommandExecutor {
                             Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
                             while (!location.getBlock().getType().isAir()) location.add(0, 1, 0);
                             new ShulkerDelivery(location).start();
+                            String msg = "A donation to (null) has spawned a shulker delivery at the " + configLocation.id() + " POI!";
+                            Utils.genericWebhook("donations", new Color(0x85FF00), "Shulker Delivery", null, msg);
+                            Bukkit.broadcast(Component.text(msg, NamedTextColor.GREEN));
                             context.getSource().getSender().sendMessage(Component.text("Delivered loot to a random location!"));
                             return 1;
                         })))
@@ -157,6 +161,7 @@ public class DonationsCommand extends CommandExecutor {
                                             for (int i = 0; i < raw.length(); i++) {
                                                 JSONObject incentive = raw.getJSONObject(i);
                                                 if (incentive.has("description") && incentive.getString("description").equalsIgnoreCase(StringArgumentType.getString(context, "incentiveName"))) {
+                                                    Utils.initializer().integration().log("Debug", "Found incentive with name " + StringArgumentType.getString(context, "incentiveName") + " (ID: " + incentive.getString("incentiveID") + ")");
                                                     switch (type) {
                                                         case LIFE ->
                                                                 participant.incentive_life = incentive.getString("incentiveID");

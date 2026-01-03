@@ -42,13 +42,14 @@ public class Utils {
     private static Initializer initializer;
     private static Configs configs;
     private static MessageChannelHandler channelMessageHandler;
-    private static LootManager lootManager;
 
     public static void init(Initializer init) {
         initializer = init;
+        init.integration().log("Utils", "Initializing...");
         configs = new Configs(init);
-        lootManager = new LootManager();
+        init.integration().log("Utils", "Configs initialized");
         PlaceholderUtils.registerPlaceholders();
+        init.integration().log("Utils", "Registered placeholders");
 
         channelMessageHandler = new MessageChannelHandler(init);
         MessageChannel stc = channelMessageHandler().register(MessageChannel.Type.OUTGOING, "stc", null);
@@ -65,10 +66,7 @@ public class Utils {
             init.integration().log("Utils", "Registered outgoing channel: " + cts.name);
         }
         setupHeartbeat();
-    }
-
-    public static LootManager loot() {
-        return lootManager;
+        init.integration().log("Utils", "Heartbeats set up");
     }
 
     private static void setupHeartbeat() {
@@ -96,7 +94,8 @@ public class Utils {
         return channelMessageHandler;
     }
 
-    public static void genericWebhook(String channelName, Color color, String title, @Nullable String image, String description, @Nullable Embed.Field... fields) {
+    public static void genericWebhook(String channelName, Color color, String title, @Nullable String image, @Nullable String description, @Nullable Embed.Field... fields) {
+        if(WebhookManager.get(channelName) == null) return;
         Embed.Builder builder = Embed.builder()
                 .title(title)
                 .description(description)

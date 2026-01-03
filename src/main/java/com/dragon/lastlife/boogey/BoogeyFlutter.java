@@ -19,6 +19,10 @@ public class BoogeyFlutter implements Flutter {
 
     private final BossBar boogeyBossBar = BossBar.bossBar(text("You are the Boogeyman!", NamedTextColor.RED), 1f, BossBar.Color.RED, BossBar.Overlay.PROGRESS);
 
+    public BoogeyFlutter() {
+        Utils.initializer().integration().log("BoogeyFlutter", "Initialized");
+    }
+
     @Override
     public boolean run() {
         long now = System.currentTimeMillis();

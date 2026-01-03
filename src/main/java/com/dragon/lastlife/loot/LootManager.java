@@ -59,4 +59,5 @@ public class LootManager {
 
         return Utils.configs().DONATION_CONFIG().total.divide(increments, RoundingMode.DOWN).intValue();
     }
+
 }

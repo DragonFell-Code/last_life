@@ -39,7 +39,7 @@ public class WebhooksConfig extends Config {
         if(initialized)
             integration().logger().warn("[WebhooksConfig] Already initialized... Initializing again.");
         initialized = true;
-        if(webhooks.size() == 0){
+        if(webhooks.isEmpty()){
             integration().logger().warn("[WebhooksConfig] No webhooks registered, skipping...");
             return;
         }

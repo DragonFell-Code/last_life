@@ -51,8 +51,8 @@ public class Donation extends ConfigObject {
 
     public ProcessResult<?> process() {
         //todo process donation and check incentives
+        Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(participantID);
         if (incentiveID != null && !incentiveID.isEmpty()) {
-            Participant participant = Utils.configs().PARTICIPANT_CONFIG().get(participantID);
             if (participant != null) {
                 if (incentiveID.equals(participant.incentive_life)) {
                     return new ProcessResult<>(IncentiveType.LIFE, participant);
@@ -71,7 +71,7 @@ public class Donation extends ConfigObject {
             }
             return new ProcessResult<>(IncentiveType.NONE, participant);
         }
-        return new ProcessResult<>(IncentiveType.NONE, participantID);
+        return new ProcessResult<>(IncentiveType.NONE, participant);
 
     }
 

@@ -6,6 +6,7 @@ import com.dragon.lastlife.listeners.*;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.ConfigManager;
+import io.netty.handler.logging.LogLevel;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.entity.Fox;
@@ -38,6 +39,7 @@ public final class Initializer extends JavaPlugin {
     @Override
     public void onEnable() {
         quipt();
+        getLogger().info("[Quipt] Quipt initialized.");
         Utils.init(this);
 
         PluginManager pluginManager = this.getServer().getPluginManager();
@@ -57,6 +59,7 @@ public final class Initializer extends JavaPlugin {
         new CommandExecutor.Builder(new PartyCommand(this)).register();
         new CommandExecutor.Builder(new PoiCommand(this)).register();
         new CommandExecutor.Builder(new SettingsCommand(this)).setDescription("Manage personal Last Life settings").register();
+        new CommandExecutor.Builder(new WebhookCommand(this)).setDescription("Manage Discord webhooks").register();
         getLogger().info("LastLife plugin has been enabled successfully.");
     }
 

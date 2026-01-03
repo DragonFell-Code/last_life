@@ -11,6 +11,8 @@ import com.quiptmc.core.heartbeat.Flutter;
 import com.quiptmc.core.utils.net.HttpConfig;
 import com.quiptmc.core.utils.net.HttpHeaders;
 import com.quiptmc.core.utils.net.NetworkUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.json.JSONArray;
@@ -36,6 +38,7 @@ public class DonationFlutter implements Flutter {
             throw new IllegalArgumentException("DonationConfig cannot be null");
         }
         GET = HttpConfig.defaults(HttpHeaders.ETAG(config.etag));
+        Utils.initializer().integration().log("DonationFlutter", "Initialized");
     }
 
     private DonationConfig config() {
@@ -121,7 +124,7 @@ public class DonationFlutter implements Flutter {
                 switch (result.type()) {
                     case LIFE -> {
                         // Don't give a life if player is already Dead
-                        if (participant.lives().lives() > 0) {
+                        if (participant.lives().lives() > 0 && participant.lives().lives() < 3) {
                             lifeMap.put(participant, lifeMap.getOrDefault(participant, 0) + 1);
                         }
                     }
@@ -136,7 +139,10 @@ public class DonationFlutter implements Flutter {
 
                         while (!location.getBlock().getType().isAir())
                             location.add(0, 1, 0);
-                        new ShulkerDelivery(location);
+                        new ShulkerDelivery(location).start();
+                        String msg = "A donation to " + participant.player().getName() + " has spawned a shulker delivery at the " + configLocation.id() + " POI!";
+                        Utils.genericWebhook("donations", new Color(0x85FF00), "Shulker Delivery", null, msg);
+                        Bukkit.broadcast(Component.text(msg, NamedTextColor.GREEN));
                     }
                     case BOOGEYMAN -> {
                         Utils.configs().PARTICIPANT_CONFIG().boogeymen().queue();
@@ -147,7 +153,7 @@ public class DonationFlutter implements Flutter {
             }
             for (Map.Entry<Participant, Integer> entry : lifeMap.entrySet()) {
                 entry.getKey().lives().add(entry.getValue());
-                Utils.initializer().integration().log("Donation", "Added 1 life to " + entry.getKey().player().getName() + " for donation incentive.");
+                Utils.genericWebhook("donations", new Color(0x85FF00), "Lives", null, entry.getKey().player().getName() + " has received " + entry.getValue() + " extra life" + (entry.getValue() > 1 ? "s" : "") + " from donations! They now have " + entry.getKey().lives().get() + " life" + (entry.getKey().lives().get() > 1 ? "s" : "") + ".");
             }
             Utils.configs().PARTICIPANT_CONFIG().save();
         }
