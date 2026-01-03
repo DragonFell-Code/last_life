@@ -3,14 +3,18 @@ package com.dragon.lastlife.listeners;
 import com.dragon.lastlife.loot.LootManager;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.block.CraftLootable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.loot.LootTable;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Collection;
 import java.util.Random;
+
+import static com.dragon.lastlife.world.DungeonManager.KEY_DUNGEON_CHEST_MARKER;
 
 public class LootListener implements Listener {
     public static int MAX_DONATION_LEVEL = 9;
@@ -23,15 +27,18 @@ public class LootListener implements Listener {
         // Only target our dungeon chests
         if (!originalKey.getNamespace().equals("lastlife") || !originalKey.getKey().equals("chests/dungeon_scaled")) return;
 
-        int level = getDonationLevel();
-        NamespacedKey key = new NamespacedKey("lastlife", "chests/dungeon_tier_" + level);
-        LootTable table = Bukkit.getLootTable(key);
+        if (event.getInventoryHolder() instanceof CraftLootable<?> craftLootable) {
+            int level = getDonationLevel();
+            NamespacedKey key = new NamespacedKey("lastlife", "chests/dungeon_tier_" + level);
+            LootTable table = Bukkit.getLootTable(key);
 
-        if (table != null) {
-            // Generate items from the tier table into this event
-            Collection<ItemStack> generated = table.populateLoot(new Random(), event.getLootContext());
-            event.getLoot().clear();
-            event.getLoot().addAll(generated);
+            if (table != null) {
+                // Generate items from the tier table into this event
+                Collection<ItemStack> generated = table.populateLoot(new Random(), event.getLootContext());
+                event.getLoot().clear();
+                event.getLoot().addAll(generated);
+                craftLootable.getBlockEntity().persistentDataContainer.set(KEY_DUNGEON_CHEST_MARKER, PersistentDataType.BOOLEAN, true);
+            }
         }
     }
 

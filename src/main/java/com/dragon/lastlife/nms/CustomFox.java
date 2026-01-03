@@ -39,12 +39,11 @@ public class CustomFox extends Fox implements NmsEntity {
     private final long created;
     private String party;
 
-
     /*
       TODO:
          - [ ] Foxes can be captured in boats / minecarts
-         - [ ] They can spawn in a pit and never be able to reach their goal
-         - [ ] Players can trap them in pits / fences
+         - [x] They can spawn in a pit and never be able to reach their goal
+         - [x] Players can trap them in pits / fences
          - [ ] Foxes can die to the void
          - [x] Leads: Foxes currently cant be led, but need to ensure it stays that way when we restrict click actions to owner only
          - [ ] Foxes drift around when trying to stop lol
@@ -59,7 +58,6 @@ public class CustomFox extends Fox implements NmsEntity {
 
         this.setTarget(this, EntityTargetEvent.TargetReason.CUSTOM); // Prevent fox to eat item if edible
         created = System.currentTimeMillis();
-
     }
 
     // Damage handling in this Minecraft version marks Entity#hurt as final.

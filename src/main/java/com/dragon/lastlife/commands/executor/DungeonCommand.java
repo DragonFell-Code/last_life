@@ -51,7 +51,7 @@ import static io.papermc.paper.command.brigadier.Commands.literal;
 
 public class DungeonCommand extends CommandExecutor {
     public DungeonCommand(Initializer initializer) {
-        super(initializer, "dungeon");
+        super(initializer, "labyrinth");
     }
 
     @Override
@@ -76,7 +76,7 @@ public class DungeonCommand extends CommandExecutor {
                     CommandSender sender = context.getSource().getSender();
 
                     spawn_marker.ifPresent(Entity::remove);
-                    this.evictPlayers();
+                    dungeonManager.evictPlayers();
 
                     Bukkit.getServer().broadcast(configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.closed"));
                     return Command.SINGLE_SUCCESS;
@@ -85,13 +85,14 @@ public class DungeonCommand extends CommandExecutor {
                     Location spawn_location = dungeonManager.getMarkerLocation(SPAWN_MARKER_NAME);
 
                     if (spawn_location == null) {
-                        return logError(context, "Failed to locate dungeon spawn point - is the dungeon generated ?");
+                        return logError(context, "Failed to locate labyrinth spawn point - is the labyrinth generated ?");
                     }
 
                     // Add a custom marker to TP in the dimension
                     dungeonManager.dungeon_world.spawn(spawn_location, Marker.class, marker -> {
                         marker.customName(Component.text(PLAYER_SPAWN_MARKER_NAME));
                     });
+                    dungeonManager.registerDonationTotalOnMarker(); // Reset donation total to the actual value on dungeon opening
 
                     Title.Times times = Title.Times.times(Ticks.duration(10), Duration.ofSeconds(5), Ticks.duration(20));
                     Component message = configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.open");
@@ -114,7 +115,7 @@ public class DungeonCommand extends CommandExecutor {
                     ServerPlayer player = source.getHandle().getPlayerOrException();
 
                     if (entrance == null) {
-                        return logError(context, "Dungeon entrance not found - is the dungeon open ?");
+                        return logError(context, "Labyrinth entrance not found - is the labyrinth open ?");
                     }
 
                     player.getBukkitEntity().teleport(entrance);
@@ -142,111 +143,27 @@ public class DungeonCommand extends CommandExecutor {
             sender.sendMessage(configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.auto_size", size));
         }
 
-        dungeonManager.create(dungeon -> {
+        dungeonManager.create((dungeon, error) -> {
             if (dungeon != null) {
                 sender.sendMessage(configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.generated"));
             } else {
-                sender.sendMessage(configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.generate_fail"));
+                sender.sendMessage(configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.generate_fail", error));
             }
         }, size);
     }
 
-    private void evictPlayers() {
-        DungeonManager dungeonManager = Utils.configs().DUNGEON_MANAGER;
-        Location exit = dungeonManager.getDungeonExitLocation();
-        World dungeonWorld = dungeonManager.dungeon_world;
-
-        dungeonWorld.getPlayers().forEach(player -> {
-            player.teleport(exit);
-            InventorySnapshot.forceApplyInventorySnapshot(((CraftPlayer)player).getHandle());
-        });
-    }
-
     private int resetDungeon(CommandContext<CommandSourceStack> context, Integer size) {
         DungeonManager dungeonManager = Utils.configs().DUNGEON_MANAGER;
-        World dungeonWorld = dungeonManager.dungeon_world;
 
-        CraftServer server = (CraftServer) Bukkit.getServer();
-        CraftWorld world = (CraftWorld) dungeonWorld;
-
-        // Ensure we remove any player from the dimension
-        this.evictPlayers();
-        // If dimension is still loaded, unload it
-        if (server.getServer().getLevel(world.getHandle().dimension()) != null && !Bukkit.getServer().unloadWorld(dungeonWorld, false)) {
-            return logError(context, "Failed to unload the Dungeon");
+        if (dungeonManager.generating) {
+            return logError(context, "Labyrinth is currently generating and cannot be interrupted");
         }
         try {
-            FileUtils.deleteDirectory(dungeonWorld.getWorldFolder());
-        } catch (IOException e) {
-            return logError(context, "Failed to delete the Dungeon");
+            dungeonManager.resetDimension();
+            generateDungeon(context, size);
+        } catch (Exception e) {
+            return logError(context, e.getMessage());
         }
-
-        DedicatedServer mc_server = server.getServer();
-        PaperWorldLoader loader = PaperWorldLoader.create(mc_server, mc_server.storageSource.getLevelId());
-
-        ResourceLocation dungeon_resource_location = ResourceLocation.fromNamespaceAndPath("lastlife", "dungeon_dim");
-        ResourceKey<Level> dungeon_level_key = ResourceKey.create(Registries.DIMENSION, dungeon_resource_location);
-
-        LevelStem stem = mc_server.registryAccess().lookupOrThrow(Registries.LEVEL_STEM).get(dungeon_resource_location).orElseThrow().value();
-        ResourceKey<LevelStem> stemKey = mc_server.registryAccess().lookupOrThrow(Registries.LEVEL_STEM).getResourceKey(stem).orElseThrow();
-        String worldType = stemKey.location().getNamespace() + "_" + stemKey.location().getPath();
-        PaperWorldLoader.WorldLoadingInfo info = new PaperWorldLoader.WorldLoadingInfo(-999, loader.levelId() + "_" + worldType, worldType, stemKey, true);
-
-        LevelStorageSource.LevelStorageAccess levelStorageAccess;
-        try {
-            levelStorageAccess = LevelStorageSource.createDefault(mc_server.server.getWorldContainer().toPath()).validateAndCreateAccess(info.name(), info.stemKey());
-        } catch (IOException | ContentValidationException e) {
-            throw new RuntimeException(e);
-        }
-        PaperWorldLoader.LevelDataResult levelData = PaperWorldLoader.getLevelData(levelStorageAccess);
-        if (levelData.fatalError()) {
-            return logError(context, "Failed to getLevelData");
-        }
-
-        final PrimaryLevelData primaryLevelData;
-        DedicatedServerSettings settings = mc_server.settings;
-
-        if (levelData.dataTag() == null) {
-            primaryLevelData = (PrimaryLevelData) Main.createNewWorldData(
-                    settings,
-                    mc_server.worldLoaderContext,
-                    mc_server.worldLoaderContext.datapackDimensions().lookupOrThrow(Registries.LEVEL_STEM),
-                    mc_server.isDemo(),
-                    mc_server.options.has("bonusChest")
-            ).cookie();
-        } else {
-            primaryLevelData = (PrimaryLevelData) LevelStorageSource.getLevelDataAndDimensions(
-                    levelData.dataTag(),
-                    mc_server.worldLoaderContext.dataConfiguration(),
-                    mc_server.worldLoaderContext.datapackDimensions().lookupOrThrow(Registries.LEVEL_STEM),
-                    mc_server.worldLoaderContext.datapackWorldgen()
-            ).worldData();
-        }
-
-        // MC doesn't expose a method to change the seed, relying on Reflection. Otherwise, a dungeon ""Reset"" would generate the same dungeon twice
-        try {
-            Field worldOptionsField = PrimaryLevelData.class.getDeclaredField("worldOptions");
-
-            worldOptionsField.setAccessible(true);
-            worldOptionsField.set(primaryLevelData, primaryLevelData.worldGenOptions().withSeed(java.util.OptionalLong.empty()));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        primaryLevelData.checkName(info.name()); // CraftBukkit - Migration did not rewrite the level.dat; This forces 1.8 to take the last loaded world as respawn (in this case the end)
-        primaryLevelData.setModdedInfo(mc_server.getServerModName(), mc_server.getModdedStatus().shouldReportAsModified());
-
-        mc_server.createLevel(stem, info, levelStorageAccess, primaryLevelData);
-        ServerLevel level = mc_server.getLevel(dungeon_level_key);
-
-        if (level == null) {
-            return logError(context, "Failed to load the level");
-        }
-        mc_server.prepareLevel(level);
-
-        dungeonManager.dungeon_world = Bukkit.getWorld(dungeonWorld.getName());
-
-        generateDungeon(context, size);
         return Command.SINGLE_SUCCESS;
     }
 }

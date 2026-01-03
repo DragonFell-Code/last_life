@@ -9,8 +9,6 @@ import org.json.JSONObject;
 import java.math.BigDecimal;
 
 public class ConfigLocation extends ConfigObject implements JsonSerializable {
-
-
     public double x;
     public double y;
     public double z;
@@ -27,7 +25,6 @@ public class ConfigLocation extends ConfigObject implements JsonSerializable {
         this.pitch = BigDecimal.valueOf(location.getPitch());
         this.world = location.getWorld().getName();
     }
-
 
     /**
      * For JSON deserialization only

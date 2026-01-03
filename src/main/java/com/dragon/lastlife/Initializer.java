@@ -2,10 +2,7 @@ package com.dragon.lastlife;
 
 import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.commands.executor.*;
-import com.dragon.lastlife.listeners.EntityTeleportEventListener;
-import com.dragon.lastlife.listeners.FoxPersistenceListener;
-import com.dragon.lastlife.listeners.LootListener;
-import com.dragon.lastlife.listeners.PlayerListener;
+import com.dragon.lastlife.listeners.*;
 import com.dragon.lastlife.utils.Utils;
 import com.quiptmc.core.QuiptIntegration;
 import com.quiptmc.core.config.ConfigManager;
@@ -27,9 +24,10 @@ public final class Initializer extends JavaPlugin {
     public LootListener LOOT_LISTENER = new LootListener();
     public FoxPersistenceListener FOX_PERSISTENCE_LISTENER = new FoxPersistenceListener();
     public EntityTeleportEventListener ENTITY_TELEPORT_LISTENER = new EntityTeleportEventListener();
+    public InventoryListener INVENTORY_LISTENER = new InventoryListener();
 
     private final List<Listener> listeners = Arrays.asList(
-            PLAYER_LISTENER, LOOT_LISTENER, FOX_PERSISTENCE_LISTENER, ENTITY_TELEPORT_LISTENER
+            PLAYER_LISTENER, LOOT_LISTENER, FOX_PERSISTENCE_LISTENER, ENTITY_TELEPORT_LISTENER, INVENTORY_LISTENER
     );
 
     public void quipt() {
