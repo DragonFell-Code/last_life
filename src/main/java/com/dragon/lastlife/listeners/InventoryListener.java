@@ -4,6 +4,7 @@ import com.dragon.lastlife.utils.Utils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.CompoundContainer;
 import net.minecraft.world.Container;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
@@ -25,31 +26,42 @@ public class InventoryListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventory(InventoryOpenEvent event) {
-        Container container = ((CraftInventory)((CraftInventoryView<?, ?>)event.getView()).getTopInventory()).getInventory();
+        Container container = ((CraftInventory) ((CraftInventoryView<?, ?>) event.getView()).getTopInventory()).getInventory();
 
+        if (event.getPlayer() instanceof CraftHumanEntity craftPlayer) {
+            handleContainer(container, craftPlayer);
+        }
+    }
+
+    private void handleContainer(Container container, CraftHumanEntity craftPlayer) {
         if (container instanceof RandomizableContainerBlockEntity blockEntity) {
-            Level level = blockEntity.getLevel();
+            handleBlockEntity(blockEntity, craftPlayer);
+        } else if (container instanceof CompoundContainer compound) {
+            handleContainer(compound.container1, craftPlayer);
+            handleContainer(compound.container2, craftPlayer);
+        }
+    }
 
-            if (level == null || !level.dimension().location().toString().equals("lastlife:dungeon_dim")) {
-                return;
-            }
-            CraftPersistentDataContainer pdc = blockEntity.persistentDataContainer;
-            if (!pdc.getOrDefault(KEY_DUNGEON_CHEST_MARKER, PersistentDataType.BOOLEAN, false)) {
-                return;
-            }
-            double current_chest_last_total = pdc.getOrDefault(KEY_DUNGEON_CHEST_LAST_DONATION_TOTAL, PersistentDataType.DOUBLE, 0.0);
-            double dungeon_last_total = Utils.configs().DUNGEON_MANAGER.getLastDonationTotalFromMarker();
+    private void handleBlockEntity(RandomizableContainerBlockEntity blockEntity, CraftHumanEntity craftPlayer) {
+        Level level = blockEntity.getLevel();
 
-            // Dungeon total has increased since this chest was last opened
-            if (dungeon_last_total > current_chest_last_total) {
-                if (event.getPlayer() instanceof CraftHumanEntity craftPlayer) {
-                    blockEntity.clearContent();
-                    blockEntity.setLootTable(DUNGEON_LOOT_TABLE);
-                    blockEntity.setLootTableSeed(level.random.nextLong());
-                    blockEntity.unpackLootTable(craftPlayer.getHandle(), true);
-                    pdc.set(KEY_DUNGEON_CHEST_LAST_DONATION_TOTAL, PersistentDataType.DOUBLE, dungeon_last_total);
-                }
-            }
+        if (level == null || !level.dimension().location().toString().equals("lastlife:dungeon_dim")) {
+            return;
+        }
+        CraftPersistentDataContainer pdc = blockEntity.persistentDataContainer;
+        if (!pdc.getOrDefault(KEY_DUNGEON_CHEST_MARKER, PersistentDataType.BOOLEAN, false)) {
+            return;
+        }
+        double current_chest_last_total = pdc.getOrDefault(KEY_DUNGEON_CHEST_LAST_DONATION_TOTAL, PersistentDataType.DOUBLE, 0.0);
+        double dungeon_last_total = Utils.configs().DUNGEON_MANAGER.getLastDonationTotalFromMarker();
+
+        // Dungeon total has increased since this chest was last opened
+        if (dungeon_last_total > current_chest_last_total) {
+            blockEntity.clearContent();
+            blockEntity.setLootTable(DUNGEON_LOOT_TABLE);
+            blockEntity.setLootTableSeed(level.random.nextLong());
+            blockEntity.unpackLootTable(craftPlayer.getHandle(), true);
+            pdc.set(KEY_DUNGEON_CHEST_LAST_DONATION_TOTAL, PersistentDataType.DOUBLE, dungeon_last_total);
         }
     }
 }

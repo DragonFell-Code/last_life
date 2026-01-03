@@ -57,7 +57,6 @@ public class LootManager {
     public static int getDonationLevel() {
         BigDecimal increments = BigDecimal.valueOf(getLobbyID() == 1 ? 1000 : 500);
 
-        return Utils.configs().DONATION_CONFIG().total.divide(increments, RoundingMode.DOWN).intValue();
+        return Utils.configs().DONATION_CONFIG().total.divide(increments, RoundingMode.DOWN).intValue() + 1;
     }
-
 }

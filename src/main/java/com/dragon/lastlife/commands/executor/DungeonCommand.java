@@ -66,12 +66,15 @@ public class DungeonCommand extends CommandExecutor {
                     if (spawn_location == null) {
                         return logError(context, "Failed to locate labyrinth spawn point - is the labyrinth generated ?");
                     }
+                    if (dungeonManager.generating) {
+                        return logError(context, "The labyrinth has not finished generating");
+                    }
 
                     // Add a custom marker to TP in the dimension
                     dungeonManager.dungeon_world.spawn(spawn_location, Marker.class, marker -> {
                         marker.customName(Component.text(PLAYER_SPAWN_MARKER_NAME));
                     });
-                    dungeonManager.registerDonationTotalOnMarker(); // Reset donation total to the actual value on dungeon opening
+                    dungeonManager.handleNewDonationTotal(); // Reset donation total to the actual value on dungeon opening
 
                     Title.Times times = Title.Times.times(Ticks.duration(10), Duration.ofSeconds(5), Ticks.duration(20));
                     Component message = configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.open");

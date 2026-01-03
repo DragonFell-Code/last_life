@@ -168,7 +168,7 @@ public class InventorySnapshot {
             }
         }
 
-        event.setKeepInventory(false);
+        // event.setKeepInventory(false);
     }
 
     public static void forceApplyInventorySnapshot(ServerPlayer player) {

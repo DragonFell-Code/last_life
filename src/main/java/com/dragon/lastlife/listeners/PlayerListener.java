@@ -127,6 +127,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent e) {
         TaskScheduler.scheduleAsyncTask(() -> Utils.configs().PARTICIPANT_CONFIG().get(e.getPlayer().getUniqueId()).sync(), 500, TimeUnit.MILLISECONDS);
-        e.getPlayer().sendMessage(Utils.configs().MESSAGE_CONFIG.parse(text("Welcome to Last Life!", NamedTextColor.GOLD)));
+        e.getPlayer().sendMessage(text("Welcome to Last Life!", NamedTextColor.GOLD));
     }
 }

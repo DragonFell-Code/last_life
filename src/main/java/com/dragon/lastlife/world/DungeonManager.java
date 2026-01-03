@@ -81,7 +81,7 @@ public class DungeonManager {
 
         dungeonWorld.getPlayers().forEach(player -> {
             player.teleport(exit);
-            InventorySnapshot.forceApplyInventorySnapshot(((CraftPlayer)player).getHandle());
+            InventorySnapshot.forceApplyInventorySnapshot(((CraftPlayer) player).getHandle());
         });
     }
 
@@ -123,6 +123,7 @@ public class DungeonManager {
         Dungeon dungeon = new Dungeon(dungeon_world, this, pos);
         BiConsumer<Dungeon, String> parentCallback = (newDungeon, error) -> {
             generating = false;
+            handleNewDonationTotal(); // Save initial donation total
             callback.accept(newDungeon, error);
         };
 
@@ -132,7 +133,6 @@ public class DungeonManager {
         try {
             generating = true;
             dungeon.generate(parentCallback, size);
-            registerDonationTotalOnMarker(); // Save initial donation total
         } catch (Exception e) {
             String error = "Failed to generate labyrinth structure";
             initializer.getLogger().severe(error + ": " + e.getMessage());
@@ -222,12 +222,6 @@ public class DungeonManager {
         dungeon_world = Bukkit.getWorld(dungeon_world.getName());
     }
 
-    public void registerDonationTotalOnMarker() {
-        double total = Utils.configs().DONATION_CONFIG().total.doubleValue();
-
-        this.registerDonationTotalOnMarker(total);
-    }
-
     public void registerDonationTotalOnMarker(double total) {
         getMarker(SPAWN_MARKER_NAME).ifPresent(marker -> {
             marker.getPersistentDataContainer().set(KEY_DUNGEON_CHEST_LAST_DONATION_TOTAL, PersistentDataType.DOUBLE, total);
@@ -248,18 +242,12 @@ public class DungeonManager {
         double total = Utils.configs().DONATION_CONFIG().total.doubleValue();
         double currentTotal = getLastDonationTotalFromMarker();
 
-        if (currentTotal == 0) {
-            registerDonationTotalOnMarker(total);
-        } else {
-            double difference = total - currentTotal;
+        if (total >= currentTotal + CHEST_REFRESH_DONATION_INCREMENT) {
+            // Make sure we don't eat the reminder. If user donates 99$ we should refresh once,
+            // but only increase our total by 50$, so we only need another 1$ to get to the next refresh
+            double newTotal = total - (total % CHEST_REFRESH_DONATION_INCREMENT);
 
-            if (difference >= CHEST_REFRESH_DONATION_INCREMENT) {
-                // Make sure we don't eat the reminder. If user donates 99$ we should refresh once,
-                // but only increase our total by 50$, so we only need another 1$ to get to the next refresh
-                double newTotal = currentTotal + (difference - (difference % CHEST_REFRESH_DONATION_INCREMENT));
-
-                registerDonationTotalOnMarker(newTotal);
-            }
+            registerDonationTotalOnMarker(newTotal);
         }
     }
 
