@@ -88,6 +88,8 @@ public class MessageUtils {
         register("lastlife.boogey.cured", text("You've been cured! You are no longer a boogeyman.", NamedTextColor.GREEN));
         register("lastlife.boogey.set", text("You are now a boogeyman!", NamedTextColor.RED));
 
+        register("lastlife.dungeon.chests_reset", text("The Labyrinth chests have been refilled !", NamedTextColor.GREEN));
+
         register("lastlife.cmd.life.view", text("[0]'s lives: [1]", NamedTextColor.YELLOW));
         register("lastlife.cmd.life.set", text("Set [0]'s lives to [1].", NamedTextColor.GREEN));
 

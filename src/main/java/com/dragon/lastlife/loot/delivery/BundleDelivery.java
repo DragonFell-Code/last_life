@@ -13,6 +13,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 
+import java.util.HashMap;
 import java.util.Random;
 
 public class BundleDelivery extends DeliverySystem {
@@ -83,7 +84,11 @@ public class BundleDelivery extends DeliverySystem {
         Chest chest = (Chest) location.getBlock().getState();
         ItemStack bundle = LootManager.generateBundle(participant);
 
-        chest.getBlockInventory().addItem(bundle);
+        HashMap<Integer, ItemStack> failed = chest.getBlockInventory().addItem(bundle);
+
+        if (!failed.isEmpty()) {
+            location.getWorld().dropItem(location, bundle).setUnlimitedLifetime(true);
+        }
         if (display != null) {
             try {
                 display.remove();
