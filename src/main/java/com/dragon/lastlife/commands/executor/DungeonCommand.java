@@ -74,7 +74,7 @@ public class DungeonCommand extends CommandExecutor {
                     dungeonManager.dungeon_world.spawn(spawn_location, Marker.class, marker -> {
                         marker.customName(Component.text(PLAYER_SPAWN_MARKER_NAME));
                     });
-                    dungeonManager.handleNewDonationTotal(); // Reset donation total to the actual value on dungeon opening
+                    dungeonManager.handleNewDonationTotal(false); // Reset donation total to the actual value on dungeon opening
 
                     Title.Times times = Title.Times.times(Ticks.duration(10), Duration.ofSeconds(5), Ticks.duration(20));
                     Component message = configs.MESSAGE_CONFIG.get("lastlife.cmd.dungeon.open");
