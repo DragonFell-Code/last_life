@@ -116,7 +116,7 @@ public class DonationFlutter implements Flutter {
         }
 
         Bukkit.getScheduler().runTask(Utils.initializer(), () -> handleResults(results));
-        Utils.configs().DUNGEON_MANAGER.handleNewDonationTotal();
+        Utils.configs().DUNGEON_MANAGER.handleNewDonationTotal(true);
 
         if (WebhookManager.get("donations") != null) {
             int batchSize = 10;

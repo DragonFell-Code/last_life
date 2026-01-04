@@ -36,6 +36,7 @@ import java.util.Optional;
 
 import static net.minecraft.world.entity.player.Inventory.EQUIPMENT_SLOT_MAPPING;
 import static net.minecraft.world.entity.player.Inventory.INVENTORY_SIZE;
+import static org.bukkit.persistence.PersistentDataType.BYTE_ARRAY;
 import static org.bukkit.persistence.PersistentDataType.STRING;
 
 public class InventorySnapshot {
@@ -77,7 +78,7 @@ public class InventorySnapshot {
             DataOutputStream output = new DataOutputStream(stream);
             try {
                 NbtIo.write(result, output);
-                player.getPersistentDataContainer().set(INVENTORY_SNAPSHOT, STRING, stream.toString());
+                player.getPersistentDataContainer().set(INVENTORY_SNAPSHOT, BYTE_ARRAY, stream.toByteArray());
             } catch (IOException e) {
                 Utils.initializer().getComponentLogger().error("Failed to write CompundTag: ", e);
             }
@@ -187,13 +188,13 @@ public class InventorySnapshot {
 
     private static SimpleContainer getInventorySnapshot(ServerPlayer player) {
         CraftPlayer craftPlayer = player.getBukkitEntity();
-        String data = craftPlayer.getPersistentDataContainer().get(INVENTORY_SNAPSHOT, STRING);
+        byte[] data = craftPlayer.getPersistentDataContainer().get(INVENTORY_SNAPSHOT, BYTE_ARRAY);
         if (data == null) {
             return null;
         }
 
         try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(player.problemPath(), Utils.initializer().getSLF4JLogger())) {
-            DataInputStream input = new DataInputStream(new ByteArrayInputStream(data.getBytes()));
+            DataInputStream input = new DataInputStream(new ByteArrayInputStream(data));
             CollectToTag tag = new CollectToTag();
             NbtIo.parse(input, tag, NbtAccounter.create(104857600L));
             SimpleContainer container = new SimpleContainer(EQUIPMENT_SLOT_MAPPING.size() + INVENTORY_SIZE);

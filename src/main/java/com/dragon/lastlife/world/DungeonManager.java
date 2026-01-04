@@ -123,7 +123,7 @@ public class DungeonManager {
         Dungeon dungeon = new Dungeon(dungeon_world, this, pos);
         BiConsumer<Dungeon, String> parentCallback = (newDungeon, error) -> {
             generating = false;
-            handleNewDonationTotal(); // Save initial donation total
+            handleNewDonationTotal(false); // Save initial donation total
             callback.accept(newDungeon, error);
         };
 
@@ -234,9 +234,9 @@ public class DungeonManager {
         }).orElse(0.0);
     }
 
-    public void handleNewDonationTotal() {
+    public void handleNewDonationTotal(boolean notify_players) {
         if (!Bukkit.isPrimaryThread()) {
-            Bukkit.getScheduler().runTask(initializer, this::handleNewDonationTotal);
+            Bukkit.getScheduler().runTask(initializer, () -> handleNewDonationTotal(notify_players));
             return;
         }
         double total = Utils.configs().DONATION_CONFIG().total.doubleValue();
@@ -248,6 +248,13 @@ public class DungeonManager {
             double newTotal = total - (total % CHEST_REFRESH_DONATION_INCREMENT);
 
             registerDonationTotalOnMarker(newTotal);
+            if (notify_players) {
+                Component message = Utils.configs().MESSAGE_CONFIG.get("lastlife.dungeon.chests_reset");
+
+                Bukkit.broadcast(message);
+                // Having a sound effect could be cool
+                // Bukkit.getServer().playSound(Sound.sound(Key.key("entity.player.levelup"), Sound.Source.MASTER, 0.5F, 1));
+            }
         }
     }
 
