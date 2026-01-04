@@ -160,7 +160,7 @@ public class DonationFlutter implements Flutter {
                         }
                     }
                     case BUNDLE_LOOT -> {
-                        Utils.genericWebhook("donations", new Color(0x85FF00), "Bundle Delivery", null, "A donation to " + participant.player().getName() + " has delivered a bundle of loot!");
+                        Utils.genericWebhook("donations", new Color(0xE26922), "Bundle Delivery", null, "A donation to " + participant.player().getName() + " has delivered a bundle of loot!");
                         for (Party party : Utils.configs().PARTY_CONFIG().parties.values()) {
                             party.deliver(participant);
                         }
@@ -173,12 +173,12 @@ public class DonationFlutter implements Flutter {
                             location.add(0, 1, 0);
                         new ShulkerDelivery(location).start();
                         String msg = "A donation to " + participant.player().getName() + " has spawned a shulker delivery at the " + configLocation.id() + " POI!";
-                        Utils.genericWebhook("donations", new Color(0x85FF00), "Shulker Delivery", null, msg);
+                        Utils.genericWebhook("donations", new Color(0x1471A5), "Shulker Delivery", null, msg);
                         Bukkit.broadcast(Component.text(msg, NamedTextColor.GREEN));
                     }
                     case BOOGEYMAN -> {
                         Utils.configs().PARTICIPANT_CONFIG().boogeymen().queue();
-                        Utils.genericWebhook("boogeymen", new Color(0xFFD738), "Boogeyman Queue", null, "A donation to " + participant.player().getName() + " has added 1 participant to the boogeyman queue!");
+                        Utils.genericWebhook("boogey", new Color(0xFFD738), "Boogeyman Queue", null, "A donation to " + participant.player().getName() + " has added 1 participant to the boogeyman queue!");
                         Utils.initializer().integration().log("Donation", participant.player().getName() + " received a donation on their boogeyman incentive.");
                     }
                 }
