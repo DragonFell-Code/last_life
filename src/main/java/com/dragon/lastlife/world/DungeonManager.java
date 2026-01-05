@@ -5,6 +5,7 @@ import com.dragon.lastlife.loot.LootManager;
 import com.dragon.lastlife.players.InventorySnapshot;
 import com.dragon.lastlife.utils.Utils;
 import io.papermc.paper.world.PaperWorldLoader;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -26,7 +27,6 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

@@ -112,6 +112,8 @@ public class ParticipantConfig extends Config {
             queued_boogeymen = 0;
             while (selected.size() < amount) {
                 attempts++;
+                // TODO: Instead of running 100 attempts of randomly selecting a player, filter the list first to remove players we can't select (like dead / admins)
+                // Then Shuffle the list of remaining players, and take the first X. Or generate X random indexes and .remove() from list after selected.
                 if (attempts > 100) {
                     Utils.initializer().integration().warn("BoogeymenManager", "Failed to select boogeyman after 100 attempts. Selected " + selected.size() + " out of " + amount);
                     break;
@@ -133,12 +135,10 @@ public class ParticipantConfig extends Config {
             countdown(selected);
         }
 
-
         private void countdown(List<Participant> selected) {
             String key = selected.size() != 1 ? "lastlife.boogey.roll.multiple" : "lastlife.boogey.roll";
             Bukkit.broadcast(Utils.configs().MESSAGE_CONFIG.get(key, String.valueOf(selected.size())));
             Bukkit.getScheduler().runTaskLater(Utils.initializer(), new Runnable() {
-
                 int seconds_remaining = 4;
 
                 //Cheat Sheet:
@@ -178,11 +178,9 @@ public class ParticipantConfig extends Config {
                     } else {
                         for (Participant participant : selected) {
                             setBoogey(participant, true);
-
                         }
                         save();
                     }
-
                 }
             }, 20L);
         }
@@ -197,13 +195,10 @@ public class ParticipantConfig extends Config {
                     player.playSound(player.getLocation(), "minecraft:entity.endermen.teleport", 100, 1);
                     if (participant.settings.get("boogey_message").value().equalsIgnoreCase("true"))
                         player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.set", player.getName(), participant.boogey));
-
                 }
                 if (WebhookManager.get("boogey") != null)
                     Utils.genericWebhook("boogey", new Color(0xD27330), "Boogeyman Selected!", "https://mc-heads.net/head/" + participant.id + "/left.png", participant.player().getName() + " has been selected as a boogeyman!");
-
             } else {
-
                 if (player != null) {
                     player.sendMessage(Utils.configs().MESSAGE_CONFIG.get("lastlife.boogey.cured"));
                     player.playSound(player.getLocation(), "minecraft:entity.endermen.teleport", 100, 1);

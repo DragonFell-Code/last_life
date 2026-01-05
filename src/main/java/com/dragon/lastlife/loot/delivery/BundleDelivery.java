@@ -15,6 +15,7 @@ import org.bukkit.util.EulerAngle;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Level;
 
 public class BundleDelivery extends DeliverySystem {
 
@@ -33,7 +34,6 @@ public class BundleDelivery extends DeliverySystem {
             display.setMarker(true);
             display.setInvisible(true);
             display.setInvulnerable(true);
-
     }
 
     @Override
@@ -41,11 +41,9 @@ public class BundleDelivery extends DeliverySystem {
         ItemStack itemStack = new ItemStack(Material.CHEST);
         display.getEquipment().setHelmet(itemStack);
         super.start();
-
     }
 
     public void tick() {
-
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < 10; j++)
                 location.getWorld().spawnParticle(Particle.END_ROD, location.x(), location.y() + Math.min(i * new Random().nextDouble(), height), location.z(), 1, 0, 0, 0, 0);
@@ -92,7 +90,8 @@ public class BundleDelivery extends DeliverySystem {
         if (display != null) {
             try {
                 display.remove();
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                Utils.initializer().getLogger().log(Level.WARNING, "Failed to remove entity", e);
             }
             display = null;
         }
