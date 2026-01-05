@@ -164,13 +164,12 @@ public class ParticipantConfig extends Config {
                         } else if (seconds_remaining == 1) {
                             player.showTitle(Title.title(text("You are...", color), text(""), 5, 10, 5));
                         } else if (seconds_remaining == 0) {
-                            if (selected.stream().anyMatch(p -> p.id.equals(player.getUniqueId().toString()))) {
+                            if (selected.stream().anyMatch(p -> p.id.equals(participant.id))) {
                                 player.showTitle(Title.title(text("The Boogeyman.", NamedTextColor.RED), text(""), 5, 10, 20));
                             } else {
                                 player.showTitle(Title.title(text("NOT the Boogeyman.", NamedTextColor.GREEN), text(""), 5, 10, 20));
                             }
                         }
-
                     }
                     if (seconds_remaining >= 0) {
                         seconds_remaining--;

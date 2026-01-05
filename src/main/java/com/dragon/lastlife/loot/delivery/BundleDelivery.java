@@ -67,8 +67,7 @@ public class BundleDelivery extends DeliverySystem {
 
         ticks = ticks + 1;
         height = height - 0.25;
-        if (height < 0) stop();
-        if (System.currentTimeMillis() - started >= MAX_DURATION) stop();
+        if (height < 0 || System.currentTimeMillis() - started >= MAX_DURATION) stop();
     }
 
     @Override
