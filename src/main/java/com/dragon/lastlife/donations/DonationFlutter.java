@@ -152,7 +152,6 @@ public class DonationFlutter implements Flutter {
     }
 
     private void finalizeResults(List<Donation.ProcessResult<?>> results){
-        config().donations = config().donations + results.size();
         Bukkit.getScheduler().runTask(Utils.initializer(), () -> handleResults(results));
 
         if (WebhookManager.get("donations") != null) {
