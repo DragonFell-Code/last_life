@@ -62,6 +62,7 @@ public class DonationFlutter implements Flutter {
 
     public void etag(String etag){
         GET = HttpConfig.defaults(HttpHeaders.ETAG(etag));
+        config().etag = etag;
     }
 
     public void validateDonations() {
