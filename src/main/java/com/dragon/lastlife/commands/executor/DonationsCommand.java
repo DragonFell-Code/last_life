@@ -38,6 +38,23 @@ public class DonationsCommand extends CommandExecutor {
                 .executes(context -> showUsage(context, ""))
                 .then(literal("test")
                         .executes(a -> 1)
+                        .then(literal("validate")
+                                .executes(context -> {
+                                    if (!context.getSource().getSender().hasPermission("lastlife.admin"))
+                                        return logError(context, "You do not have permission to use this command.");
+                                    context.getSource().getSender().sendMessage(Component.text("Validating donations... Please wait this may take a couple minutes.", NamedTextColor.GREEN));
+                                    Utils.donations().validateDonations();
+                                    return 1;
+                                }))
+                        .then(literal("refresh")
+                                .executes(context -> {
+                                    if (!context.getSource().getSender().hasPermission("lastlife.admin"))
+                                        return logError(context, "You do not have permission to use this command.");
+                                    context.getSource().getSender().sendMessage(Component.text("Refreshing donations.", NamedTextColor.GREEN));
+                                    Utils.donations().refresh();
+                                    return 1;
+
+                                }))
                         .then(literal("fox")
                                 .executes(context -> {
                                     if (!(context.getSource().getSender() instanceof Player player))

@@ -24,6 +24,8 @@ import static net.kyori.adventure.text.Component.text;
 
 public class Utils {
 
+
+    private static DonationFlutter DONATION_FLUTTER;
     private static final Flutter SAVE_FLUTTER = new Flutter() {
         private long lastHeartbeat = 0;
         private long delay = TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES);
@@ -75,7 +77,8 @@ public class Utils {
             Heartbeat heartbeat = HeartbeatUtils.init(initializer().integration());
 
             heartbeat.flutter(SAVE_FLUTTER);
-            heartbeat.flutter(new DonationFlutter(configs().DONATION_CONFIG()));
+            DONATION_FLUTTER = new DonationFlutter(configs().DONATION_CONFIG());
+            heartbeat.flutter(DONATION_FLUTTER);
             heartbeat.flutter(new BoogeyFlutter());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -110,5 +113,9 @@ public class Utils {
 
         }
         WebhookManager.send(channelName, builder.build());
+    }
+
+    public static DonationFlutter donations() {
+        return DONATION_FLUTTER;
     }
 }

@@ -55,23 +55,23 @@ public class Donation extends ConfigObject {
         if (incentiveID != null && !incentiveID.isEmpty()) {
             if (participant != null) {
                 if (incentiveID.equals(participant.incentive_life)) {
-                    return new ProcessResult<>(IncentiveType.LIFE, participant);
+                    return new ProcessResult<>(IncentiveType.LIFE, embed(), participant);
                 }
                 if (incentiveID.equals(participant.incentive_boogey)) {
-                    return new ProcessResult<>(IncentiveType.BOOGEYMAN, participant);
+                    return new ProcessResult<>(IncentiveType.BOOGEYMAN, embed(), participant);
                 }
                 if (incentiveID.equals(participant.incentive_bundle_loot)) {
-                    return new ProcessResult<>(IncentiveType.BUNDLE_LOOT, participant);
+                    return new ProcessResult<>(IncentiveType.BUNDLE_LOOT, embed(), participant);
                 }
                 if (incentiveID.equals(participant.incentive_shulker_loot)) {
-                    return new ProcessResult<>(IncentiveType.SHULKER_LOOT, participant);
+                    return new ProcessResult<>(IncentiveType.SHULKER_LOOT, embed(), participant);
                 }
             } else {
                 Utils.initializer().integration().log("Donation", "Participant with ID " + participantID + " not found for donation incentive.");
             }
-            return new ProcessResult<>(IncentiveType.NONE, participant);
+            return new ProcessResult<>(IncentiveType.NONE, embed(), participant);
         }
-        return new ProcessResult<>(IncentiveType.NONE, participant);
+        return new ProcessResult<>(IncentiveType.NONE, embed(), participant);
 
     }
 
@@ -116,7 +116,7 @@ public class Donation extends ConfigObject {
         }
     }
 
-    public record ProcessResult<T>(IncentiveType type, T payload) {
+    public record ProcessResult<T>(IncentiveType type, Embed embed, T payload) {
 
     }
 }
