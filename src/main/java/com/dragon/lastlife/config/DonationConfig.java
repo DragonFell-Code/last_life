@@ -58,7 +58,7 @@ public class DonationConfig extends Config {
                 .toFormatter();
 
         long donationEpoch = OffsetDateTime.parse(utcString, formatter).toInstant().toEpochMilli();
-        if (last_bucket > donationEpoch)
+        if (last_bucket < donationEpoch)
             last_bucket = donationEpoch;
         return result;
     }

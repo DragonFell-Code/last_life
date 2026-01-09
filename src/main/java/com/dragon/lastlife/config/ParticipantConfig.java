@@ -125,8 +125,9 @@ public class ParticipantConfig extends Config {
                 if (selected.contains(participant)) continue;
                 if (participant.boogey) continue;
                 if (participant.player() == null) continue;
-                if (participant.player().getPlayer() == null) continue;
-                if (!participant.player().getPlayer().getGameMode().equals(GameMode.SURVIVAL)) continue;
+                Player player = participant.player().getPlayer();
+                if (player == null) continue;
+                if (!player.getGameMode().equals(GameMode.SURVIVAL)) continue;
                 //todo add checks for if they are online, not modded, and haven't won in the last 7 days [ai]
                 selected.add(participant);
             }
