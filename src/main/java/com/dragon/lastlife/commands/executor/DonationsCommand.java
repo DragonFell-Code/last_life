@@ -127,7 +127,7 @@ public class DonationsCommand extends CommandExecutor {
                         .then(literal("shulker").executes(context -> {
                             if (!context.getSource().getSender().hasPermission("lastlife.admin"))
                                 return logError(context, "You do not have permission to use this command.");
-                            DonationFlutter.shulkerLoot();
+                            ConfigLocation configLocation = DonationFlutter.shulkerLoot();
                             String msg = "A donation to (null) has spawned a shulker delivery at the " + configLocation.id() + " POI!";
                             Utils.genericWebhook("donations", new Color(0x85FF00), "Shulker Delivery", null, msg);
                             Bukkit.broadcast(Component.text(msg, NamedTextColor.GREEN));
