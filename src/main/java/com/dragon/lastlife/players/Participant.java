@@ -107,6 +107,7 @@ public class Participant extends ConfigObject {
 
     public void color(NamedTextColor color) {
         Player player = player().getPlayer();
+
         if (player != null && player.isOnline()) {
             Component value = text(player.getName(), color);
             player.displayName(value);

@@ -9,6 +9,10 @@ import com.quiptmc.core.config.ConfigValue;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 
 @ConfigTemplate(name = "donations", ext = ConfigTemplate.Extension.JSON)
 public class DonationConfig extends Config {
@@ -21,9 +25,6 @@ public class DonationConfig extends Config {
 
     @ConfigValue
     public int team_id = 69005;
-
-    @ConfigValue
-    public int donations = 0;
 
     @ConfigValue
     public BigDecimal total = BigDecimal.valueOf(0.0);
@@ -44,11 +45,25 @@ public class DonationConfig extends Config {
     public Donation.ProcessResult<?> process(Donation donation) {
         Donation.ProcessResult<?> result = donation.process();
         processed.put(donation);
-        total = BigDecimal.valueOf(total.doubleValue() + donation.amount);
+        total = total.add(BigDecimal.valueOf(donation.amount));
+        String utcString = donation.createdDateUTC;
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                .appendFraction(ChronoField.MILLI_OF_SECOND, 0, 3, true) // min 0, max 3 digits, prefixed with decimal point
+                .appendPattern("Z")
+                .toFormatter();
+
+        long donationEpoch = OffsetDateTime.parse(utcString, formatter).toInstant().toEpochMilli();
+        if (last_bucket < donationEpoch)
+            last_bucket = donationEpoch;
         return result;
     }
 
     public boolean processed(Donation donation) {
         return processed.contains(donation.id);
+    }
+
+    public int donations(){
+        return processed.size();
     }
 }

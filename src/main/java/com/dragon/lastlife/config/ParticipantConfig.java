@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
@@ -124,6 +125,9 @@ public class ParticipantConfig extends Config {
                 if (selected.contains(participant)) continue;
                 if (participant.boogey) continue;
                 if (participant.player() == null) continue;
+                Player player = participant.player().getPlayer();
+                if (player == null) continue;
+                if (!player.getGameMode().equals(GameMode.SURVIVAL)) continue;
                 //todo add checks for if they are online, not modded, and haven't won in the last 7 days [ai]
                 selected.add(participant);
             }
