@@ -46,6 +46,7 @@ public class DungeonManager {
     public static final NamespacedKey KEY_DUNGEON_CHEST_MARKER = new NamespacedKey(Utils.initializer(), "is_dungeon_chest");
     // These coordinates are always the same, because of how the dungeon is generated in the custom dimension
     static Location dungeonSpawn = new Location(null, 0, 271, 0);
+    static Dungeon dungeon = null;
 
     public World dungeon_world;
     Initializer initializer;
@@ -120,7 +121,7 @@ public class DungeonManager {
 
         size = Math.clamp(size, 1, MAX_DUNGEON_SIZE);
         ChunkPos pos = new ChunkPos(dungeonSpawn.getBlockX() >> 4, dungeonSpawn.getBlockZ() >> 4);
-        Dungeon dungeon = new Dungeon(dungeon_world, this, pos);
+         dungeon = new Dungeon(dungeon_world, this, pos);
         BiConsumer<Dungeon, String> parentCallback = (newDungeon, error) -> {
             generating = false;
             handleNewDonationTotal(false); // Save initial donation total
@@ -220,6 +221,11 @@ public class DungeonManager {
         mc_server.prepareLevel(level);
 
         dungeon_world = Bukkit.getWorld(dungeon_world.getName());
+        dungeon = null;
+    }
+
+    public Dungeon getDungeon() {
+        return dungeon;
     }
 
     public void registerDonationTotalOnMarker(double total) {
@@ -248,7 +254,7 @@ public class DungeonManager {
             double newTotal = total - (total % CHEST_REFRESH_DONATION_INCREMENT);
 
             registerDonationTotalOnMarker(newTotal);
-            if (notify_players) {
+            if (notify_players && dungeon != null) {
                 Component message = Utils.configs().MESSAGE_CONFIG.get("lastlife.dungeon.chests_reset");
 
                 Bukkit.broadcast(message);

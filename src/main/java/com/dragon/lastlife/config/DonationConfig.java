@@ -27,9 +27,6 @@ public class DonationConfig extends Config {
     public int team_id = 69005;
 
     @ConfigValue
-    public int donations = 0;
-
-    @ConfigValue
     public BigDecimal total = BigDecimal.valueOf(0.0);
 
     @ConfigValue
@@ -49,7 +46,6 @@ public class DonationConfig extends Config {
         Donation.ProcessResult<?> result = donation.process();
         processed.put(donation);
         total = total.add(BigDecimal.valueOf(donation.amount));
-        donations = donations + 1;
         String utcString = donation.createdDateUTC;
         DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
@@ -65,5 +61,9 @@ public class DonationConfig extends Config {
 
     public boolean processed(Donation donation) {
         return processed.contains(donation.id);
+    }
+
+    public int donations(){
+        return processed.size();
     }
 }

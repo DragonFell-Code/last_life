@@ -27,8 +27,9 @@ public class BundleDelivery extends DeliverySystem {
     private double height = 20;
 
     public BundleDelivery(Party party, Participant participant) {
-        this.location = party.mailbox().clone().add(0.5, 1, 0.5);
+        this.location = party.mailbox().getBlock().getLocation().clone().add(0.5, 1, 0.5);
         this.participant = participant;
+        location.getChunk().load(true);
             display = location.getWorld().spawn(location, ArmorStand.class);
             display.setGravity(false);
             display.setMarker(true);
@@ -44,6 +45,8 @@ public class BundleDelivery extends DeliverySystem {
     }
 
     public void tick() {
+        location.getChunk().load(false);
+
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < 10; j++)
                 location.getWorld().spawnParticle(Particle.END_ROD, location.x(), location.y() + Math.min(i * new Random().nextDouble(), height), location.z(), 1, 0, 0, 0, 0);

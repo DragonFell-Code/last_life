@@ -27,6 +27,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -43,6 +44,7 @@ public class DonationFlutter implements Flutter {
     private HttpConfig GET;
     private long LAST_HEARTBEAT = 0;
     private boolean validated = false;
+    private final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS").withZone(ZoneOffset.UTC);
 
     public DonationFlutter(DonationConfig config) {
         if (config == null) {
@@ -55,12 +57,12 @@ public class DonationFlutter implements Flutter {
 
     }
 
-    public void refresh(){
+    public void refresh() {
         etag("null");
         LAST_HEARTBEAT = 0;
     }
 
-    public void etag(String etag){
+    public void etag(String etag) {
         GET = HttpConfig.defaults(HttpHeaders.ETAG(etag));
         config().etag = etag;
     }
@@ -87,14 +89,15 @@ public class DonationFlutter implements Flutter {
         int batchSize = donationsJson.length();
         overdraw = overdraw + batchSize;
         numDonations = numDonations - batchSize;
-        Utils.initializer().integration().log("DonationFlutter DEBUG", "Batch size: " + batchSize);
-        Utils.initializer().integration().log("DonationFlutter DEBUG", "New Overdraw: " + overdraw);
-        Utils.initializer().integration().log("DonationFlutter DEBUG", "New NumDonations: " + numDonations);
+        Utils.initializer().integration().logger().debug("DonationFlutter", "Batch size: " + batchSize);
+        Utils.initializer().integration().logger().debug("DonationFlutter", "New Overdraw: " + overdraw);
+        Utils.initializer().integration().logger().debug("DonationFlutter", "New NumDonations: " + numDonations);
 
-        processArray(donationsJson);
+        List<Donation.ProcessResult<?>> results = processArray(donationsJson);
+        finalizeResults(results);
 
         if (numDonations > 0) {
-            Utils.initializer().integration().log("DonationFlutter DEBUG", "Validation Incomplete. Continuing...");
+            Utils.initializer().integration().log("DonationFlutter", "Validation Incomplete. Continuing...");
             int finalNumDonations = numDonations;
             int finalOverdraw = overdraw;
             TaskScheduler.scheduleAsyncTask(() -> validateLoop(finalNumDonations, finalOverdraw), config().seconds_per_check, TimeUnit.SECONDS);
@@ -119,17 +122,16 @@ public class DonationFlutter implements Flutter {
                 Utils.initializer().integration().log("DonationFlutter", "Processed donation: " + donation.donationID);
                 results.add(result);
             }
-
-
         }
         return results;
     }
 
     private void processLoop() {
-        Instant instant = Instant.ofEpochMilli(config().last_bucket);
+        Instant instant = Instant.ofEpochMilli(config().last_bucket - TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES));
 
         // The default toString() format of Instant is an ISO-8601 UTC string (e.g., 2024-02-20T16:00:26.969Z)
-        String utcString = instant.toString();
+        String utcString = FORMATTER.format(instant) + "+0000";
+        Utils.initializer().integration().log("DonationFlutter", "Last bucket: " + utcString);
         String url = config().api_endpoint + "teams/" + config().team_id + "/donations?where=" + URLEncoder.encode("createdDateUTC >= '" + utcString + "'", StandardCharsets.UTF_8);
         HttpResponse<String> donationsResponse = NetworkUtils.get(NetworkUtils.DEFAULT, url);
         JSONArray donationsJson = new JSONArray(donationsResponse.body());
@@ -147,15 +149,16 @@ public class DonationFlutter implements Flutter {
         finalizeResults(results);
 
 
-
-        Utils.initializer().integration().log("DonationFlutter", "Total donations: " + config().donations);
+        Utils.initializer().integration().log("DonationFlutter", "Total processed donations: " + config().donations());
         config().save();
     }
 
-    private void finalizeResults(List<Donation.ProcessResult<?>> results){
+    private void finalizeResults(List<Donation.ProcessResult<?>> results) {
+        Utils.initializer().integration().log("DonationFlutter", "Finalizing " + results.size() + " new donations.");
         Bukkit.getScheduler().runTask(Utils.initializer(), () -> handleResults(results));
 
         if (WebhookManager.get("donations") != null) {
+            Utils.initializer().integration().log("DonationFlutter", "Sending Discord Webhook(s)");
             int webhookBatchSize = 10;
             int totalEmbeds = results.size();
             int batches = (int) Math.ceil(totalEmbeds / (double) webhookBatchSize);
@@ -200,12 +203,15 @@ public class DonationFlutter implements Flutter {
                 return true; // No new donations continue running
             }
             String etag = response.headers().firstValue("etag").orElse("");
-            if (etag.equals(config().etag)) return true;
+            if (etag.equals(config().etag)) {
+                System.out.println("etag unchanged");
+                return true;
+            }
             etag(etag);
             JSONObject teamData = new JSONObject(response.body());
             int allDonations = teamData.getInt("numDonations");
-            if (config().donations >= allDonations) return true;
-            int diff = allDonations - config().donations;
+            if (config().donations() >= allDonations) return true;
+            int diff = allDonations - config().donations();
             Utils.initializer().integration().log("DonationFlutter", "New donations available: " + (diff));
             processLoop();
         } catch (Exception e) {
@@ -214,52 +220,6 @@ public class DonationFlutter implements Flutter {
 
         return true; // Continue running
     }
-
-//    private void sync(int diff) {
-//        String url = config().api_endpoint + "teams/" + config().team_id + "/donations?limit=" + (diff) + (offset > 0 ? "&offset=" + (offset + 1) : "");
-//        HttpResponse<String> donationsResponse = NetworkUtils.get(NetworkUtils.DEFAULT, url);
-//        if (donationsResponse.statusCode() != 200 && donationsResponse.statusCode() != 304) {
-//            Utils.initializer().integration().log("DonationFlutter", "Failed to fetch donations: " + donationsResponse.statusCode() + " - " + donationsResponse.body());
-//            return;
-//        }
-//
-//        JSONArray donationsArray = new JSONArray(donationsResponse.body());
-//        List<Donation.ProcessResult<?>> results = processArray(donationsArray);
-//
-//        if (!results.isEmpty()) {
-//            Utils.configs().DONATION_CONFIG().save();
-//        } else {
-//
-//        }
-//
-//        Bukkit.getScheduler().runTask(Utils.initializer(), () -> handleResults(results));
-//
-//        if (WebhookManager.get("donations") != null) {
-//            int batchSize = 10;
-//            int totalEmbeds = embedArray.length();
-//            int batches = (int) Math.ceil(totalEmbeds / (double) batchSize);
-//
-//            for (int batchIndex = 0; batchIndex < batches; batchIndex++) {
-//                int startIndex = batchIndex * batchSize;
-//                int endIndex = Math.min(startIndex + batchSize, totalEmbeds);
-//
-//                JSONArray batchArray = new JSONArray();
-//                for (int i = startIndex; i < endIndex; i++) {
-//                    batchArray.put(embedArray.getJSONObject(i));
-//                }
-//
-//                if (!batchArray.isEmpty()) {
-//                    JSONObject send = new JSONObject();
-//                    send.put("embeds", batchArray);
-//                    WebhookManager.send("donations", send);
-//                }
-//            }
-//        }
-//
-//        config().donations = config().donations + diff;
-//        Utils.initializer().integration().log("DonationFlutter", "Total donations: " + config().donations);
-//        config().save();
-//    }
 
     private void handleResults(List<Donation.ProcessResult<?>> results) {
         Map<Participant, Integer> lifeMap = new HashMap<>();
@@ -282,11 +242,8 @@ public class DonationFlutter implements Flutter {
                         }
                     }
                     case SHULKER_LOOT -> {
-                        ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
-                        Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
 
-                        while (!location.getBlock().getType().isAir()) location.add(0, 1, 0);
-                        new ShulkerDelivery(location).start();
+                        ConfigLocation configLocation = shulkerLoot();;
                         String msg = "A donation to " + participant.player().getName() + " has spawned a shulker delivery at the " + configLocation.id() + " POI!";
                         Utils.genericWebhook("donations", new Color(0x1471A5), "Shulker Delivery", null, msg);
                         Bukkit.broadcast(Component.text(msg, NamedTextColor.GREEN));
@@ -299,11 +256,22 @@ public class DonationFlutter implements Flutter {
                 }
             }
             for (Map.Entry<Participant, Integer> entry : lifeMap.entrySet()) {
-                entry.getKey().lives().add(entry.getValue());
+                entry.getKey().lives().set(Math.min(entry.getValue() + entry.getKey().lives().lives(), 3));
                 Utils.genericWebhook("donations", new Color(0x85FF00), "Lives", null, entry.getKey().player().getName() + " has received " + entry.getValue() + " extra life" + (entry.getValue() > 1 ? "s" : "") + " from donations! They now have " + entry.getKey().lives().get() + " life" + (entry.getKey().lives().get() > 1 ? "s" : "") + ".");
             }
             Utils.configs().PARTICIPANT_CONFIG().save();
+        } else {
+            Utils.initializer().integration().warn("DonationFlutter", "handleResults was run but no new donations were found.");
         }
         Utils.configs().DUNGEON_MANAGER.handleNewDonationTotal(true);
+    }
+
+    public static ConfigLocation shulkerLoot() {
+        ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
+        Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
+
+        while (!location.getBlock().getType().isAir()) location.add(0, 1, 0);
+        new ShulkerDelivery(location).start();
+        return configLocation;
     }
 }

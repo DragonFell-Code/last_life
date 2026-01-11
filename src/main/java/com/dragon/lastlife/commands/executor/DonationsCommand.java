@@ -3,11 +3,14 @@ package com.dragon.lastlife.commands.executor;
 import com.dragon.lastlife.Initializer;
 import com.dragon.lastlife.commands.CommandExecutor;
 import com.dragon.lastlife.config.object.ConfigLocation;
+import com.dragon.lastlife.donations.Donation;
+import com.dragon.lastlife.donations.DonationFlutter;
 import com.dragon.lastlife.donations.IncentiveType;
 import com.dragon.lastlife.loot.delivery.ShulkerDelivery;
 import com.dragon.lastlife.party.Party;
 import com.dragon.lastlife.players.Participant;
 import com.dragon.lastlife.utils.Utils;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -21,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static io.papermc.paper.command.brigadier.Commands.argument;
@@ -46,6 +51,26 @@ public class DonationsCommand extends CommandExecutor {
                                     Utils.donations().validateDonations();
                                     return 1;
                                 }))
+                        .then(literal("remove")
+                                .executes(a->1)
+                                .then(argument("donationId", StringArgumentType.string())
+                                        .executes(context -> {
+                                            String donationId = StringArgumentType.getString(context, "donationId");
+                                            Utils.configs().DONATION_CONFIG().processed.remove(donationId);
+                                            Utils.configs().DONATION_CONFIG().save();
+                                            context.getSource().getSender().sendMessage(Component.text("Donation with ID " + donationId + " removed.", NamedTextColor.GREEN));
+                                            return 1;
+                                        })
+                                        .suggests((context, builder) -> {
+                                            String[] donationIdArray = new String[Utils.configs().DONATION_CONFIG().processed.size()];
+                                            int i = 0;
+                                            for (Donation donation : Utils.configs().DONATION_CONFIG().processed.values()){
+                                                donationIdArray[i] = String.valueOf(donation.id);
+                                                i++;
+                                            }
+
+                                            return onlySimilar(donationIdArray, "donationId", context, builder);
+                                        })))
                         .then(literal("refresh")
                                 .executes(context -> {
                                     if (!context.getSource().getSender().hasPermission("lastlife.admin"))
@@ -102,10 +127,7 @@ public class DonationsCommand extends CommandExecutor {
                         .then(literal("shulker").executes(context -> {
                             if (!context.getSource().getSender().hasPermission("lastlife.admin"))
                                 return logError(context, "You do not have permission to use this command.");
-                            ConfigLocation configLocation = Utils.configs().POI_CONFIG().random();
-                            Location location = new Location(Bukkit.getWorld(configLocation.world), configLocation.x, configLocation.y, configLocation.z);
-                            while (!location.getBlock().getType().isAir()) location.add(0, 1, 0);
-                            new ShulkerDelivery(location).start();
+                            DonationFlutter.shulkerLoot();
                             String msg = "A donation to (null) has spawned a shulker delivery at the " + configLocation.id() + " POI!";
                             Utils.genericWebhook("donations", new Color(0x85FF00), "Shulker Delivery", null, msg);
                             Bukkit.broadcast(Component.text(msg, NamedTextColor.GREEN));
