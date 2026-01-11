@@ -18,11 +18,9 @@ import java.util.Random;
 import java.util.logging.Level;
 
 public class BundleDelivery extends DeliverySystem {
-
     private final Location location;
     private final Participant participant;
     private ArmorStand display; // Spinning chest display
-
 
     private double height = 20;
 
